@@ -19,7 +19,7 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="TypeAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} be type of {ExpectedType}, but it is {ValueType}</value>
+        <value>The data [{ValueName}] {AssertionType} be type of {ExpectedType}, but it is {ValueType}.</value>
         <comment>This is the message displayed on the home page.</comment>
     </data>
     <data name="Must" xml:space="preserve">
@@ -30,5 +30,11 @@
     </data>
     <data name="Could" xml:space="preserve">
         <value>COULD</value>
+    </data>
+    <data name="Reason" xml:space="preserve">
+        <value>Because: </value>
+    </data>
+    <data name="EqualityAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} be {ExpectedValue}, but it is {Value}.</value>
     </data>
 </root>

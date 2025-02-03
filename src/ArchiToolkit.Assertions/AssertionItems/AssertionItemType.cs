@@ -9,4 +9,9 @@ public enum AssertionItemType : byte
     /// For the data type.
     /// </summary>
     DataType,
+
+    /// <summary>
+    /// For the equality
+    /// </summary>
+    Equality,
 }

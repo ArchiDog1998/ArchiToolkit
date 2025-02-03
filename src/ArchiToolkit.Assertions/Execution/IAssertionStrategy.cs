@@ -19,6 +19,7 @@ public interface IAssertionStrategy
     /// Handle the assertions items.
     /// </summary>
     /// <param name="context"></param>
+    /// <param name="assertionType"></param>
     /// <param name="assertion"></param>
-    void HandleFailure(string context, AssertionItem assertion);
+    void HandleFailure(string context, AssertionType assertionType, AssertionItem assertion);
 }

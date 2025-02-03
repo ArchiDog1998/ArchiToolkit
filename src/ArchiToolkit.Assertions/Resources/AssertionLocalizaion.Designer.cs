@@ -60,7 +60,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could.
+        ///   Looks up a localized string similar to COULD.
         /// </summary>
         internal static string Could {
             get {
@@ -69,7 +69,16 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must.
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} be {ExpectedValue}, but it is {Value}..
+        /// </summary>
+        internal static string EqualityAssertion {
+            get {
+                return ResourceManager.GetString("EqualityAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MUST.
         /// </summary>
         internal static string Must {
             get {
@@ -78,7 +87,16 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Should.
+        ///   Looks up a localized string similar to Because: .
+        /// </summary>
+        internal static string Reason {
+            get {
+                return ResourceManager.GetString("Reason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SHOULD.
         /// </summary>
         internal static string Should {
             get {
@@ -87,7 +105,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data {0} {1} be type of {2}, but it is {3}.
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} be type of {ExpectedType}, but it is {ValueType}..
         /// </summary>
         internal static string TypeAssertion {
             get {

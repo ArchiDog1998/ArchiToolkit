@@ -59,21 +59,47 @@ public class Assertion<TValue> : IAssertion
     }
 
     /// <summary>
-    /// The item is type of.
+    /// The item should be.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <param name="expectValue"></param>
+    /// <param name="equalityComparer"></param>
+    /// <param name="reasonFormat"></param>
+    /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<Assertion<TValue>> BeTypeOf<T>()
+    public AndConstraint<Assertion<TValue>> Be(TValue expectValue,
+        IEqualityComparer<TValue>? equalityComparer = null, string reasonFormat = "", params object?[] reasonArgs)
     {
-        var message = FormatString(AssertionLocalizaion.TypeAssertion,
-            new Argument("ValueType", Value?.GetType().GetFullName()),
-            new Argument("ExpectedType", typeof(T).GetFullName()));
+        var comparer = equalityComparer ?? EqualityComparer<TValue>.Default;
+        if (IsSucceed(comparer.Equals(Value, expectValue))) return new AndConstraint<Assertion<TValue>>(this);
 
-        AddAssertionItem(AssertionItemType.DataType, message, Value is T);
+        var message = FormatString(AssertionLocalizaion.EqualityAssertion,
+            string.Format(reasonFormat, reasonArgs),
+            new Argument("ExpectValue", expectValue));
+
+        AddAssertionItem(AssertionItemType.Equality, message);
         return new AndConstraint<Assertion<TValue>>(this);
     }
 
-    private string FormatString(string formatString, params Argument[] arguments)
+    /// <summary>
+    /// The item is type of.
+    /// </summary>
+    /// <param name="reasonFormat"></param>
+    /// <param name="reasonArgs"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public AndConstraint<Assertion<TValue>> BeTypeOf<T>(string reasonFormat = "", params object?[] reasonArgs)
+    {
+        if (IsSucceed(Value is T)) return new AndConstraint<Assertion<TValue>>(this);
+        var message = FormatString(AssertionLocalizaion.TypeAssertion,
+            string.Format(reasonFormat, reasonArgs),
+            new Argument("ValueType", Value?.GetType().GetFullName()),
+            new Argument("ExpectedType", typeof(T).GetFullName()));
+
+        AddAssertionItem(AssertionItemType.DataType, message);
+        return new AndConstraint<Assertion<TValue>>(this);
+    }
+
+    private string FormatString(string formatString, string reason, params Argument[] arguments)
     {
         Argument[] allArguments =
         [
@@ -91,22 +117,31 @@ public class Assertion<TValue> : IAssertion
         var index = 0;
         formatString = allArguments.Aggregate(formatString,
             (current, argument) => current.ReplacePlaceHolder(argument.Name, (index++).ToString()));
-        return string.Format(formatString, [..allArguments.Select(a => a.Value)]);
+        var result = string.Format(formatString, [..allArguments.Select(a => a.Value)]);
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            result += $"\n{AssertionLocalizaion.Reason}{reason}";
+        }
+
+        return result;
     }
 
-    private void AddAssertionItem(AssertionItemType type, string message, bool succeed)
+    private bool IsSucceed(bool succeed)
     {
         try
         {
-            var passed = _reversed ? !succeed : succeed;
-            if (passed) return;
-            var item = new AssertionItem(type, message, new StackTrace(), DateTimeOffset.Now);
-            _items.Add(item);
-            _scope.PushAssertionItem(item);
+            return _reversed ? !succeed : succeed;
         }
         finally
         {
             _reversed = false;
         }
+    }
+
+    private void AddAssertionItem(AssertionItemType type, string message)
+    {
+        var item = new AssertionItem(type, message, new StackTrace(2, true), DateTimeOffset.Now);
+        _items.Add(item);
+        _scope.PushAssertionItem(item, Type);
     }
 }

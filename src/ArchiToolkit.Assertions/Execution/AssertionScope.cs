@@ -18,17 +18,27 @@ public class AssertionScope : IDisposable
     /// </summary>
     public static AssertionScope Current
     {
-        get => CurrentScope.Value ?? new AssertionScope(null!, string.Empty);
+        get => CurrentScope.Value ?? new AssertionScope(AssertionService.DefaultPushStrategy, string.Empty);
         set => CurrentScope.Value = value;
     }
+
     private static readonly AsyncLocal<AssertionScope?> CurrentScope = new();
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="context"></param>
+    public AssertionScope(string context = "")
+        : this(AssertionService.DefaultScopeStrategy, context)
+    {
+    }
 
     /// <summary>
     /// Add the assertion.
     /// </summary>
     /// <param name="strategy"></param>
     /// <param name="context"></param>
-    public AssertionScope(IAssertionStrategy strategy, string context)
+    public AssertionScope(IAssertionStrategy strategy, string context= "")
     {
         _strategy = strategy;
         _parent = CurrentScope.Value;
@@ -42,9 +52,9 @@ public class AssertionScope : IDisposable
         _assertions.Add(assertion);
     }
 
-    internal void PushAssertionItem(AssertionItem assertionItem)
+    internal void PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType)
     {
-        _strategy.HandleFailure(_context, assertionItem);
+        _strategy.HandleFailure(_context, assertionType, assertionItem);
     }
 
     /// <inheritdoc />
@@ -54,6 +64,7 @@ public class AssertionScope : IDisposable
         {
             CurrentScope.Value = _parent;
         }
+
         GC.SuppressFinalize(this);
 
         _strategy.HandleFailure(_context, _assertions);
