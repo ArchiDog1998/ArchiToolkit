@@ -76,7 +76,7 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         if (IsSucceed(predicate.Compile()(Value), out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalizaion.MatchAssertion,
+        var message = FormatString(AssertionLocalization.MatchAssertion,
             string.Format(reasonFormat, reasonArgs),reverse,
             new Argument("Expression", predicate.Body));
 
@@ -104,7 +104,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var realComparer = comparer ?? Comparer<TValue>.Default;
         if (IsSucceed(realComparer.Compare(Value, minimumValue) >= 0 && realComparer.Compare(Value, maximumValue) <= 0, out var reverse))
             return new AndConstraint<ObjectAssertion<TValue>>(this);
-        var message = FormatString(AssertionLocalizaion.RangeAssertion,
+        var message = FormatString(AssertionLocalization.RangeAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("MinimumValue", minimumValue),
             new Argument("MaximumValue", maximumValue));
@@ -132,7 +132,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var realComparer = comparer ?? Comparer<TValue>.Default;
         if (IsSucceed(realComparer.Compare(Value, expectedValue) >= 0, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalizaion.GreaterOrEqualAssertion,
+        var message = FormatString(AssertionLocalization.GreaterOrEqualAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ComparedValue", expectedValue));
 
@@ -154,7 +154,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var realComparer = comparer ?? Comparer<TValue>.Default;
         if (IsSucceed(realComparer.Compare(Value, expectedValue) > 0, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalizaion.GreaterAssertion,
+        var message = FormatString(AssertionLocalization.GreaterAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ComparedValue", expectedValue));
 
@@ -176,7 +176,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var realComparer = comparer ?? Comparer<TValue>.Default;
         if (IsSucceed(realComparer.Compare(Value, expectedValue) <= 0, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalizaion.LessOrEqualAssertion,
+        var message = FormatString(AssertionLocalization.LessOrEqualAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ComparedValue", expectedValue));
 
@@ -198,7 +198,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var realComparer = comparer ?? Comparer<TValue>.Default;
         if (IsSucceed(realComparer.Compare(Value, expectedValue) < 0, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalizaion.LessAssertion,
+        var message = FormatString(AssertionLocalization.LessAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ComparedValue", expectedValue));
 
@@ -224,7 +224,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var realComparer = equalityComparer ?? Comparer<TValue>.Default;
         if (IsSucceed(realComparer.Compare(Value, expectedValue) == 0, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalizaion.EqualityAssertion,
+        var message = FormatString(AssertionLocalization.EqualityAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ExpectedValue", expectedValue));
 
@@ -247,7 +247,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var comparer = equalityComparer ?? EqualityComparer<TValue>.Default;
         if (IsSucceed(comparer.Equals(Value, expectedValue), out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalizaion.EqualityAssertion,
+        var message = FormatString(AssertionLocalization.EqualityAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ExpectedValue", expectedValue));
 
@@ -270,7 +270,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var values = expectedValues as TValue[] ?? expectedValues.ToArray();
         if (IsSucceed(values.Contains(Value, comparer), out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalizaion.OneOfAssertion,
+        var message = FormatString(AssertionLocalization.OneOfAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ExpectedValues", values.GetItemsString()));
 
@@ -292,7 +292,7 @@ public class ObjectAssertion<TValue> : IAssertion
     public AndConstraint<ObjectAssertion<TValue>> BeAssignableTo<T>(string reasonFormat = "", params object?[] reasonArgs)
     {
         if (IsSucceed(Value is T, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
-        var message = FormatString(AssertionLocalizaion.AssignableAssertion,
+        var message = FormatString(AssertionLocalization.AssignableAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ValueType", Value?.GetType().GetFullName()),
             new Argument("ExpectedType", typeof(T).GetFullName()));
@@ -328,7 +328,7 @@ public class ObjectAssertion<TValue> : IAssertion
                 ? subjectType.GetGenericTypeDefinition() == expectedType
                 : subjectType == expectedType, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalizaion.TypeAssertion,
+        var message = FormatString(AssertionLocalization.TypeAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ValueType", Value?.GetType().GetFullName()),
             new Argument("ExpectedType", expectedType.GetFullName()));
@@ -350,7 +350,7 @@ public class ObjectAssertion<TValue> : IAssertion
     public AndConstraint<ObjectAssertion<TValue>> BeNull(string reasonFormat = "", params object?[] reasonArgs)
     {
         if (IsSucceed(Value is null, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
-        var message = FormatString(AssertionLocalizaion.NullAssertion,
+        var message = FormatString(AssertionLocalization.NullAssertion,
             string.Format(reasonFormat, reasonArgs), reverse);
 
         AddAssertionItem(AssertionItemType.DataType, message);
@@ -369,12 +369,12 @@ public class ObjectAssertion<TValue> : IAssertion
             new(nameof(ValueName), ValueName),
             new(nameof(AssertionType), Type switch
             {
-                AssertionType.Must => AssertionLocalizaion.Must,
-                AssertionType.Should => AssertionLocalizaion.Should,
-                AssertionType.Could => AssertionLocalizaion.Could,
+                AssertionType.Must => AssertionLocalization.Must,
+                AssertionType.Should => AssertionLocalization.Should,
+                AssertionType.Could => AssertionLocalization.Could,
                 _ => "Unknown",
             }),
-            new("Not", reverse ? AssertionLocalizaion.Not : string.Empty),
+            new("Not", reverse ? AssertionLocalization.Not : string.Empty),
             ..arguments
         ];
         var index = 0;
@@ -383,7 +383,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var result = string.Format(formatString, [..allArguments.Select(a => a.Value)]);
         if (!string.IsNullOrWhiteSpace(reason))
         {
-            result += $"\n{string.Format(AssertionLocalizaion.Reason, reason)}";
+            result += $"\n{string.Format(AssertionLocalization.Reason, reason)}";
         }
 
         return result;

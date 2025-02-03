@@ -35,7 +35,7 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
         if (IsSucceed(Value.Contains(expectedValue, comparer), out var reverse)) return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalizaion.ContainAssertion,
+        var message = FormatString(AssertionLocalization.ContainAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ExpectedValue", expectedValue));
 
@@ -56,7 +56,7 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         var func = predicate.Compile();
         if (IsSucceed(Value.Any(func), out var reverse)) return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalizaion.ContaionExpressionAssesrtion,
+        var message = FormatString(AssertionLocalization.ContaionExpressionAssesrtion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("Expression", predicate.Body));
 
@@ -79,7 +79,7 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         var values = expectedValues as TItem[] ?? expectedValues.ToArray();
         if (IsSucceed(values.Except(Value, comparer).Any(), out var reverse)) return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalizaion.ContainAssertion,
+        var message = FormatString(AssertionLocalization.ContainAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ExpectedValues", values.GetItemsString()));
 
@@ -100,7 +100,7 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         var actualCount = Value.Count();
         if (IsSucceed(actualCount == expectedCount, out var reverse)) return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalizaion.CountAssertion,
+        var message = FormatString(AssertionLocalization.CountAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ActualCount", actualCount),
             new Argument("ExpectedCount", expectedCount));
@@ -122,7 +122,7 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         var actualCount = Value.Count();
         if (IsSucceed(actualCount > expectedCount, out var reverse)) return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalizaion.CountGreaterAssertion,
+        var message = FormatString(AssertionLocalization.CountGreaterAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ActualCount", actualCount),
             new Argument("ExpectedCount", expectedCount));
@@ -144,7 +144,7 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         var actualCount = Value.Count();
         if (IsSucceed(actualCount >= expectedCount, out var reverse)) return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalizaion.CountGreaterOrEqualAssertion,
+        var message = FormatString(AssertionLocalization.CountGreaterOrEqualAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ActualCount", actualCount),
             new Argument("ExpectedCount", expectedCount));
@@ -166,7 +166,7 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         var actualCount = Value.Count();
         if (IsSucceed(actualCount < expectedCount, out var reverse)) return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalizaion.CountLessAssertion,
+        var message = FormatString(AssertionLocalization.CountLessAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ActualCount", actualCount),
             new Argument("ExpectedCount", expectedCount));
@@ -188,7 +188,7 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         var actualCount = Value.Count();
         if (IsSucceed(actualCount <= expectedCount, out var reverse)) return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalizaion.CountLessOrEqualAssertion,
+        var message = FormatString(AssertionLocalization.CountLessOrEqualAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("ActualCount", actualCount),
             new Argument("ExpectedCount", expectedCount));
