@@ -197,5 +197,4 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
     }
     #endregion
-
 }

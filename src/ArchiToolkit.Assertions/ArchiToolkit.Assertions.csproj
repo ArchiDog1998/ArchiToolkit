@@ -4,6 +4,7 @@
         <Title>Assertion</Title>
         <Description>Some amazing assertion.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Version>0.9.0</Version>
     </PropertyGroup>
 
     <ItemGroup>

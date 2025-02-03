@@ -17,6 +17,7 @@ public static class AssertionExtensions
     /// <param name="valueName"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
+    [OverloadResolutionPriority(-1)]
     public static ObjectAssertion<T> Must<T>(this T value, [CallerArgumentExpression(nameof(value))] string valueName = "")
     {
         return new ObjectAssertion<T>(value, valueName, AssertionType.Must);
@@ -29,6 +30,7 @@ public static class AssertionExtensions
     /// <param name="valueName"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
+    [OverloadResolutionPriority(-1)]
     public static ObjectAssertion<T> Should<T>(this T value, [CallerArgumentExpression(nameof(value))] string valueName = "")
     {
         return new ObjectAssertion<T>(value, valueName, AssertionType.Should);
@@ -41,6 +43,7 @@ public static class AssertionExtensions
     /// <param name="valueName"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
+    [OverloadResolutionPriority(-1)]
     public static ObjectAssertion<T> Could<T>(this T value, [CallerArgumentExpression(nameof(value))] string valueName = "")
     {
         return new ObjectAssertion<T>(value, valueName, AssertionType.Could);

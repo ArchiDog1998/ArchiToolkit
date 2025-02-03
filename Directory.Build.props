@@ -3,7 +3,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
-        <TargetFrameworks>net9.0;net5.0;net6.0;net8.0;net472;net48</TargetFrameworks>
+        <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0;net472;net48</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/ArchiDog1998/ArchiToolkit</RepositoryUrl>
