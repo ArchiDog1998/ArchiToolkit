@@ -1,7 +1,7 @@
 ﻿namespace ArchiToolkit.Assertions.Constraints;
 
 /// <summary>
-/// Just the And Constratint
+/// Just the And Constraint
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class AndConstraint<T>

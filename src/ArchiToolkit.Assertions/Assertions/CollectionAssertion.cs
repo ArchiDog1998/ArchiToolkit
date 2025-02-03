@@ -22,6 +22,30 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     #region ItemEquality
 
     /// <summary>
+    /// Get if the item contain single.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="reasonFormat"></param>
+    /// <param name="reasonArgs"></param>
+    /// <returns></returns>
+    public AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem?>
+        ContainSingle(Expression<Func<TItem, bool>> predicate, string reasonFormat = "", params object?[] reasonArgs)
+    {
+        var func = predicate.Compile();
+        var items = Value.Where(func).ToArray();
+        if (IsSucceed(items.Length is 1, out var reverse))
+            return new AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem?>(this, items.FirstOrDefault());
+
+        var message = FormatString(AssertionLocalization.ContainSingleExpressionAssertion,
+            string.Format(reasonFormat, reasonArgs), reverse,
+            new Argument("MatchedCount", items.Length),
+            new Argument("Expression", predicate.Body));
+
+        AddAssertionItem(AssertionItemType.ItemEquality, message);
+        return new AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem?>(this, items.FirstOrDefault());
+    }
+
+    /// <summary>
     /// Contains items
     /// </summary>
     /// <param name="expectedValue"></param>
@@ -56,7 +80,7 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         var func = predicate.Compile();
         if (IsSucceed(Value.Any(func), out var reverse)) return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalization.ContaionExpressionAssesrtion,
+        var message = FormatString(AssertionLocalization.ContainExpressionAssertion,
             string.Format(reasonFormat, reasonArgs), reverse,
             new Argument("Expression", predicate.Body));
 

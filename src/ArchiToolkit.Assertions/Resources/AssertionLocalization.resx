@@ -70,7 +70,7 @@
     <data name="ContainAssertion" xml:space="preserve">
         <value>The data [{ValueName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Value}.</value>
     </data>
-    <data name="ContaionExpressionAssesrtion" xml:space="preserve">
+    <data name="ContainExpressionAssertion" xml:space="preserve">
         <value>The data [{ValueName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Value}.</value>
     </data>
     <data name="CountAssertion" xml:space="preserve">
@@ -87,5 +87,8 @@
     </data>
     <data name="CountLessOrEqualAssertion" xml:space="preserve">
         <value>The data [{ValueName}] {AssertionType} {Not}contain at most {ExpectedCount} item(s), but there are {ActualCount} item(s).</value>
+    </data>
+    <data name="ContainSingleExpressionAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}have a single item matching {Expression}, but there are {MatchedCount} item(s).</value>
     </data>
 </root>
