@@ -85,13 +85,16 @@ namespace ArchiToolkit.Assertions.Resources {
                 return ResourceManager.GetString("ContainExpressionAssertion", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have a single item matching {Expression}, but there are {MatchedCount} item(s)..
+        /// </summary>
         internal static string ContainSingleExpressionAssertion {
             get {
                 return ResourceManager.GetString("ContainSingleExpressionAssertion", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to COULD.
         /// </summary>
