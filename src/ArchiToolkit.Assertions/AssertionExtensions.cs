@@ -8,11 +8,7 @@ namespace ArchiToolkit.Assertions;
 /// </summary>
 public static class AssertionExtensions
 {
-    private static void Foo()
-    {
-        int a = 10;
-        a.Should().Not().BeTypeOf<double>();
-    }
+    #region Object
 
     /// <summary>
     /// The must assertion
@@ -21,9 +17,9 @@ public static class AssertionExtensions
     /// <param name="valueName"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static Assertion<T> Must<T>(this T value, [CallerArgumentExpression(nameof(value))] string valueName = "")
+    public static ObjectAssertion<T> Must<T>(this T value, [CallerArgumentExpression(nameof(value))] string valueName = "")
     {
-        return new Assertion<T>(value, valueName, AssertionType.Must);
+        return new ObjectAssertion<T>(value, valueName, AssertionType.Must);
     }
 
     /// <summary>
@@ -33,9 +29,9 @@ public static class AssertionExtensions
     /// <param name="valueName"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static Assertion<T> Should<T>(this T value, [CallerArgumentExpression(nameof(value))] string valueName = "")
+    public static ObjectAssertion<T> Should<T>(this T value, [CallerArgumentExpression(nameof(value))] string valueName = "")
     {
-        return new Assertion<T>(value, valueName, AssertionType.Should);
+        return new ObjectAssertion<T>(value, valueName, AssertionType.Should);
     }
 
     /// <summary>
@@ -45,8 +41,50 @@ public static class AssertionExtensions
     /// <param name="valueName"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static Assertion<T> Could<T>(this T value, [CallerArgumentExpression(nameof(value))] string valueName = "")
+    public static ObjectAssertion<T> Could<T>(this T value, [CallerArgumentExpression(nameof(value))] string valueName = "")
     {
-        return new Assertion<T>(value, valueName, AssertionType.Could);
+        return new ObjectAssertion<T>(value, valueName, AssertionType.Could);
     }
+
+    #endregion
+
+    #region Collection
+
+    /// <summary>
+    /// The must assertion
+    /// </summary>
+    /// <param name="collection"></param>
+    /// <param name="valueName"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static CollectionAssertion<IEnumerable<T>, T> Must<T>(this IEnumerable<T> collection, [CallerArgumentExpression(nameof(collection))] string valueName = "")
+    {
+        return new CollectionAssertion<IEnumerable<T>, T>(collection, valueName, AssertionType.Must);
+    }
+
+    /// <summary>
+    /// The things should be.
+    /// </summary>
+    /// <param name="collection"></param>
+    /// <param name="valueName"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static CollectionAssertion<IEnumerable<T>, T> Should<T>(this IEnumerable<T> collection, [CallerArgumentExpression(nameof(collection))] string valueName = "")
+    {
+        return new CollectionAssertion<IEnumerable<T>, T>(collection, valueName, AssertionType.Should);
+    }
+
+    /// <summary>
+    /// The things could be.
+    /// </summary>
+    /// <param name="collection"></param>
+    /// <param name="valueName"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static CollectionAssertion<IEnumerable<T>, T> Could<T>(this IEnumerable<T> collection, [CallerArgumentExpression(nameof(collection))] string valueName = "")
+    {
+        return new CollectionAssertion<IEnumerable<T>, T>(collection, valueName, AssertionType.Could);
+    }
+
+    #endregion
 }

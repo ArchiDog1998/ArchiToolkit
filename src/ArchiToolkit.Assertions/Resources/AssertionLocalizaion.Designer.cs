@@ -60,6 +60,33 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be assignable to {ExpectedType}, but it is {ValueType}.
+        /// </summary>
+        internal static string AssignableAssertion {
+            get {
+                return ResourceManager.GetString("AssignableAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Value}..
+        /// </summary>
+        internal static string ContainAssertion {
+            get {
+                return ResourceManager.GetString("ContainAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Value}..
+        /// </summary>
+        internal static string ContaionExpressionAssesrtion {
+            get {
+                return ResourceManager.GetString("ContaionExpressionAssesrtion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to COULD.
         /// </summary>
         internal static string Could {
@@ -69,11 +96,101 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} be {ExpectedValue}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}contain {ExpectedCount} item(s), but there are {ActualCount} item(s)..
+        /// </summary>
+        internal static string CountAssertion {
+            get {
+                return ResourceManager.GetString("CountAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}contain more than {ExpectedCount} item(s), but there are {ActualCount} item(s)..
+        /// </summary>
+        internal static string CountGreaterAssertion {
+            get {
+                return ResourceManager.GetString("CountGreaterAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}contain at least {ExpectedCount} item(s), but there are {ActualCount} item(s)..
+        /// </summary>
+        internal static string CountGreaterOrEqualAssertion {
+            get {
+                return ResourceManager.GetString("CountGreaterOrEqualAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}contain fewer than {ExpectedCount} item(s), but there are {ActualCount} item(s)..
+        /// </summary>
+        internal static string CountLessAssertion {
+            get {
+                return ResourceManager.GetString("CountLessAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}contain at most {ExpectedCount} item(s), but there are {ActualCount} item(s)..
+        /// </summary>
+        internal static string CountLessOrEqualAssertion {
+            get {
+                return ResourceManager.GetString("CountLessOrEqualAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be {ExpectedValue}, but it is {Value}..
         /// </summary>
         internal static string EqualityAssertion {
             get {
                 return ResourceManager.GetString("EqualityAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be greater than {ComparedValue}, but it is {Value}..
+        /// </summary>
+        internal static string GreaterAssertion {
+            get {
+                return ResourceManager.GetString("GreaterAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be greater than or equal to {ComparedValue}, but it is {Value}..
+        /// </summary>
+        internal static string GreaterOrEqualAssertion {
+            get {
+                return ResourceManager.GetString("GreaterOrEqualAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be less than {ComparedValue}, but it is {Value}..
+        /// </summary>
+        internal static string LessAssertion {
+            get {
+                return ResourceManager.GetString("LessAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be less than or equal to {ComparedValue}, but it is {Value}..
+        /// </summary>
+        internal static string LessOrEqualAssertion {
+            get {
+                return ResourceManager.GetString("LessOrEqualAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}match {Expression}, but it is {Value}..
+        /// </summary>
+        internal static string MatchAssertion {
+            get {
+                return ResourceManager.GetString("MatchAssertion", resourceCulture);
             }
         }
         
@@ -87,7 +204,43 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Because: .
+        ///   Looks up a localized string similar to not .
+        /// </summary>
+        internal static string Not {
+            get {
+                return ResourceManager.GetString("Not", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be null, but it is {Value}..
+        /// </summary>
+        internal static string NullAssertion {
+            get {
+                return ResourceManager.GetString("NullAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be one of {ExpectedValues}, but it is {Value}..
+        /// </summary>
+        internal static string OneOfAssertion {
+            get {
+                return ResourceManager.GetString("OneOfAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be between {MinimumValue} and {MaximumValue}, but it is {Value}..
+        /// </summary>
+        internal static string RangeAssertion {
+            get {
+                return ResourceManager.GetString("RangeAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Because: {0}.
         /// </summary>
         internal static string Reason {
             get {
@@ -105,7 +258,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} be type of {ExpectedType}, but it is {ValueType}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be type of {ExpectedType}, but it is {ValueType}..
         /// </summary>
         internal static string TypeAssertion {
             get {

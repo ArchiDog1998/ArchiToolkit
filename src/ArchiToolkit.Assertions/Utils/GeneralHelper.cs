@@ -26,4 +26,14 @@ internal static class GeneralHelper
 
         static string GetTypeName(Type type) => type.FullName ?? type.Name;
     }
+
+    public static string GetItemsString<T>(this IEnumerable<T> items)
+    {
+        const int maxItems = 10;
+
+        var objects = items as T[] ?? items.ToArray();
+        return objects.Length > maxItems
+            ? $"({objects.Length})[{string.Join(", ", objects.Take(maxItems))}, ...]"
+            : $"[{string.Join(", ", objects)}]";
+    }
 }

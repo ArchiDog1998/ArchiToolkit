@@ -12,7 +12,7 @@ public class GeneralTests
 
         using (new AssertionScope("你好"))
         {
-            a.Must().BeTypeOf<double>("Bad reason.");
+            a.Must().BeAssignableTo<double>("Bad reason.");
         }
     }
 }

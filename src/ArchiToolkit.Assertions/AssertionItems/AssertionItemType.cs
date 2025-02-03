@@ -14,4 +14,34 @@ public enum AssertionItemType : byte
     /// For the equality
     /// </summary>
     Equality,
+
+    /// <summary>
+    /// The comparison
+    /// </summary>
+    Comparison,
+
+    /// <summary>
+    /// The custom match.
+    /// </summary>
+    Match,
+
+    /// <summary>
+    /// The in range.
+    /// </summary>
+    Range,
+
+    /// <summary>
+    /// Null check.
+    /// </summary>
+    Null,
+
+    /// <summary>
+    /// The equality of the items.
+    /// </summary>
+    ItemEquality,
+
+    /// <summary>
+    /// The Count
+    /// </summary>
+    ItemCount,
 }

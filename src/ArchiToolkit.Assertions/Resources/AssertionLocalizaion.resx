@@ -19,7 +19,7 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="TypeAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} be type of {ExpectedType}, but it is {ValueType}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be type of {ExpectedType}, but it is {ValueType}.</value>
         <comment>This is the message displayed on the home page.</comment>
     </data>
     <data name="Must" xml:space="preserve">
@@ -32,9 +32,60 @@
         <value>COULD</value>
     </data>
     <data name="Reason" xml:space="preserve">
-        <value>Because: </value>
+        <value>Because: {0}</value>
     </data>
     <data name="EqualityAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} be {ExpectedValue}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be {ExpectedValue}, but it is {Value}.</value>
+    </data>
+    <data name="LessAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be less than {ComparedValue}, but it is {Value}.</value>
+    </data>
+    <data name="LessOrEqualAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be less than or equal to {ComparedValue}, but it is {Value}.</value>
+    </data>
+    <data name="GreaterAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be greater than {ComparedValue}, but it is {Value}.</value>
+    </data>
+    <data name="GreaterOrEqualAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be greater than or equal to {ComparedValue}, but it is {Value}.</value>
+    </data>
+    <data name="MatchAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}match {Expression}, but it is {Value}.</value>
+    </data>
+    <data name="RangeAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be between {MinimumValue} and {MaximumValue}, but it is {Value}.</value>
+    </data>
+    <data name="OneOfAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be one of {ExpectedValues}, but it is {Value}.</value>
+    </data>
+    <data name="AssignableAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be assignable to {ExpectedType}, but it is {ValueType}</value>
+    </data>
+    <data name="NullAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be null, but it is {Value}.</value>
+    </data>
+    <data name="Not" xml:space="preserve">
+        <value>not </value>
+    </data>
+    <data name="ContainAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Value}.</value>
+    </data>
+    <data name="ContaionExpressionAssesrtion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Value}.</value>
+    </data>
+    <data name="CountAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}contain {ExpectedCount} item(s), but there are {ActualCount} item(s).</value>
+    </data>
+    <data name="CountGreaterAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}contain more than {ExpectedCount} item(s), but there are {ActualCount} item(s).</value>
+    </data>
+    <data name="CountGreaterOrEqualAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}contain at least {ExpectedCount} item(s), but there are {ActualCount} item(s).</value>
+    </data>
+    <data name="CountLessAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}contain fewer than {ExpectedCount} item(s), but there are {ActualCount} item(s).</value>
+    </data>
+    <data name="CountLessOrEqualAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}contain at most {ExpectedCount} item(s), but there are {ActualCount} item(s).</value>
     </data>
 </root>
