@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit", "ArchiToolki
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Analyzer", "ArchiToolkit.Analyzer\ArchiToolkit.Analyzer.csproj", "{4399D4C0-A647-4F06-9EFD-1BE673769433}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions", "src\ArchiToolkit.Assertions\ArchiToolkit.Assertions.csproj", "{09587BBC-ED85-42E4-B631-EE7217871B58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions.Tests", "tests\ArchiToolkit.Assertions.Tests\ArchiToolkit.Assertions.Tests.csproj", "{00801ED4-5DF5-43BC-BDAA-A64FAFD94574}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{4399D4C0-A647-4F06-9EFD-1BE673769433}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4399D4C0-A647-4F06-9EFD-1BE673769433}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4399D4C0-A647-4F06-9EFD-1BE673769433}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09587BBC-ED85-42E4-B631-EE7217871B58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09587BBC-ED85-42E4-B631-EE7217871B58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09587BBC-ED85-42E4-B631-EE7217871B58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09587BBC-ED85-42E4-B631-EE7217871B58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00801ED4-5DF5-43BC-BDAA-A64FAFD94574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00801ED4-5DF5-43BC-BDAA-A64FAFD94574}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00801ED4-5DF5-43BC-BDAA-A64FAFD94574}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00801ED4-5DF5-43BC-BDAA-A64FAFD94574}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
