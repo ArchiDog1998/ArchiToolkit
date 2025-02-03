@@ -1,16 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <Title>Const</Title>
         <Description>Make the parameter const, just like cpp.</Description>
         <TargetFrameworks>net5.0;net8.0;net48;net9.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
-        <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-        <GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<RepositoryUrl>https://github.com/ArchiDog1998/ArchiToolkit</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Version>0.10.14</Version>
     </PropertyGroup>

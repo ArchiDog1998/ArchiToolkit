@@ -1,4 +1,5 @@
 ﻿using ArchiToolkit.Assertions.Execution;
+using TUnit.Core;
 
 namespace ArchiToolkit.Assertions.Tests;
 
