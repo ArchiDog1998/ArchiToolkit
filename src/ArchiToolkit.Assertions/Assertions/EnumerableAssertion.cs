@@ -12,30 +12,43 @@ namespace ArchiToolkit.Assertions.Assertions;
 /// </summary>
 /// <typeparam name="TValue"></typeparam>
 /// <typeparam name="TItem"></typeparam>
-public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where TValue : IEnumerable<TItem>
+public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where TValue : IEnumerable<TItem>
 {
-    internal CollectionAssertion(TValue value, string valueName, AssertionType type) : base(value, valueName, type)
+    internal EnumerableAssertion(TValue subject, string valueName, AssertionType type) : base(subject, valueName, type)
     {
     }
 
-    internal AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem> AssertCheck(Func<TItem> result, bool succeed, AssertionItemType assertionItemType,
+    internal AndWhichConstraint<EnumerableAssertion<TValue, TItem>, TItem> AssertCheck(Func<TItem> result, bool succeed, AssertionItemType assertionItemType,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string formatString, Argument[] additionalArguments,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat, object?[] reasonArgs)
     {
-        return AssertCheck(new AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem>(this, result), succeed, assertionItemType, formatString,
+        return AssertCheck(new AndWhichConstraint<EnumerableAssertion<TValue, TItem>, TItem>(this, result), succeed, assertionItemType, formatString,
             additionalArguments, reasonFormat, reasonArgs);
     }
 
-    internal new AndConstraint<CollectionAssertion<TValue, TItem>> AssertCheck(bool succeed, AssertionItemType assertionItemType,
+    internal new AndConstraint<EnumerableAssertion<TValue, TItem>> AssertCheck(bool succeed, AssertionItemType assertionItemType,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string formatString, Argument[] additionalArguments,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat, object?[] reasonArgs)
     {
-        return AssertCheck(new AndConstraint<CollectionAssertion<TValue, TItem>>(this), succeed, assertionItemType, formatString,
+        return AssertCheck(new AndConstraint<EnumerableAssertion<TValue, TItem>>(this), succeed, assertionItemType, formatString,
             additionalArguments, reasonFormat, reasonArgs);
+    }
+
+    /// <summary>
+    /// Not
+    /// </summary>
+    /// <returns></returns>
+    public new EnumerableAssertion<TValue, TItem> Not
+    {
+        get
+        {
+            ReverseNot();
+            return this;
+        }
     }
 
     #region ItemEquality
@@ -47,11 +60,11 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem>
+    public AndWhichConstraint<EnumerableAssertion<TValue, TItem>, TItem>
         ContainSingle(Expression<Func<TItem, bool>> predicate, string reasonFormat = "", params object?[] reasonArgs)
     {
         var func = predicate.Compile();
-        var items = Value.Where(func).ToArray();
+        var items = Subject.Where(func).ToArray();
 
         return AssertCheck(() => items.First(), items.Length is 1, AssertionItemType.ItemEquality,
             AssertionLocalization.ContainSingleExpressionAssertion,
@@ -70,12 +83,12 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<CollectionAssertion<TValue, TItem>> Contain(TItem expectedValue,
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> Contain(TItem expectedValue,
         IEqualityComparer<TItem>? equalityComparer = null, string reasonFormat = "", params object?[] reasonArgs)
     {
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
 
-        return AssertCheck(Value.Contains(expectedValue, comparer), AssertionItemType.ItemEquality,
+        return AssertCheck(Subject.Contains(expectedValue, comparer), AssertionItemType.ItemEquality,
             AssertionLocalization.ContainAssertion,
             [
                 new Argument("ExpectedValue", expectedValue)
@@ -90,11 +103,11 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<CollectionAssertion<TValue, TItem>> Contain(Expression<Func<TItem, bool>> predicate,
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> Contain(Expression<Func<TItem, bool>> predicate,
         string reasonFormat = "", params object?[] reasonArgs)
     {
         var func = predicate.Compile();
-        return AssertCheck(Value.Any(func), AssertionItemType.ItemEquality,
+        return AssertCheck(Subject.Any(func), AssertionItemType.ItemEquality,
             AssertionLocalization.ContainExpressionAssertion,
             [
                 new Argument("Expression", predicate.Body)
@@ -110,13 +123,13 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<CollectionAssertion<TValue, TItem>> Contain(IEnumerable<TItem> expectedValues,
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> Contain(IEnumerable<TItem> expectedValues,
         IEqualityComparer<TItem>? equalityComparer = null, string reasonFormat = "", params object?[] reasonArgs)
     {
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
         var values = expectedValues as TItem[] ?? expectedValues.ToArray();
 
-        return AssertCheck(values.Except(Value, comparer).Any(), AssertionItemType.ItemEquality,
+        return AssertCheck(values.Except(Subject, comparer).Any(), AssertionItemType.ItemEquality,
             AssertionLocalization.ContainAssertion,
             [
                 new Argument("ExpectedValues", values)
@@ -135,10 +148,10 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<CollectionAssertion<TValue, TItem>> HaveCount(int expectedCount, string reasonFormat = "",
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCount(int expectedCount, string reasonFormat = "",
         params object?[] reasonArgs)
     {
-        var actualCount = Value.Count();
+        var actualCount = Subject.Count();
 
         return AssertCheck(actualCount == expectedCount, AssertionItemType.ItemCount,
             AssertionLocalization.CountAssertion,
@@ -156,11 +169,11 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<CollectionAssertion<TValue, TItem>> HaveCountGreaterThan(int expectedCount,
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCountGreaterThan(int expectedCount,
         string reasonFormat = "",
         params object?[] reasonArgs)
     {
-        var actualCount = Value.Count();
+        var actualCount = Subject.Count();
         return AssertCheck(actualCount > expectedCount, AssertionItemType.ItemCount,
             AssertionLocalization.CountGreaterAssertion,
             [
@@ -176,11 +189,11 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<CollectionAssertion<TValue, TItem>> HaveCountGreaterThanOrEqualTo(int expectedCount,
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCountGreaterThanOrEqualTo(int expectedCount,
         string reasonFormat = "",
         params object?[] reasonArgs)
     {
-        var actualCount = Value.Count();
+        var actualCount = Subject.Count();
         return AssertCheck(actualCount >= expectedCount, AssertionItemType.ItemCount,
             AssertionLocalization.CountGreaterOrEqualAssertion,
             [
@@ -197,11 +210,11 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<CollectionAssertion<TValue, TItem>> HaveCountLessThan(int expectedCount,
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCountLessThan(int expectedCount,
         string reasonFormat = "",
         params object?[] reasonArgs)
     {
-        var actualCount = Value.Count();
+        var actualCount = Subject.Count();
         return AssertCheck(actualCount < expectedCount, AssertionItemType.ItemCount,
             AssertionLocalization.CountLessAssertion,
             [
@@ -218,11 +231,11 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<CollectionAssertion<TValue, TItem>> HaveCountLessThanOrEqualTo(int expectedCount,
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCountLessThanOrEqualTo(int expectedCount,
         string reasonFormat = "",
         params object?[] reasonArgs)
     {
-        var actualCount = Value.Count();
+        var actualCount = Subject.Count();
         return AssertCheck(actualCount <= expectedCount, AssertionItemType.ItemCount,
             AssertionLocalization.CountLessOrEqualAssertion,
             [

@@ -20,47 +20,56 @@ public class ObjectAssertion<TValue> : IAssertion
     private readonly List<AssertionItem> _items = [];
     private readonly AssertionScope _scope;
     private bool _reversed;
+    private readonly AssertionType _type;
+    private readonly DateTimeOffset _createTime;
 
-    internal ObjectAssertion(TValue value, string valueName, AssertionType type)
+    internal ObjectAssertion(TValue subject, string valueName, AssertionType type)
     {
-        Value = value;
+        Subject = subject;
         ValueName = string.IsNullOrEmpty(valueName) ? "Unnamed" : valueName;
-        Type = type;
-        CreatedTime = DateTimeOffset.Now;
+        _type = type;
+        _createTime = DateTimeOffset.Now;
         _scope = AssertionScope.Current;
         _scope.AddAssertion(this);
     }
 
     /// <summary>
-    ///     The value itself
+    /// The value itself
     /// </summary>
-    public TValue Value { get; }
+    public TValue It => Subject;
+
+    internal TValue Subject { get; }
 
     /// <summary>
     ///     The value name
     /// </summary>
     public string ValueName { get; }
 
-    private string? ValueString => Value?.GetObjectString();
+    private string? ValueString => Subject?.GetObjectString();
 
     /// <inheritdoc />
-    public IReadOnlyList<AssertionItem> Items => _items;
+    IReadOnlyList<AssertionItem> IAssertion.Items => _items;
 
     /// <inheritdoc />
-    public AssertionType Type { get; }
+    AssertionType IAssertion.Type => _type;
 
     /// <inheritdoc />
-    public DateTimeOffset CreatedTime { get; }
+    DateTimeOffset IAssertion.CreatedTime => _createTime;
 
     /// <summary>
     ///     Not
     /// </summary>
     /// <returns></returns>
-    public ObjectAssertion<TValue> Not()
+    public ObjectAssertion<TValue> Not
     {
-        _reversed = !_reversed;
-        return this;
+        get
+        {
+            ReverseNot();
+            return this;
+        }
     }
+
+    private protected void ReverseNot() =>  _reversed = !_reversed;
 
     #region Match
 
@@ -75,7 +84,7 @@ public class ObjectAssertion<TValue> : IAssertion
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
-        return AssertCheck(predicate.Compile()(Value),
+        return AssertCheck(predicate.Compile()(Subject),
             AssertionItemType.Match, AssertionLocalization.MatchAssertion,
             [
                 new Argument("Expression", predicate.Body)
@@ -103,7 +112,7 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
 
-        return AssertCheck(realComparer.Compare(Value, minimumValue) >= 0 && realComparer.Compare(Value, maximumValue) <= 0,
+        return AssertCheck(realComparer.Compare(Subject, minimumValue) >= 0 && realComparer.Compare(Subject, maximumValue) <= 0,
             AssertionItemType.Range, AssertionLocalization.RangeAssertion,
             [
                 new Argument("MinimumValue", minimumValue),
@@ -126,7 +135,7 @@ public class ObjectAssertion<TValue> : IAssertion
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
-        return AssertCheck(Value is null,
+        return AssertCheck(Subject is null,
             AssertionItemType.Null, AssertionLocalization.NullAssertion,
             [
             ],
@@ -152,7 +161,7 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
 
-        return AssertCheck(realComparer.Compare(Value, comparedValue) >= 0,
+        return AssertCheck(realComparer.Compare(Subject, comparedValue) >= 0,
             AssertionItemType.Comparison, AssertionLocalization.GreaterOrEqualAssertion,
             [
                 new Argument("ComparedValue", comparedValue)
@@ -175,7 +184,7 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
 
-        return AssertCheck(realComparer.Compare(Value, comparedValue) > 0,
+        return AssertCheck(realComparer.Compare(Subject, comparedValue) > 0,
             AssertionItemType.Comparison, AssertionLocalization.GreaterAssertion,
             [
                 new Argument("ComparedValue", comparedValue)
@@ -198,7 +207,7 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
 
-        return AssertCheck(realComparer.Compare(Value, comparedValue) <= 0,
+        return AssertCheck(realComparer.Compare(Subject, comparedValue) <= 0,
             AssertionItemType.Comparison, AssertionLocalization.LessOrEqualAssertion,
             [
                 new Argument("ComparedValue", comparedValue)
@@ -219,7 +228,7 @@ public class ObjectAssertion<TValue> : IAssertion
         string reasonFormat = "", params object?[] reasonArgs)
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
-        return AssertCheck(realComparer.Compare(Value, comparedValue) < 0,
+        return AssertCheck(realComparer.Compare(Subject, comparedValue) < 0,
             AssertionItemType.Comparison, AssertionLocalization.LessAssertion,
             [
                 new Argument("ComparedValue", comparedValue)
@@ -246,7 +255,7 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         var realComparer = equalityComparer ?? Comparer<TValue>.Default;
 
-        return AssertCheck(realComparer.Compare(Value, expectedValue) == 0,
+        return AssertCheck(realComparer.Compare(Subject, expectedValue) == 0,
             AssertionItemType.Equality, AssertionLocalization.EqualityAssertion,
             [
                 new Argument("ExpectedValue", expectedValue)
@@ -270,7 +279,7 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         var comparer = equalityComparer ?? EqualityComparer<TValue>.Default;
 
-        return AssertCheck(comparer.Equals(Value, expectedValue),
+        return AssertCheck(comparer.Equals(Subject, expectedValue),
             AssertionItemType.Equality, AssertionLocalization.EqualityAssertion,
             [
                 new Argument("ExpectedValue", expectedValue)
@@ -294,7 +303,7 @@ public class ObjectAssertion<TValue> : IAssertion
         var comparer = equalityComparer ?? EqualityComparer<TValue>.Default;
         var values = expectedValues as TValue[] ?? expectedValues.ToArray();
 
-        return AssertCheck(values.Contains(Value, comparer),
+        return AssertCheck(values.Contains(Subject, comparer),
             AssertionItemType.Equality, AssertionLocalization.OneOfAssertion,
             [
                 new Argument("ExpectedValues", values)
@@ -316,10 +325,10 @@ public class ObjectAssertion<TValue> : IAssertion
     public AndWhichConstraint<ObjectAssertion<TValue>, T?> BeAssignableTo<T>(string reasonFormat = "",
         params object?[] reasonArgs)
     {
-        return AssertCheck(() => Value is T type ? type : default,
-            Value is T, AssertionItemType.DataType, AssertionLocalization.AssignableAssertion,
+        return AssertCheck(() => Subject is T type ? type : default,
+            Subject is T, AssertionItemType.DataType, AssertionLocalization.AssignableAssertion,
             [
-                new Argument("ValueType", Value?.GetType().GetFullName()),
+                new Argument("ValueType", Subject?.GetType().GetFullName()),
                 new Argument("ExpectedType", typeof(T).GetFullName())
             ],
             reasonFormat, reasonArgs);
@@ -348,14 +357,14 @@ public class ObjectAssertion<TValue> : IAssertion
     public AndConstraint<ObjectAssertion<TValue>> BeTypeOf(Type expectedType, string reasonFormat = "",
         params object?[] reasonArgs)
     {
-        var subjectType = Value?.GetType();
+        var subjectType = Subject?.GetType();
         var succeed = expectedType.IsGenericTypeDefinition && (subjectType?.IsGenericType ?? false)
             ? subjectType.GetGenericTypeDefinition() == expectedType
             : subjectType == expectedType;
 
         return AssertCheck(succeed, AssertionItemType.DataType, AssertionLocalization.TypeAssertion,
             [
-                new Argument("ValueType", Value?.GetType().GetFullName()),
+                new Argument("ValueType", Subject?.GetType().GetFullName()),
                 new Argument("ExpectedType", expectedType.GetFullName())
             ],
             reasonFormat, reasonArgs);
@@ -403,9 +412,9 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         Argument[] allArguments =
         [
-            new(nameof(Value), ValueString),
+            new(nameof(Subject), ValueString),
             new(nameof(ValueName), ValueName),
-            new(nameof(AssertionType), Type switch
+            new(nameof(AssertionType), _type switch
             {
                 AssertionType.Must => AssertionLocalization.Must,
                 AssertionType.Should => AssertionLocalization.Should,
@@ -441,7 +450,7 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         var item = new AssertionItem(type, message, new StackTrace(2, true), DateTimeOffset.Now);
         _items.Add(item);
-        _scope.PushAssertionItem(item, Type);
+        _scope.PushAssertionItem(item, _type);
     }
 
     #endregion

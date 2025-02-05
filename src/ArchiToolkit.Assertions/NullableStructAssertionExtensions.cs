@@ -24,8 +24,8 @@ public static class NullableStructAssertionExtensions
         string reasonFormat = "", params object?[] reasonArgs)
         where TStruct : struct
     {
-        return assertion.AssertCheck(() => assertion.Value!.Value, //Let it throw the exception.
-            assertion.Value.HasValue, AssertionItemType.Null,
+        return assertion.AssertCheck(() => assertion.Subject!.Value, //Let it throw the exception.
+            assertion.Subject.HasValue, AssertionItemType.Null,
             AssertionLocalization.HaveValueAssertion, [],
             reasonFormat, reasonArgs);
     }

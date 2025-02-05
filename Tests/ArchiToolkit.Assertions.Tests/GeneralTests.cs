@@ -10,10 +10,8 @@ public class GeneralTests
     [Test]
     public async Task TestMethodHere()
     {
-        List<int> a = [];
-        int? b = null;
-        var must = a.Must();
-
+        List<int> a = [1, 2, 3];
+        a.Must().Contain(1).And.It.Must().Not.Contain(2);
 
         new List<int>().Must();
         using (new AssertionScope("你好"))

@@ -63,10 +63,10 @@ public static class AssertionExtensions
     /// <param name="valueName"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static CollectionAssertion<IEnumerable<T>, T> Must<T>(this IEnumerable<T> collection,
+    public static EnumerableAssertion<IEnumerable<T>, T> Must<T>(this IEnumerable<T> collection,
         [CallerArgumentExpression(nameof(collection))] string valueName = "")
     {
-        return new CollectionAssertion<IEnumerable<T>, T>(collection, valueName, AssertionType.Must);
+        return new EnumerableAssertion<IEnumerable<T>, T>(collection, valueName, AssertionType.Must);
     }
 
     /// <summary>
@@ -76,10 +76,10 @@ public static class AssertionExtensions
     /// <param name="valueName"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static CollectionAssertion<IEnumerable<T>, T> Should<T>(this IEnumerable<T> collection,
+    public static EnumerableAssertion<IEnumerable<T>, T> Should<T>(this IEnumerable<T> collection,
         [CallerArgumentExpression(nameof(collection))] string valueName = "")
     {
-        return new CollectionAssertion<IEnumerable<T>, T>(collection, valueName, AssertionType.Should);
+        return new EnumerableAssertion<IEnumerable<T>, T>(collection, valueName, AssertionType.Should);
     }
 
     /// <summary>
@@ -89,10 +89,10 @@ public static class AssertionExtensions
     /// <param name="valueName"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static CollectionAssertion<IEnumerable<T>, T> Could<T>(this IEnumerable<T> collection,
+    public static EnumerableAssertion<IEnumerable<T>, T> Could<T>(this IEnumerable<T> collection,
         [CallerArgumentExpression(nameof(collection))] string valueName = "")
     {
-        return new CollectionAssertion<IEnumerable<T>, T>(collection, valueName, AssertionType.Could);
+        return new EnumerableAssertion<IEnumerable<T>, T>(collection, valueName, AssertionType.Could);
     }
 
     #endregion

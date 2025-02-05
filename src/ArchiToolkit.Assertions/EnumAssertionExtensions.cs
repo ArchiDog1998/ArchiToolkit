@@ -25,7 +25,7 @@ public static class EnumAssertionExtensions
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string reasonFormat = "", params object?[] reasonArgs)
         where TEnum : Enum
     {
-        return assertion.AssertCheck(assertion.Value.HasFlag(flag), AssertionItemType.Flag,
+        return assertion.AssertCheck(assertion.Subject.HasFlag(flag), AssertionItemType.Flag,
             AssertionLocalization.FlagAssertion,
             [
                 new Argument("Flag", flag)
@@ -45,7 +45,7 @@ public static class EnumAssertionExtensions
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string reasonFormat = "", params object?[] reasonArgs)
         where TEnum : Enum
     {
-        return assertion.AssertCheck(Enum.IsDefined(typeof(TEnum), assertion.Value) , AssertionItemType.Defined,
+        return assertion.AssertCheck(Enum.IsDefined(typeof(TEnum), assertion.Subject) , AssertionItemType.Defined,
             AssertionLocalization.EnumDefinedAssertion,
             [
             ],
