@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using ArchiToolkit.Assertions.AssertionItems;
@@ -23,7 +25,7 @@ public class ObjectAssertion<TValue> : IAssertion
     internal ObjectAssertion(TValue value, string valueName, AssertionType type)
     {
         Value = value;
-        ValueName = valueName;
+        ValueName = string.IsNullOrEmpty(valueName) ? "Unnamed" : valueName;
         Type = type;
         CreatedTime = DateTimeOffset.Now;
         _scope = AssertionScope.Current;
@@ -40,7 +42,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// </summary>
     public string ValueName { get; }
 
-    private protected virtual string? ValueString => Value?.ToString();
+    private string? ValueString => Value?.GetObjectString();
 
     /// <inheritdoc />
     public IReadOnlyList<AssertionItem> Items => _items;
@@ -71,17 +73,15 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<ObjectAssertion<TValue>> Match(Expression<Func<TValue, bool>> predicate,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
-        if (IsSucceed(predicate.Compile()(Value), out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
-
-        var message = FormatString(AssertionLocalization.MatchAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("Expression", predicate.Body));
-
-        AddAssertionItem(AssertionItemType.Match, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(predicate.Compile()(Value),
+            AssertionItemType.Match, AssertionLocalization.MatchAssertion,
+            [
+                new Argument("Expression", predicate.Body)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     #endregion
@@ -99,19 +99,18 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <returns></returns>
     public AndConstraint<ObjectAssertion<TValue>> BeInRange(TValue minimumValue, TValue maximumValue,
         IComparer<TValue>? comparer = null,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
-        if (IsSucceed(realComparer.Compare(Value, minimumValue) >= 0 && realComparer.Compare(Value, maximumValue) <= 0,
-                out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
-        var message = FormatString(AssertionLocalization.RangeAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("MinimumValue", minimumValue),
-            new Argument("MaximumValue", maximumValue));
 
-        AddAssertionItem(AssertionItemType.Range, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(realComparer.Compare(Value, minimumValue) >= 0 && realComparer.Compare(Value, maximumValue) <= 0,
+            AssertionItemType.Range, AssertionLocalization.RangeAssertion,
+            [
+                new Argument("MinimumValue", minimumValue),
+                new Argument("MaximumValue", maximumValue)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     #endregion
@@ -124,115 +123,109 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeNull(string reasonFormat = "", params object?[] reasonArgs)
+    public AndConstraint<ObjectAssertion<TValue>> BeNull(
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat = "", params object?[] reasonArgs)
     {
-        if (IsSucceed(Value is null, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
-        var message = FormatString(AssertionLocalization.NullAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse);
-
-        AddAssertionItem(AssertionItemType.DataType, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(Value is null,
+            AssertionItemType.Null, AssertionLocalization.NullAssertion,
+            [
+            ],
+            reasonFormat, reasonArgs);
     }
 
     #endregion
-
-    private protected readonly record struct Argument(string Name, object? Value);
 
     #region Comparison
 
     /// <summary>
     ///     Should be greater.
     /// </summary>
-    /// <param name="expectedValue"></param>
+    /// <param name="comparedValue"></param>
     /// <param name="comparer"></param>
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeGreaterThanOrEqualTo(TValue expectedValue,
+    public AndConstraint<ObjectAssertion<TValue>> BeGreaterThanOrEqualTo(TValue comparedValue,
         IComparer<TValue>? comparer = null,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
-        if (IsSucceed(realComparer.Compare(Value, expectedValue) >= 0, out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalization.GreaterOrEqualAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ComparedValue", expectedValue));
-
-        AddAssertionItem(AssertionItemType.Comparison, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(realComparer.Compare(Value, comparedValue) >= 0,
+            AssertionItemType.Comparison, AssertionLocalization.GreaterOrEqualAssertion,
+            [
+                new Argument("ComparedValue", comparedValue)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
     ///     Should be greater.
     /// </summary>
-    /// <param name="expectedValue"></param>
+    /// <param name="comparedValue"></param>
     /// <param name="comparer"></param>
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeGreaterThan(TValue expectedValue,
+    public AndConstraint<ObjectAssertion<TValue>> BeGreaterThan(TValue comparedValue,
         IComparer<TValue>? comparer = null,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
-        if (IsSucceed(realComparer.Compare(Value, expectedValue) > 0, out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalization.GreaterAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ComparedValue", expectedValue));
-
-        AddAssertionItem(AssertionItemType.Comparison, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(realComparer.Compare(Value, comparedValue) > 0,
+            AssertionItemType.Comparison, AssertionLocalization.GreaterAssertion,
+            [
+                new Argument("ComparedValue", comparedValue)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
     ///     Less or equal to
     /// </summary>
-    /// <param name="expectedValue"></param>
+    /// <param name="comparedValue"></param>
     /// <param name="comparer"></param>
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeLessThanOrEqualTo(TValue expectedValue,
+    public AndConstraint<ObjectAssertion<TValue>> BeLessThanOrEqualTo(TValue comparedValue,
         IComparer<TValue>? comparer = null,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
-        if (IsSucceed(realComparer.Compare(Value, expectedValue) <= 0, out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalization.LessOrEqualAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ComparedValue", expectedValue));
-
-        AddAssertionItem(AssertionItemType.Comparison, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(realComparer.Compare(Value, comparedValue) <= 0,
+            AssertionItemType.Comparison, AssertionLocalization.LessOrEqualAssertion,
+            [
+                new Argument("ComparedValue", comparedValue)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
     ///     Should be less than.
     /// </summary>
-    /// <param name="expectedValue"></param>
+    /// <param name="comparedValue"></param>
     /// <param name="comparer"></param>
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeLessThan(TValue expectedValue, IComparer<TValue>? comparer = null,
+    public AndConstraint<ObjectAssertion<TValue>> BeLessThan(TValue comparedValue, IComparer<TValue>? comparer = null,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
-        if (IsSucceed(realComparer.Compare(Value, expectedValue) < 0, out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
-
-        var message = FormatString(AssertionLocalization.LessAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ComparedValue", expectedValue));
-
-        AddAssertionItem(AssertionItemType.Comparison, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(realComparer.Compare(Value, comparedValue) < 0,
+            AssertionItemType.Comparison, AssertionLocalization.LessAssertion,
+            [
+                new Argument("ComparedValue", comparedValue)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     #endregion
@@ -248,18 +241,18 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<ObjectAssertion<TValue>> Be(TValue expectedValue,
-        IComparer<TValue>? equalityComparer = null, string reasonFormat = "", params object?[] reasonArgs)
+        IComparer<TValue>? equalityComparer = null,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat = "", params object?[] reasonArgs)
     {
         var realComparer = equalityComparer ?? Comparer<TValue>.Default;
-        if (IsSucceed(realComparer.Compare(Value, expectedValue) == 0, out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalization.EqualityAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ExpectedValue", expectedValue));
-
-        AddAssertionItem(AssertionItemType.Equality, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(realComparer.Compare(Value, expectedValue) == 0,
+            AssertionItemType.Equality, AssertionLocalization.EqualityAssertion,
+            [
+                new Argument("ExpectedValue", expectedValue)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -272,18 +265,18 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <returns></returns>
     [OverloadResolutionPriority(1)]
     public AndConstraint<ObjectAssertion<TValue>> Be(TValue expectedValue,
-        IEqualityComparer<TValue>? equalityComparer = null, string reasonFormat = "", params object?[] reasonArgs)
+        IEqualityComparer<TValue>? equalityComparer = null,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat = "", params object?[] reasonArgs)
     {
         var comparer = equalityComparer ?? EqualityComparer<TValue>.Default;
-        if (IsSucceed(comparer.Equals(Value, expectedValue), out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalization.EqualityAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ExpectedValue", expectedValue));
-
-        AddAssertionItem(AssertionItemType.Equality, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(comparer.Equals(Value, expectedValue),
+            AssertionItemType.Equality, AssertionLocalization.EqualityAssertion,
+            [
+                new Argument("ExpectedValue", expectedValue)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -295,19 +288,19 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<ObjectAssertion<TValue>> BeOneOf(IEnumerable<TValue> expectedValues,
-        IEqualityComparer<TValue>? equalityComparer = null, string reasonFormat = "", params object?[] reasonArgs)
+        IEqualityComparer<TValue>? equalityComparer = null,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat = "", params object?[] reasonArgs)
     {
         var comparer = equalityComparer ?? EqualityComparer<TValue>.Default;
         var values = expectedValues as TValue[] ?? expectedValues.ToArray();
-        if (IsSucceed(values.Contains(Value, comparer), out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
 
-        var message = FormatString(AssertionLocalization.OneOfAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ExpectedValues", values.GetItemsString()));
-
-        AddAssertionItem(AssertionItemType.Equality, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(values.Contains(Value, comparer),
+            AssertionItemType.Equality, AssertionLocalization.OneOfAssertion,
+            [
+                new Argument("ExpectedValues", values)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     #endregion
@@ -324,18 +317,13 @@ public class ObjectAssertion<TValue> : IAssertion
     public AndWhichConstraint<ObjectAssertion<TValue>, T?> BeAssignableTo<T>(string reasonFormat = "",
         params object?[] reasonArgs)
     {
-        var typedValue = Value is T type ? type : default;
-
-        if (IsSucceed(Value is T, out var reverse))
-            return new AndWhichConstraint<ObjectAssertion<TValue>, T?>(this, typedValue);
-
-        var message = FormatString(AssertionLocalization.AssignableAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ValueType", Value?.GetType().GetFullName()),
-            new Argument("ExpectedType", typeof(T).GetFullName()));
-
-        AddAssertionItem(AssertionItemType.DataType, message);
-        return new AndWhichConstraint<ObjectAssertion<TValue>, T?>(this, typedValue);
+        return AssertCheck(() => Value is T type ? type : default,
+            Value is T, AssertionItemType.DataType, AssertionLocalization.AssignableAssertion,
+            [
+                new Argument("ValueType", Value?.GetType().GetFullName()),
+                new Argument("ExpectedType", typeof(T).GetFullName())
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -345,7 +333,9 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonArgs"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeTypeOf<T>(string reasonFormat = "", params object?[] reasonArgs)
+    public AndConstraint<ObjectAssertion<TValue>> BeTypeOf<T>(
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat = "", params object?[] reasonArgs)
     {
         return BeTypeOf(typeof(T), reasonFormat, reasonArgs);
     }
@@ -360,25 +350,57 @@ public class ObjectAssertion<TValue> : IAssertion
         params object?[] reasonArgs)
     {
         var subjectType = Value?.GetType();
-        if (IsSucceed(expectedType.IsGenericTypeDefinition && (subjectType?.IsGenericType ?? false)
-                ? subjectType.GetGenericTypeDefinition() == expectedType
-                : subjectType == expectedType, out var reverse))
-            return new AndConstraint<ObjectAssertion<TValue>>(this);
+        var succeed = expectedType.IsGenericTypeDefinition && (subjectType?.IsGenericType ?? false)
+            ? subjectType.GetGenericTypeDefinition() == expectedType
+            : subjectType == expectedType;
 
-        var message = FormatString(AssertionLocalization.TypeAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ValueType", Value?.GetType().GetFullName()),
-            new Argument("ExpectedType", expectedType.GetFullName()));
-
-        AddAssertionItem(AssertionItemType.DataType, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
+        return AssertCheck(succeed, AssertionItemType.DataType, AssertionLocalization.TypeAssertion,
+            [
+                new Argument("ValueType", Value?.GetType().GetFullName()),
+                new Argument("ExpectedType", expectedType.GetFullName())
+            ],
+            reasonFormat, reasonArgs);
     }
 
     #endregion
 
     #region Assertion Helper Methods
 
-    private protected string FormatString(string formatString, string reason, bool reverse, params Argument[] arguments)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal AndConstraint<ObjectAssertion<TValue>> AssertCheck(bool succeed, AssertionItemType assertionItemType,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string formatString, Argument[] additionalArguments,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat, object?[] reasonArgs)
+    {
+        return AssertCheck(new AndConstraint<ObjectAssertion<TValue>>(this), succeed, assertionItemType, formatString,
+            additionalArguments, reasonFormat, reasonArgs);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal AndWhichConstraint<ObjectAssertion<TValue>, TMatchedElement> AssertCheck<TMatchedElement>(Func<TMatchedElement> result, bool succeed, AssertionItemType assertionItemType,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string formatString, Argument[] additionalArguments,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat, object?[] reasonArgs)
+    {
+        return AssertCheck(new AndWhichConstraint<ObjectAssertion<TValue>, TMatchedElement>(this, result), succeed, assertionItemType, formatString,
+            additionalArguments, reasonFormat, reasonArgs);
+    }
+
+    private protected TResult AssertCheck<TResult>(TResult result, bool succeed, AssertionItemType assertionItemType,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string formatString, Argument[] additionalArguments,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat, object?[] reasonArgs)
+    {
+        if (IsSucceed(succeed, out var reverse)) return result;
+        var message = FormatString(formatString, string.Format(reasonFormat, reasonArgs), reverse, additionalArguments);
+        AddAssertionItem(assertionItemType, message);
+        return result;
+    }
+
+    private string FormatString(string formatString, string reason, bool reverse, params Argument[] arguments)
     {
         Argument[] allArguments =
         [
@@ -397,13 +419,13 @@ public class ObjectAssertion<TValue> : IAssertion
         var index = 0;
         formatString = allArguments.Aggregate(formatString,
             (current, argument) => current.ReplacePlaceHolder(argument.Name, (index++).ToString()));
-        var result = string.Format(formatString, [..allArguments.Select(a => a.Value)]);
+        var result = string.Format(formatString, [..allArguments.Select(a => a.Value.GetObjectString())]);
         if (!string.IsNullOrWhiteSpace(reason)) result += $"\n{string.Format(AssertionLocalization.Reason, reason)}";
 
         return result;
     }
 
-    private protected bool IsSucceed(bool succeed, out bool reverse)
+    private bool IsSucceed(bool succeed, out bool reverse)
     {
         try
         {
@@ -416,7 +438,7 @@ public class ObjectAssertion<TValue> : IAssertion
         }
     }
 
-    private protected void AddAssertionItem(AssertionItemType type, string message)
+    private void AddAssertionItem(AssertionItemType type, string message)
     {
         var item = new AssertionItem(type, message, new StackTrace(2, true), DateTimeOffset.Now);
         _items.Add(item);

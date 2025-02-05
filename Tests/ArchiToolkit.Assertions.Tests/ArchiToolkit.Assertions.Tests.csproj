@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="TUnit" Version="0.8.2" />
+        <PackageReference Include="TUnit" Version="0.10.19"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\ArchiToolkit.Assertions\ArchiToolkit.Assertions.csproj" />
+        <ProjectReference Include="..\..\src\ArchiToolkit.Assertions\ArchiToolkit.Assertions.csproj"/>
     </ItemGroup>
 
 </Project>

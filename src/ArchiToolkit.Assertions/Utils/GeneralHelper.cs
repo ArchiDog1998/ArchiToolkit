@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace ArchiToolkit.Assertions.Utils;
 
@@ -30,13 +31,27 @@ internal static class GeneralHelper
         }
     }
 
-    public static string GetItemsString<T>(this IEnumerable<T> items)
+    public static string GetObjectString(this object? obj)
+    {
+        return obj switch
+        {
+            IEnumerable enumerable => GetItemsString(enumerable),
+            _ => obj?.ToString() ?? "Null Object",
+        };
+    }
+
+    private static string GetItemsString(IEnumerable items)
     {
         const int maxItems = 10;
 
-        var objects = items as T[] ?? items.ToArray();
+        object?[] objects = [..items];
         return objects.Length > maxItems
-            ? $"({objects.Length})[{string.Join(", ", objects.Take(maxItems))}, ...]"
-            : $"[{string.Join(", ", objects)}]";
+            ? $"({objects.Length})[{string.Join(", ", objects.Take(maxItems).Select(GetObjectString))}, ...]"
+            : $"[{string.Join(", ", objects.Select(GetObjectString))}]";
+    }
+
+    public static int Count(this IEnumerable enumerable)
+    {
+        return Enumerable.Count(enumerable.Cast<object?>());
     }
 }

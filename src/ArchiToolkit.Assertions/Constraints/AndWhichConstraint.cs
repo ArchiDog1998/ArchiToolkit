@@ -3,17 +3,18 @@
 /// <summary>
 ///     The constraint
 /// </summary>
-/// <typeparam name="TParentConstraint"></typeparam>
+/// <typeparam name="TAssertion"></typeparam>
 /// <typeparam name="TMatchedElement"></typeparam>
-public class AndWhichConstraint<TParentConstraint, TMatchedElement> : AndConstraint<TParentConstraint>
+public class AndWhichConstraint<TAssertion, TMatchedElement> : AndConstraint<TAssertion>
 {
-    internal AndWhichConstraint(TParentConstraint value, TMatchedElement item) : base(value)
+    private readonly Lazy<TMatchedElement> _itemGetter;
+    internal AndWhichConstraint(TAssertion value, Func<TMatchedElement> itemGetter) : base(value)
     {
-        Which = item;
+        _itemGetter = new Lazy<TMatchedElement>(itemGetter);
     }
 
     /// <summary>
     ///     The which thing.
     /// </summary>
-    public TMatchedElement Which { get; }
+    public TMatchedElement Which => _itemGetter.Value;
 }

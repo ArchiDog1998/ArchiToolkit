@@ -3,10 +3,10 @@
 /// <summary>
 ///     Just the And Constraint
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public class AndConstraint<T>
+/// <typeparam name="TAssertion"></typeparam>
+public class AndConstraint<TAssertion>
 {
-    internal AndConstraint(T value)
+    internal AndConstraint(TAssertion value)
     {
         And = value;
     }
@@ -14,5 +14,5 @@ public class AndConstraint<T>
     /// <summary>
     ///     And things.
     /// </summary>
-    public T And { get; }
+    public TAssertion And { get; }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Constraints;
 using ArchiToolkit.Assertions.Resources;
@@ -17,7 +18,25 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     {
     }
 
-    private protected override string ValueString => Value.GetItemsString();
+    internal AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem> AssertCheck(Func<TItem> result, bool succeed, AssertionItemType assertionItemType,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string formatString, Argument[] additionalArguments,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat, object?[] reasonArgs)
+    {
+        return AssertCheck(new AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem>(this, result), succeed, assertionItemType, formatString,
+            additionalArguments, reasonFormat, reasonArgs);
+    }
+
+    internal new AndConstraint<CollectionAssertion<TValue, TItem>> AssertCheck(bool succeed, AssertionItemType assertionItemType,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string formatString, Argument[] additionalArguments,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat, object?[] reasonArgs)
+    {
+        return AssertCheck(new AndConstraint<CollectionAssertion<TValue, TItem>>(this), succeed, assertionItemType, formatString,
+            additionalArguments, reasonFormat, reasonArgs);
+    }
 
     #region ItemEquality
 
@@ -28,21 +47,19 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem?>
+    public AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem>
         ContainSingle(Expression<Func<TItem, bool>> predicate, string reasonFormat = "", params object?[] reasonArgs)
     {
         var func = predicate.Compile();
         var items = Value.Where(func).ToArray();
-        if (IsSucceed(items.Length is 1, out var reverse))
-            return new AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem?>(this, items.FirstOrDefault());
 
-        var message = FormatString(AssertionLocalization.ContainSingleExpressionAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("MatchedCount", items.Length),
-            new Argument("Expression", predicate.Body));
-
-        AddAssertionItem(AssertionItemType.ItemEquality, message);
-        return new AndWhichConstraint<CollectionAssertion<TValue, TItem>, TItem?>(this, items.FirstOrDefault());
+        return AssertCheck(() => items.First(), items.Length is 1, AssertionItemType.ItemEquality,
+            AssertionLocalization.ContainSingleExpressionAssertion,
+            [
+                new Argument("MatchedCount", items.Length),
+                new Argument("Expression", predicate.Body)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -57,15 +74,13 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         IEqualityComparer<TItem>? equalityComparer = null, string reasonFormat = "", params object?[] reasonArgs)
     {
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
-        if (IsSucceed(Value.Contains(expectedValue, comparer), out var reverse))
-            return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalization.ContainAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ExpectedValue", expectedValue));
-
-        AddAssertionItem(AssertionItemType.ItemEquality, message);
-        return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
+        return AssertCheck(Value.Contains(expectedValue, comparer), AssertionItemType.ItemEquality,
+            AssertionLocalization.ContainAssertion,
+            [
+                new Argument("ExpectedValue", expectedValue)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -79,15 +94,12 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         string reasonFormat = "", params object?[] reasonArgs)
     {
         var func = predicate.Compile();
-        if (IsSucceed(Value.Any(func), out var reverse))
-            return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
-
-        var message = FormatString(AssertionLocalization.ContainExpressionAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("Expression", predicate.Body));
-
-        AddAssertionItem(AssertionItemType.ItemEquality, message);
-        return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
+        return AssertCheck(Value.Any(func), AssertionItemType.ItemEquality,
+            AssertionLocalization.ContainExpressionAssertion,
+            [
+                new Argument("Expression", predicate.Body)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -103,16 +115,18 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     {
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
         var values = expectedValues as TItem[] ?? expectedValues.ToArray();
-        if (IsSucceed(values.Except(Value, comparer).Any(), out var reverse))
-            return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalization.ContainAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ExpectedValues", values.GetItemsString()));
-
-        AddAssertionItem(AssertionItemType.ItemEquality, message);
-        return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
+        return AssertCheck(values.Except(Value, comparer).Any(), AssertionItemType.ItemEquality,
+            AssertionLocalization.ContainAssertion,
+            [
+                new Argument("ExpectedValues", values)
+            ],
+            reasonFormat, reasonArgs);
     }
+
+    #endregion
+
+    #region Item Count
 
     /// <summary>
     ///     have the count.
@@ -125,16 +139,14 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         params object?[] reasonArgs)
     {
         var actualCount = Value.Count();
-        if (IsSucceed(actualCount == expectedCount, out var reverse))
-            return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
 
-        var message = FormatString(AssertionLocalization.CountAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ActualCount", actualCount),
-            new Argument("ExpectedCount", expectedCount));
-
-        AddAssertionItem(AssertionItemType.ItemCount, message);
-        return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
+        return AssertCheck(actualCount == expectedCount, AssertionItemType.ItemCount,
+            AssertionLocalization.CountAssertion,
+            [
+                new Argument("ActualCount", actualCount),
+                new Argument("ExpectedCount", expectedCount)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -149,16 +161,13 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         params object?[] reasonArgs)
     {
         var actualCount = Value.Count();
-        if (IsSucceed(actualCount > expectedCount, out var reverse))
-            return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
-
-        var message = FormatString(AssertionLocalization.CountGreaterAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ActualCount", actualCount),
-            new Argument("ExpectedCount", expectedCount));
-
-        AddAssertionItem(AssertionItemType.ItemCount, message);
-        return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
+        return AssertCheck(actualCount > expectedCount, AssertionItemType.ItemCount,
+            AssertionLocalization.CountGreaterAssertion,
+            [
+                new Argument("ActualCount", actualCount),
+                new Argument("ExpectedCount", expectedCount)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -172,16 +181,13 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         params object?[] reasonArgs)
     {
         var actualCount = Value.Count();
-        if (IsSucceed(actualCount >= expectedCount, out var reverse))
-            return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
-
-        var message = FormatString(AssertionLocalization.CountGreaterOrEqualAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ActualCount", actualCount),
-            new Argument("ExpectedCount", expectedCount));
-
-        AddAssertionItem(AssertionItemType.ItemCount, message);
-        return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
+        return AssertCheck(actualCount >= expectedCount, AssertionItemType.ItemCount,
+            AssertionLocalization.CountGreaterOrEqualAssertion,
+            [
+                new Argument("ActualCount", actualCount),
+                new Argument("ExpectedCount", expectedCount)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -196,16 +202,13 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         params object?[] reasonArgs)
     {
         var actualCount = Value.Count();
-        if (IsSucceed(actualCount < expectedCount, out var reverse))
-            return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
-
-        var message = FormatString(AssertionLocalization.CountLessAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ActualCount", actualCount),
-            new Argument("ExpectedCount", expectedCount));
-
-        AddAssertionItem(AssertionItemType.ItemCount, message);
-        return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
+        return AssertCheck(actualCount < expectedCount, AssertionItemType.ItemCount,
+            AssertionLocalization.CountLessAssertion,
+            [
+                new Argument("ActualCount", actualCount),
+                new Argument("ExpectedCount", expectedCount)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     /// <summary>
@@ -220,16 +223,13 @@ public class CollectionAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         params object?[] reasonArgs)
     {
         var actualCount = Value.Count();
-        if (IsSucceed(actualCount <= expectedCount, out var reverse))
-            return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
-
-        var message = FormatString(AssertionLocalization.CountLessOrEqualAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse,
-            new Argument("ActualCount", actualCount),
-            new Argument("ExpectedCount", expectedCount));
-
-        AddAssertionItem(AssertionItemType.ItemCount, message);
-        return new AndConstraint<CollectionAssertion<TValue, TItem>>(this);
+        return AssertCheck(actualCount <= expectedCount, AssertionItemType.ItemCount,
+            AssertionLocalization.CountLessOrEqualAssertion,
+            [
+                new Argument("ActualCount", actualCount),
+                new Argument("ExpectedCount", expectedCount)
+            ],
+            reasonFormat, reasonArgs);
     }
 
     #endregion

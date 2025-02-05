@@ -150,11 +150,29 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be defined, but it is {Value}..
+        /// </summary>
+        internal static string EnumDefinedAssertion {
+            get {
+                return ResourceManager.GetString("EnumDefinedAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be {ExpectedValue}, but it is {Value}..
         /// </summary>
         internal static string EqualityAssertion {
             get {
                 return ResourceManager.GetString("EqualityAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have flag {Flag}, but it is {Value}..
+        /// </summary>
+        internal static string FlagAssertion {
+            get {
+                return ResourceManager.GetString("FlagAssertion", resourceCulture);
             }
         }
         
@@ -173,6 +191,15 @@ namespace ArchiToolkit.Assertions.Resources {
         internal static string GreaterOrEqualAssertion {
             get {
                 return ResourceManager.GetString("GreaterOrEqualAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have a value, but it is {Value}..
+        /// </summary>
+        internal static string HaveValueAssertion {
+            get {
+                return ResourceManager.GetString("HaveValueAssertion", resourceCulture);
             }
         }
         

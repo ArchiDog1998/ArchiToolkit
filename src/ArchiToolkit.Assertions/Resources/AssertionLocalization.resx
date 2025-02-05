@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
                 xmlns="">
         <xsd:element name="root" msdata:IsDataSet="true">
 
@@ -95,5 +96,14 @@
     <data name="TypeAssertion" xml:space="preserve">
         <value>The data [{ValueName}] {AssertionType} {Not}be type of {ExpectedType}, but it is {ValueType}.</value>
         <comment>This is the message displayed on the home page.</comment>
+    </data>
+    <data name="HaveValueAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}have a value, but it is {Value}.</value>
+    </data>
+    <data name="FlagAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}have flag {Flag}, but it is {Value}.</value>
+    </data>
+    <data name="EnumDefinedAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be defined, but it is {Value}.</value>
     </data>
 </root>
