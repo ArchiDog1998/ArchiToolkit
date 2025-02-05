@@ -25,15 +25,18 @@ file class DefaultScopeStrategy : IAssertionStrategy
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.AppendLine($"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz}]{context}");
+        var any = false;
         foreach (var assertion in assertions)
+        foreach (var assertionItem in assertion.Items)
         {
-            foreach (var assertionItem in assertion.Items)
-            {
-                stringBuilder.AppendLine($"-[{assertionItem.Time:yyyy-MM-dd HH:mm:ss.fff zzz}]{assertionItem.Message}");
-                var frame = assertionItem.StackTrace.GetFrames()[0];
-                stringBuilder.AppendLine($"-at {frame.GetMethod()?.ToString()} in {frame.GetFileName()}:line {frame.GetFileLineNumber()}");
-            }
+            any = true;
+            stringBuilder.AppendLine($"-[{assertionItem.Time:yyyy-MM-dd HH:mm:ss.fff zzz}]{assertionItem.Message}");
+            var frame = assertionItem.StackTrace.GetFrames()[0];
+            stringBuilder.AppendLine(
+                $"-at {frame.GetMethod()?.ToString()} in {frame.GetFileName()}:line {frame.GetFileLineNumber()}");
         }
+
+        if (!any) return;
         throw new AssertionException(stringBuilder.ToString());
     }
 
@@ -43,17 +46,17 @@ file class DefaultScopeStrategy : IAssertionStrategy
 }
 
 /// <summary>
-/// The service of the assertions.
+///     The service of the assertions.
 /// </summary>
 public static class AssertionService
 {
     /// <summary>
-    /// The default push strategy.
+    ///     The default push strategy.
     /// </summary>
     public static IAssertionStrategy DefaultPushStrategy { get; set; } = new DefaultPushStrategy();
 
     /// <summary>
-    /// The default scope strategy
+    ///     The default scope strategy
     /// </summary>
     public static IAssertionStrategy DefaultScopeStrategy { get; set; } = new DefaultScopeStrategy();
 }

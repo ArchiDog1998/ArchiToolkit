@@ -10,37 +10,15 @@ using ArchiToolkit.Assertions.Utils;
 namespace ArchiToolkit.Assertions.Assertions;
 
 /// <summary>
-/// Just the Assertion
+///     Just the Assertion
 /// </summary>
 /// <typeparam name="TValue"></typeparam>
 public class ObjectAssertion<TValue> : IAssertion
 {
-    private protected readonly record struct Argument(string Name, object? Value);
+    private readonly List<AssertionItem> _items = [];
+    private readonly AssertionScope _scope;
 
     private bool _reversed;
-    private readonly AssertionScope _scope;
-    private readonly List<AssertionItem> _items = [];
-
-    /// <inheritdoc />
-    public IReadOnlyList<AssertionItem> Items => _items;
-
-    /// <inheritdoc />
-    public AssertionType Type { get; }
-
-    /// <inheritdoc />
-    public DateTimeOffset CreatedTime { get; }
-
-    /// <summary>
-    /// The value itself
-    /// </summary>
-    public TValue Value { get; }
-
-    /// <summary>
-    /// The value name
-    /// </summary>
-    public string ValueName { get; }
-
-    private protected virtual string? ValueString => Value?.ToString();
 
     internal ObjectAssertion(TValue value, string valueName, AssertionType type)
     {
@@ -53,7 +31,28 @@ public class ObjectAssertion<TValue> : IAssertion
     }
 
     /// <summary>
-    /// Not
+    ///     The value itself
+    /// </summary>
+    public TValue Value { get; }
+
+    /// <summary>
+    ///     The value name
+    /// </summary>
+    public string ValueName { get; }
+
+    private protected virtual string? ValueString => Value?.ToString();
+
+    /// <inheritdoc />
+    public IReadOnlyList<AssertionItem> Items => _items;
+
+    /// <inheritdoc />
+    public AssertionType Type { get; }
+
+    /// <inheritdoc />
+    public DateTimeOffset CreatedTime { get; }
+
+    /// <summary>
+    ///     Not
     /// </summary>
     /// <returns></returns>
     public ObjectAssertion<TValue> Not()
@@ -65,7 +64,7 @@ public class ObjectAssertion<TValue> : IAssertion
     #region Match
 
     /// <summary>
-    /// Match the method
+    ///     Match the method
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="reasonFormat"></param>
@@ -90,7 +89,7 @@ public class ObjectAssertion<TValue> : IAssertion
     #region Range
 
     /// <summary>
-    /// Should be in range.
+    ///     Should be in range.
     /// </summary>
     /// <param name="minimumValue"></param>
     /// <param name="maximumValue"></param>
@@ -117,10 +116,32 @@ public class ObjectAssertion<TValue> : IAssertion
 
     #endregion
 
+    #region Null
+
+    /// <summary>
+    ///     The item is type of.
+    /// </summary>
+    /// <param name="reasonFormat"></param>
+    /// <param name="reasonArgs"></param>
+    /// <returns></returns>
+    public AndConstraint<ObjectAssertion<TValue>> BeNull(string reasonFormat = "", params object?[] reasonArgs)
+    {
+        if (IsSucceed(Value is null, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
+        var message = FormatString(AssertionLocalization.NullAssertion,
+            string.Format(reasonFormat, reasonArgs), reverse);
+
+        AddAssertionItem(AssertionItemType.DataType, message);
+        return new AndConstraint<ObjectAssertion<TValue>>(this);
+    }
+
+    #endregion
+
+    private protected readonly record struct Argument(string Name, object? Value);
+
     #region Comparison
 
     /// <summary>
-    /// Should be greater.
+    ///     Should be greater.
     /// </summary>
     /// <param name="expectedValue"></param>
     /// <param name="comparer"></param>
@@ -144,7 +165,7 @@ public class ObjectAssertion<TValue> : IAssertion
     }
 
     /// <summary>
-    /// Should be greater.
+    ///     Should be greater.
     /// </summary>
     /// <param name="expectedValue"></param>
     /// <param name="comparer"></param>
@@ -168,7 +189,7 @@ public class ObjectAssertion<TValue> : IAssertion
     }
 
     /// <summary>
-    /// Less or equal to
+    ///     Less or equal to
     /// </summary>
     /// <param name="expectedValue"></param>
     /// <param name="comparer"></param>
@@ -192,7 +213,7 @@ public class ObjectAssertion<TValue> : IAssertion
     }
 
     /// <summary>
-    /// Should be less than.
+    ///     Should be less than.
     /// </summary>
     /// <param name="expectedValue"></param>
     /// <param name="comparer"></param>
@@ -219,7 +240,7 @@ public class ObjectAssertion<TValue> : IAssertion
     #region Equality
 
     /// <summary>
-    /// The item should be.
+    ///     The item should be.
     /// </summary>
     /// <param name="expectedValue"></param>
     /// <param name="equalityComparer"></param>
@@ -242,7 +263,7 @@ public class ObjectAssertion<TValue> : IAssertion
     }
 
     /// <summary>
-    /// The item should be.
+    ///     The item should be.
     /// </summary>
     /// <param name="expectedValue"></param>
     /// <param name="equalityComparer"></param>
@@ -266,7 +287,7 @@ public class ObjectAssertion<TValue> : IAssertion
     }
 
     /// <summary>
-    /// be one of.
+    ///     be one of.
     /// </summary>
     /// <param name="expectedValues"></param>
     /// <param name="equalityComparer"></param>
@@ -294,7 +315,7 @@ public class ObjectAssertion<TValue> : IAssertion
     #region Type
 
     /// <summary>
-    /// The item is type of.
+    ///     The item is type of.
     /// </summary>
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
@@ -318,7 +339,7 @@ public class ObjectAssertion<TValue> : IAssertion
     }
 
     /// <summary>
-    /// Be type of
+    ///     Be type of
     /// </summary>
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
@@ -330,7 +351,6 @@ public class ObjectAssertion<TValue> : IAssertion
     }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="expectedType"></param>
     /// <param name="reasonFormat"></param>
@@ -356,26 +376,6 @@ public class ObjectAssertion<TValue> : IAssertion
 
     #endregion
 
-    #region Null
-
-    /// <summary>
-    /// The item is type of.
-    /// </summary>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
-    /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeNull(string reasonFormat = "", params object?[] reasonArgs)
-    {
-        if (IsSucceed(Value is null, out var reverse)) return new AndConstraint<ObjectAssertion<TValue>>(this);
-        var message = FormatString(AssertionLocalization.NullAssertion,
-            string.Format(reasonFormat, reasonArgs), reverse);
-
-        AddAssertionItem(AssertionItemType.DataType, message);
-        return new AndConstraint<ObjectAssertion<TValue>>(this);
-    }
-
-    #endregion
-
     #region Assertion Helper Methods
 
     private protected string FormatString(string formatString, string reason, bool reverse, params Argument[] arguments)
@@ -389,7 +389,7 @@ public class ObjectAssertion<TValue> : IAssertion
                 AssertionType.Must => AssertionLocalization.Must,
                 AssertionType.Should => AssertionLocalization.Should,
                 AssertionType.Could => AssertionLocalization.Could,
-                _ => "Unknown",
+                _ => "Unknown"
             }),
             new("Not", reverse ? AssertionLocalization.Not : string.Empty),
             ..arguments
@@ -398,10 +398,7 @@ public class ObjectAssertion<TValue> : IAssertion
         formatString = allArguments.Aggregate(formatString,
             (current, argument) => current.ReplacePlaceHolder(argument.Name, (index++).ToString()));
         var result = string.Format(formatString, [..allArguments.Select(a => a.Value)]);
-        if (!string.IsNullOrWhiteSpace(reason))
-        {
-            result += $"\n{string.Format(AssertionLocalization.Reason, reason)}";
-        }
+        if (!string.IsNullOrWhiteSpace(reason)) result += $"\n{string.Format(AssertionLocalization.Reason, reason)}";
 
         return result;
     }

@@ -24,7 +24,10 @@ internal static class GeneralHelper
 
         return $"{typeName}<{genericArgs}>";
 
-        static string GetTypeName(Type type) => type.FullName ?? type.Name;
+        static string GetTypeName(Type type)
+        {
+            return type.FullName ?? type.Name;
+        }
     }
 
     public static string GetItemsString<T>(this IEnumerable<T> items)

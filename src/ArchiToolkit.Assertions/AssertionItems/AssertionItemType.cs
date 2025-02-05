@@ -1,47 +1,47 @@
 ﻿namespace ArchiToolkit.Assertions.AssertionItems;
 
 /// <summary>
-/// The type of the assertion.
+///     The type of the assertion.
 /// </summary>
 public enum AssertionItemType : byte
 {
     /// <summary>
-    /// For the data type.
+    ///     For the data type.
     /// </summary>
     DataType,
 
     /// <summary>
-    /// For the equality
+    ///     For the equality
     /// </summary>
     Equality,
 
     /// <summary>
-    /// The comparison
+    ///     The comparison
     /// </summary>
     Comparison,
 
     /// <summary>
-    /// The custom match.
+    ///     The custom match.
     /// </summary>
     Match,
 
     /// <summary>
-    /// The in range.
+    ///     The in range.
     /// </summary>
     Range,
 
     /// <summary>
-    /// Null check.
+    ///     Null check.
     /// </summary>
     Null,
 
     /// <summary>
-    /// The equality of the items.
+    ///     The equality of the items.
     /// </summary>
     ItemEquality,
 
     /// <summary>
-    /// The Count
+    ///     The Count
     /// </summary>
-    ItemCount,
+    ItemCount
 }
