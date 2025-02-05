@@ -19,7 +19,6 @@ public class ObjectAssertion<TValue> : IAssertion
 {
     private readonly List<AssertionItem> _items = [];
     private readonly AssertionScope _scope;
-
     private bool _reversed;
 
     internal ObjectAssertion(TValue value, string valueName, AssertionType type)
