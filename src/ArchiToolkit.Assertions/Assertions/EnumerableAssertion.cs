@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Constraints;
 using ArchiToolkit.Assertions.Resources;
-using ArchiToolkit.Assertions.Utils;
 
 namespace ArchiToolkit.Assertions.Assertions;
 
@@ -61,7 +60,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndWhichConstraint<EnumerableAssertion<TValue, TItem>, TItem>
-        ContainSingle(Expression<Func<TItem, bool>> predicate, string reasonFormat = "", params object?[] reasonArgs)
+        ContainSingle(Expression<Func<TItem, bool>> predicate, [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "", params object?[] reasonArgs)
     {
         var func = predicate.Compile();
         var items = Subject.Where(func).ToArray();
@@ -84,7 +83,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<EnumerableAssertion<TValue, TItem>> Contain(TItem expectedValue,
-        IEqualityComparer<TItem>? equalityComparer = null, string reasonFormat = "", params object?[] reasonArgs)
+        IEqualityComparer<TItem>? equalityComparer = null, [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "", params object?[] reasonArgs)
     {
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
 
@@ -104,7 +103,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<EnumerableAssertion<TValue, TItem>> Contain(Expression<Func<TItem, bool>> predicate,
-        string reasonFormat = "", params object?[] reasonArgs)
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "", params object?[] reasonArgs)
     {
         var func = predicate.Compile();
         return AssertCheck(Subject.Any(func), AssertionItemType.ItemEquality,
@@ -124,7 +123,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<EnumerableAssertion<TValue, TItem>> Contain(IEnumerable<TItem> expectedValues,
-        IEqualityComparer<TItem>? equalityComparer = null, string reasonFormat = "", params object?[] reasonArgs)
+        IEqualityComparer<TItem>? equalityComparer = null, [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "", params object?[] reasonArgs)
     {
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
         var values = expectedValues as TItem[] ?? expectedValues.ToArray();
@@ -140,6 +139,22 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     #endregion
 
     #region Item Count
+    /// <summary>
+    ///     be empty
+    /// </summary>
+    /// <param name="reasonFormat"></param>
+    /// <param name="reasonArgs"></param>
+    /// <returns></returns>
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> BeEmpty(
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "",
+        params object?[] reasonArgs)
+    {
+        return AssertCheck(!Subject.Any(), AssertionItemType.Empty,
+            AssertionLocalization.EmptyAssertion,
+            [
+            ],
+            reasonFormat, reasonArgs);
+    }
 
     /// <summary>
     ///     have the count.
@@ -148,7 +163,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCount(int expectedCount, string reasonFormat = "",
+    public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCount(int expectedCount, [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "",
         params object?[] reasonArgs)
     {
         var actualCount = Subject.Count();
@@ -170,7 +185,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCountGreaterThan(int expectedCount,
-        string reasonFormat = "",
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "",
         params object?[] reasonArgs)
     {
         var actualCount = Subject.Count();
@@ -190,7 +205,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCountGreaterThanOrEqualTo(int expectedCount,
-        string reasonFormat = "",
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "",
         params object?[] reasonArgs)
     {
         var actualCount = Subject.Count();
@@ -211,7 +226,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCountLessThan(int expectedCount,
-        string reasonFormat = "",
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "",
         params object?[] reasonArgs)
     {
         var actualCount = Subject.Count();
@@ -232,7 +247,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     public AndConstraint<EnumerableAssertion<TValue, TItem>> HaveCountLessThanOrEqualTo(int expectedCount,
-        string reasonFormat = "",
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]string reasonFormat = "",
         params object?[] reasonArgs)
     {
         var actualCount = Subject.Count();

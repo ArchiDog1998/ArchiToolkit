@@ -60,7 +60,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be assignable to {ExpectedType}, but it is {ValueType}.
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be assignable to {ExpectedType}, but it is {ValueType}..
         /// </summary>
         internal static string AssignableAssertion {
             get {
@@ -150,6 +150,15 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be empty, but it is {Value}..
+        /// </summary>
+        internal static string EmptyAssertion {
+            get {
+                return ResourceManager.GetString("EmptyAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be defined, but it is {Value}..
         /// </summary>
         internal static string EnumDefinedAssertion {
@@ -227,6 +236,15 @@ namespace ArchiToolkit.Assertions.Resources {
         internal static string MatchAssertion {
             get {
                 return ResourceManager.GetString("MatchAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}match {Expression} {ExpectedMatchCount} times, but it is {ActualMatchCount} times..
+        /// </summary>
+        internal static string MatchCountAssertion {
+            get {
+                return ResourceManager.GetString("MatchCountAssertion", resourceCulture);
             }
         }
         

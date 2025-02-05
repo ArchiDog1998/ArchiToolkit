@@ -54,4 +54,9 @@ public enum AssertionItemType : byte
     ///
     /// </summary>
     Defined,
+
+    /// <summary>
+    /// Empty
+    /// </summary>
+    Empty,
 }

@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using ArchiToolkit.Assertions.AssertionItems;
-using ArchiToolkit.Assertions.Assertions;
 using ArchiToolkit.Assertions.Constraints;
 using ArchiToolkit.Assertions.Resources;
 
-namespace ArchiToolkit.Assertions;
+namespace ArchiToolkit.Assertions.Assertions.Extensions;
 
 /// <summary>
 /// The extension for the enum

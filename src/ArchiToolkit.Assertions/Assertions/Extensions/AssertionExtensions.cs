@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
-using ArchiToolkit.Assertions.Assertions;
 
-namespace ArchiToolkit.Assertions;
+namespace ArchiToolkit.Assertions.Assertions.Extensions;
 
 /// <summary>
 ///     Contains some assertions

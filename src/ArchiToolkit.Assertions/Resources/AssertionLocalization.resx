@@ -25,7 +25,7 @@
         </value>
     </resheader>
     <data name="AssignableAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be assignable to {ExpectedType}, but it is {ValueType}</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be assignable to {ExpectedType}, but it is {ValueType}.</value>
     </data>
     <data name="ContainAssertion" xml:space="preserve">
         <value>The data [{ValueName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Value}.</value>
@@ -105,5 +105,11 @@
     </data>
     <data name="EnumDefinedAssertion" xml:space="preserve">
         <value>The data [{ValueName}] {AssertionType} {Not}be defined, but it is {Value}.</value>
+    </data>
+    <data name="EmptyAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}be empty, but it is {Value}.</value>
+    </data>
+    <data name="MatchCountAssertion" xml:space="preserve">
+        <value>The data [{ValueName}] {AssertionType} {Not}match {Expression} {ExpectedMatchCount} times, but it is {ActualMatchCount} times.</value>
     </data>
 </root>

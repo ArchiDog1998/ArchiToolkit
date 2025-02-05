@@ -1,5 +1,6 @@
 ﻿using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Assertions;
+using ArchiToolkit.Assertions.Assertions.Extensions;
 using ArchiToolkit.Assertions.Execution;
 using TUnit.Core;
 
