@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -16,42 +15,31 @@ namespace ArchiToolkit.Assertions.Assertions;
 ///     Just the Assertion
 /// </summary>
 /// <typeparam name="TValue"></typeparam>
-public class ObjectAssertion<TValue> : IAssertion
+public sealed class ObjectAssertion<TValue> : IAssertion
 {
     private readonly List<AssertionItem> _items = [];
+    private readonly DateTimeOffset _createTime;
+    private readonly AssertionScope _scope;
+    private readonly AssertionType _type;
     private bool _reversed;
-
-    private protected readonly AssertionScope Scope;
-    private protected readonly AssertionType Type;
-    private protected readonly DateTimeOffset CreateTime;
 
     internal ObjectAssertion(TValue subject, string valueName, AssertionType type)
         : this(subject, valueName, type, DateTimeOffset.Now, AssertionScope.Current)
     {
     }
 
-    private protected ObjectAssertion(TValue subject, string valueName, AssertionType type, DateTimeOffset createTime,
+    private ObjectAssertion(TValue subject, string valueName, AssertionType type, DateTimeOffset createTime,
         AssertionScope scope)
     {
         Subject = subject;
         ValueName = string.IsNullOrEmpty(valueName) ? "Unknown" : valueName;
-        Type = type;
-        CreateTime = createTime;
-        Scope = scope;
-        Scope.AddAssertion(this);
+        _type = type;
+        _createTime = createTime;
+        _scope = scope;
+        _scope.AddAssertion(this);
     }
 
-    IAssertion IAssertion.Duplicate(AssertionType type)
-    {
-        return type == Type ? this : Duplicate(type);
-    }
-
-    private protected virtual IAssertion Duplicate(AssertionType type)
-    {
-        return new ObjectAssertion<TValue>(Subject, ValueName, type, CreateTime, Scope);
-    }
-
-    internal TValue Subject { get; }
+     public TValue Subject { get; }
 
     /// <summary>
     ///     The value name
@@ -59,15 +47,6 @@ public class ObjectAssertion<TValue> : IAssertion
     public string ValueName { get; }
 
     private string? ValueString => Subject?.GetObjectString();
-
-    /// <inheritdoc />
-    IReadOnlyList<AssertionItem> IAssertion.Items => _items;
-
-    /// <inheritdoc />
-    AssertionType IAssertion.Type => Type;
-
-    /// <inheritdoc />
-    DateTimeOffset IAssertion.CreatedTime => CreateTime;
 
     /// <summary>
     ///     Not
@@ -77,12 +56,25 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         get
         {
-            ReverseNot();
+            _reversed = !_reversed;
             return this;
         }
     }
 
-    private protected void ReverseNot() => _reversed = !_reversed;
+    internal ObjectAssertion<TValue> Duplicate(AssertionType type)
+    {
+        return type == _type ? this :new ObjectAssertion<TValue>(Subject, ValueName, type, _createTime, _scope);
+    }
+
+    /// <inheritdoc />
+    IReadOnlyList<AssertionItem> IAssertion.Items => _items;
+
+    /// <inheritdoc />
+    AssertionType IAssertion.Type => _type;
+
+    /// <inheritdoc />
+    DateTimeOffset IAssertion.CreatedTime => _createTime;
+
 
     #region Match
 
@@ -93,7 +85,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> Match(Expression<Func<TValue, bool>> predicate,
+    public AndConstraint<TValue> Match(Expression<Func<TValue, bool>> predicate,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
@@ -118,7 +110,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeInRange(TValue minimumValue, TValue maximumValue,
+    public AndConstraint<TValue> BeInRange(TValue minimumValue, TValue maximumValue,
         IComparer<TValue>? comparer = null,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
@@ -145,7 +137,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeNull(
+    public AndConstraint<TValue> BeNull(
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
@@ -168,7 +160,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeGreaterThanOrEqualTo(TValue comparedValue,
+    public AndConstraint<TValue> BeGreaterThanOrEqualTo(TValue comparedValue,
         IComparer<TValue>? comparer = null,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
@@ -191,7 +183,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeGreaterThan(TValue comparedValue,
+    public AndConstraint<TValue> BeGreaterThan(TValue comparedValue,
         IComparer<TValue>? comparer = null,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
@@ -214,7 +206,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeLessThanOrEqualTo(TValue comparedValue,
+    public AndConstraint<TValue> BeLessThanOrEqualTo(TValue comparedValue,
         IComparer<TValue>? comparer = null,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
@@ -237,7 +229,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeLessThan(TValue comparedValue, IComparer<TValue>? comparer = null,
+    public AndConstraint<TValue> BeLessThan(TValue comparedValue, IComparer<TValue>? comparer = null,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
@@ -262,7 +254,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> Be(TValue expectedValue,
+    public AndConstraint<TValue> Be(TValue expectedValue,
         IComparer<TValue>? equalityComparer = null,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
@@ -286,7 +278,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
     [OverloadResolutionPriority(1)]
-    public AndConstraint<ObjectAssertion<TValue>> Be(TValue expectedValue,
+    public AndConstraint<TValue> Be(TValue expectedValue,
         IEqualityComparer<TValue>? equalityComparer = null,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
@@ -309,7 +301,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeOneOf(IEnumerable<TValue> expectedValues,
+    public AndConstraint<TValue> BeOneOf(IEnumerable<TValue> expectedValues,
         IEqualityComparer<TValue>? equalityComparer = null,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
@@ -336,7 +328,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonArgs"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public AndWhichConstraint<ObjectAssertion<TValue>, T?> BeAssignableTo<T>(string reasonFormat = "",
+    public AndWhichConstraint<TValue, T?> BeAssignableTo<T>(string reasonFormat = "",
         params object?[] reasonArgs)
     {
         return AssertCheck(() => Subject is T type ? type : default,
@@ -355,7 +347,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonArgs"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeTypeOf<T>(
+    public AndConstraint<TValue> BeTypeOf<T>(
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat = "", params object?[] reasonArgs)
     {
@@ -368,7 +360,7 @@ public class ObjectAssertion<TValue> : IAssertion
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <returns></returns>
-    public AndConstraint<ObjectAssertion<TValue>> BeTypeOf(Type expectedType, string reasonFormat = "",
+    public AndConstraint<TValue> BeTypeOf(Type expectedType, string reasonFormat = "",
         params object?[] reasonArgs)
     {
         var subjectType = Subject?.GetType();
@@ -388,31 +380,53 @@ public class ObjectAssertion<TValue> : IAssertion
 
     #region Assertion Helper Methods
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="succeed"></param>
+    /// <param name="assertionItemType"></param>
+    /// <param name="formatString"></param>
+    /// <param name="additionalArguments"></param>
+    /// <param name="reasonFormat"></param>
+    /// <param name="reasonArgs"></param>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal AndConstraint<ObjectAssertion<TValue>> AssertCheck(bool succeed, AssertionItemType assertionItemType,
+    public AndConstraint<TValue> AssertCheck(bool succeed, AssertionItemType assertionItemType,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string formatString, Argument[] additionalArguments,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat, object?[] reasonArgs)
     {
-        return AssertCheck(new AndConstraint<ObjectAssertion<TValue>>(this), succeed, assertionItemType, formatString,
+        return AssertCheck(new AndConstraint<TValue>(this), succeed, assertionItemType, formatString,
             additionalArguments, reasonFormat, reasonArgs);
     }
 
+    /// <summary>
+    /// Just the check
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="succeed"></param>
+    /// <param name="assertionItemType"></param>
+    /// <param name="formatString"></param>
+    /// <param name="additionalArguments"></param>
+    /// <param name="reasonFormat"></param>
+    /// <param name="reasonArgs"></param>
+    /// <typeparam name="TMatchedElement"></typeparam>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal AndWhichConstraint<ObjectAssertion<TValue>, TMatchedElement> AssertCheck<TMatchedElement>(
+    public AndWhichConstraint<TValue, TMatchedElement> AssertCheck<TMatchedElement>(
         Func<TMatchedElement> result, bool succeed, AssertionItemType assertionItemType,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string formatString, Argument[] additionalArguments,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat, object?[] reasonArgs)
     {
-        return AssertCheck(new AndWhichConstraint<ObjectAssertion<TValue>, TMatchedElement>(this, result), succeed,
+        return AssertCheck(new AndWhichConstraint<TValue, TMatchedElement>(this, result), succeed,
             assertionItemType, formatString,
             additionalArguments, reasonFormat, reasonArgs);
     }
 
-    private protected TResult AssertCheck<TResult>(TResult result, bool succeed, AssertionItemType assertionItemType,
+    private TResult AssertCheck<TResult>(TResult result, bool succeed, AssertionItemType assertionItemType,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string formatString, Argument[] additionalArguments,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
@@ -430,7 +444,7 @@ public class ObjectAssertion<TValue> : IAssertion
         [
             new(nameof(Subject), ValueString),
             new(nameof(ValueName), ValueName),
-            new(nameof(AssertionType), Type switch
+            new(nameof(AssertionType), _type switch
             {
                 AssertionType.Must => AssertionLocalization.Must,
                 AssertionType.Should => AssertionLocalization.Should,
@@ -467,22 +481,23 @@ public class ObjectAssertion<TValue> : IAssertion
         var skipIndex = GetIndex(new StackTrace());
         var item = new AssertionItem(type, message, new StackTrace(skipIndex, true), DateTimeOffset.Now);
         _items.Add(item);
-        Scope.PushAssertionItem(item, Type);
-    }
+        _scope.PushAssertionItem(item, _type);
+        return;
 
-    private static int GetIndex(StackTrace stackTrace)
-    {
-        var index = 0;
-        foreach (var frame in stackTrace.GetFrames())
+        static int GetIndex(StackTrace stackTrace)
         {
-            index++;
+            var index = 0;
+            foreach (var frame in stackTrace.GetFrames())
+            {
+                index++;
 
-            if (frame.GetMethod() is not MethodInfo method) continue;
-            if (method.ReturnType.GetInterfaces().All(i => i != typeof(IConstraint)))continue;
-            return index + 1;
+                if (frame.GetMethod() is not MethodInfo method) continue;
+                if (method.ReturnType.GetInterfaces().All(i => i != typeof(IConstraint))) continue;
+                return index + 1;
+            }
+
+            throw new InvalidOperationException("Failed to get the frame index!");
         }
-
-        throw new InvalidOperationException("Failed to get the frame index!");
     }
 
     #endregion

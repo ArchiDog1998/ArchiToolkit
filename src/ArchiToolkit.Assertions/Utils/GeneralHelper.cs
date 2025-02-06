@@ -37,7 +37,7 @@ internal static class GeneralHelper
         {
             string str => str,
             IEnumerable enumerable => GetItemsString(enumerable),
-            _ => obj?.ToString() ?? "<null>",
+            _ => obj?.ToString() ?? "<null>"
         };
     }
 

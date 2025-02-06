@@ -5,10 +5,10 @@ namespace ArchiToolkit.Assertions.Constraints;
 /// <summary>
 ///     Just the And Constraint
 /// </summary>
-/// <typeparam name="TAssertion"></typeparam>
-public class AndConstraint<TAssertion> : IConstraint where TAssertion : IAssertion
+/// <typeparam name="TValue"></typeparam>
+public class AndConstraint<TValue> : IConstraint
 {
-    internal AndConstraint(TAssertion value)
+    internal AndConstraint(ObjectAssertion<TValue> value)
     {
         And = value;
     }
@@ -16,10 +16,10 @@ public class AndConstraint<TAssertion> : IConstraint where TAssertion : IAsserti
     /// <summary>
     ///     And things.
     /// </summary>
-    public TAssertion And { get; }
+    public ObjectAssertion<TValue> And { get; }
 
     /// <summary>
-    /// And it.
+    ///     And it.
     /// </summary>
-    public PronounAssertion<TAssertion> AndIt => new(And);
+    public PronounAssertion<TValue> AndIt => new(And);
 }

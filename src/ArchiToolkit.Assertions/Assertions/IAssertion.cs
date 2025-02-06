@@ -1,4 +1,5 @@
-﻿using ArchiToolkit.Assertions.AssertionItems;
+﻿using System.Diagnostics.CodeAnalysis;
+using ArchiToolkit.Assertions.AssertionItems;
 
 namespace ArchiToolkit.Assertions.Assertions;
 
@@ -21,6 +22,4 @@ public interface IAssertion
     ///     Assertion Type
     /// </summary>
     AssertionType Type { get; }
-
-    internal IAssertion Duplicate(AssertionType type);
 }

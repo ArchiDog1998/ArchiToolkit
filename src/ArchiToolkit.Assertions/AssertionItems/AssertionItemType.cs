@@ -46,17 +46,16 @@ public enum AssertionItemType : byte
     ItemCount,
 
     /// <summary>
-    /// Enum have flag.
+    ///     Enum have flag.
     /// </summary>
     Flag,
 
     /// <summary>
-    ///
     /// </summary>
     Defined,
 
     /// <summary>
-    /// Empty
+    ///     Empty
     /// </summary>
-    Empty,
+    Empty
 }

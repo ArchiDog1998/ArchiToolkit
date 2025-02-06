@@ -6,12 +6,12 @@ using ArchiToolkit.Assertions.Resources;
 namespace ArchiToolkit.Assertions.Assertions.Extensions;
 
 /// <summary>
-/// The extension for the enum
+///     The extension for the enum
 /// </summary>
 public static class EnumAssertionExtensions
 {
     /// <summary>
-    /// Whether it has the flag.
+    ///     Whether it has the flag.
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="flag"></param>
@@ -19,9 +19,10 @@ public static class EnumAssertionExtensions
     /// <param name="reasonArgs"></param>
     /// <typeparam name="TEnum"></typeparam>
     /// <returns></returns>
-    public static AndConstraint<ObjectAssertion<TEnum>> HaveFlag<TEnum>(this ObjectAssertion<TEnum> assertion,
+    public static AndConstraint<TEnum> HaveFlag<TEnum>(this ObjectAssertion<TEnum> assertion,
         TEnum flag,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string reasonFormat = "", params object?[] reasonArgs)
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat = "", params object?[] reasonArgs)
         where TEnum : Enum
     {
         return assertion.AssertCheck(assertion.Subject.HasFlag(flag), AssertionItemType.Flag,
@@ -33,18 +34,19 @@ public static class EnumAssertionExtensions
     }
 
     /// <summary>
-    /// Be defined.
+    ///     Be defined.
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="reasonFormat"></param>
     /// <param name="reasonArgs"></param>
     /// <typeparam name="TEnum"></typeparam>
     /// <returns></returns>
-    public static AndConstraint<ObjectAssertion<TEnum>> BeDefined<TEnum>(this ObjectAssertion<TEnum> assertion,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string reasonFormat = "", params object?[] reasonArgs)
+    public static AndConstraint<TEnum> BeDefined<TEnum>(this ObjectAssertion<TEnum> assertion,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string reasonFormat = "", params object?[] reasonArgs)
         where TEnum : Enum
     {
-        return assertion.AssertCheck(Enum.IsDefined(typeof(TEnum), assertion.Subject) , AssertionItemType.Defined,
+        return assertion.AssertCheck(Enum.IsDefined(typeof(TEnum), assertion.Subject), AssertionItemType.Defined,
             AssertionLocalization.EnumDefinedAssertion,
             [
             ],

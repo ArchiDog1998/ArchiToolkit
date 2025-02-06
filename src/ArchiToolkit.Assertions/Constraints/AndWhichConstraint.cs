@@ -5,12 +5,13 @@ namespace ArchiToolkit.Assertions.Constraints;
 /// <summary>
 ///     The constraint
 /// </summary>
-/// <typeparam name="TAssertion"></typeparam>
+/// <typeparam name="TValue"></typeparam>
 /// <typeparam name="TMatchedElement"></typeparam>
-public class AndWhichConstraint<TAssertion, TMatchedElement> : AndConstraint<TAssertion> where TAssertion : IAssertion
+public class AndWhichConstraint<TValue, TMatchedElement> : AndConstraint<TValue>
 {
     private readonly Lazy<TMatchedElement> _itemGetter;
-    internal AndWhichConstraint(TAssertion value, Func<TMatchedElement> itemGetter) : base(value)
+
+    internal AndWhichConstraint(ObjectAssertion<TValue> value, Func<TMatchedElement> itemGetter) : base(value)
     {
         _itemGetter = new Lazy<TMatchedElement>(itemGetter);
     }

@@ -1,29 +1,28 @@
 ﻿namespace ArchiToolkit.Assertions.Assertions;
 
 /// <summary>
-/// The assertion it.
+///     The assertion it.
 /// </summary>
-/// <typeparam name="TAssertion"></typeparam>
-public class PronounAssertion<TAssertion> where TAssertion : IAssertion
+/// <typeparam name="TValue"></typeparam>
+public class PronounAssertion<TValue>
 {
-    private readonly TAssertion _assertion;
-    internal PronounAssertion(TAssertion assertion)
+    private readonly ObjectAssertion<TValue> _assertion;
+
+    internal PronounAssertion(ObjectAssertion<TValue> assertion)
     {
         _assertion = assertion;
     }
 
     /// <summary>
-    /// Must thing.
+    ///     Must thing.
     /// </summary>
-    public TAssertion Must => (TAssertion)_assertion.Duplicate(AssertionType.Must);
+    public ObjectAssertion<TValue> Must => _assertion.Duplicate(AssertionType.Must);
 
     /// <summary>
-    ///
     /// </summary>
-    public TAssertion Should => (TAssertion)_assertion.Duplicate(AssertionType.Should);
+    public ObjectAssertion<TValue> Should => _assertion.Duplicate(AssertionType.Should);
 
     /// <summary>
-    ///
     /// </summary>
-    public TAssertion Could => (TAssertion)_assertion.Duplicate(AssertionType.Could);
+    public ObjectAssertion<TValue> Could => _assertion.Duplicate(AssertionType.Could);
 }
