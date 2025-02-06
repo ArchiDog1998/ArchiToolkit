@@ -1,17 +1,25 @@
-﻿namespace ArchiToolkit.Assertions.Constraints;
+﻿using ArchiToolkit.Assertions.Assertions;
+
+namespace ArchiToolkit.Assertions.Constraints;
 
 /// <summary>
-/// Just the And Constraint
+///     Just the And Constraint
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public class AndConstraint<T>
+/// <typeparam name="TValue"></typeparam>
+public class AndConstraint<TValue> : IConstraint
 {
-    /// <summary>
-    /// And things.
-    /// </summary>
-    public T And { get; }
-    internal AndConstraint(T value)
+    internal AndConstraint(ObjectAssertion<TValue> assertion)
     {
-        And = value;
+        And = assertion;
     }
+
+    /// <summary>
+    ///     And things.
+    /// </summary>
+    public ObjectAssertion<TValue> And { get; }
+
+    /// <summary>
+    ///     And it.
+    /// </summary>
+    public PronounConstraint<TValue> AndIt => new(And);
 }

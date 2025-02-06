@@ -1,19 +1,26 @@
-﻿namespace ArchiToolkit.Assertions.Constraints;
+﻿using ArchiToolkit.Assertions.Assertions;
+
+namespace ArchiToolkit.Assertions.Constraints;
 
 /// <summary>
-/// The constraint
+///     The constraint
 /// </summary>
-/// <typeparam name="TParentConstraint"></typeparam>
+/// <typeparam name="TValue"></typeparam>
 /// <typeparam name="TMatchedElement"></typeparam>
-public class AndWhichConstraint<TParentConstraint, TMatchedElement> : AndConstraint<TParentConstraint>
+public class AndWhichConstraint<TValue, TMatchedElement> : AndConstraint<TValue>
 {
-    /// <summary>
-    /// The which thing.
-    /// </summary>
-    public TMatchedElement Which { get; }
+    private readonly Lazy<TMatchedElement> _itemGetter;
+    private readonly string _suffix;
 
-    internal AndWhichConstraint(TParentConstraint value, TMatchedElement item) : base(value)
+    internal AndWhichConstraint(ObjectAssertion<TValue> assertion, Func<TMatchedElement> itemGetter, string suffix) :
+        base(assertion)
     {
-        Which = item;
+        _itemGetter = new Lazy<TMatchedElement>(itemGetter);
+        _suffix = suffix;
     }
+
+    /// <summary>
+    ///     The which thing.
+    /// </summary>
+    public WhichConstraint<TMatchedElement> Which => new(_itemGetter, And.SubjectName + _suffix);
 }

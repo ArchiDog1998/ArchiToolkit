@@ -3,21 +3,22 @@
 namespace ArchiToolkit.Assertions.Assertions;
 
 /// <summary>
-/// The Assertion
+///     The Assertion
 /// </summary>
 public interface IAssertion
 {
     /// <summary>
-    /// The assertion items.
+    ///     The assertion items.
     /// </summary>
     IReadOnlyList<AssertionItem> Items { get; }
+
     /// <summary>
-    /// Created time
+    ///     Created time
     /// </summary>
     DateTimeOffset CreatedTime { get; }
 
     /// <summary>
-    /// Assertion Type
+    ///     Assertion Type
     /// </summary>
     AssertionType Type { get; }
 }

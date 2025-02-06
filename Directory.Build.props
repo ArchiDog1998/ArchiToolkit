@@ -1,5 +1,5 @@
 <Project>
-  <PropertyGroup>
+    <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
@@ -7,5 +7,5 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/ArchiDog1998/ArchiToolkit</RepositoryUrl>
-  </PropertyGroup>
+    </PropertyGroup>
 </Project>

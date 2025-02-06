@@ -1,22 +1,22 @@
 ﻿namespace ArchiToolkit.Assertions.Assertions;
 
 /// <summary>
-/// The type of the assertion.
+///     The type of the assertion.
 /// </summary>
 public enum AssertionType : byte
 {
     /// <summary>
-    /// Must way.
+    ///     Must way.
     /// </summary>
     Must,
 
     /// <summary>
-    /// Should way.
+    ///     Should way.
     /// </summary>
     Should,
 
     /// <summary>
-    /// Could way.
+    ///     Could way.
     /// </summary>
-    Could,
+    Could
 }
