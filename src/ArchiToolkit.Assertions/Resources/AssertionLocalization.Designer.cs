@@ -69,7 +69,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Subject}..
         /// </summary>
         internal static string ContainAssertion {
             get {
@@ -78,7 +78,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Subject}..
         /// </summary>
         internal static string ContainExpressionAssertion {
             get {
@@ -150,7 +150,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be empty, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be empty, but it is {Subject}..
         /// </summary>
         internal static string EmptyAssertion {
             get {
@@ -159,7 +159,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be defined, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be defined, but it is {Subject}..
         /// </summary>
         internal static string EnumDefinedAssertion {
             get {
@@ -168,7 +168,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be {ExpectedValue}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be {ExpectedValue}, but it is {Subject}..
         /// </summary>
         internal static string EqualityAssertion {
             get {
@@ -177,7 +177,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have flag {Flag}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have flag {Flag}, but it is {Subject}..
         /// </summary>
         internal static string FlagAssertion {
             get {
@@ -186,7 +186,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be greater than {ComparedValue}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be greater than {ComparedValue}, but it is {Subject}..
         /// </summary>
         internal static string GreaterAssertion {
             get {
@@ -195,7 +195,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be greater than or equal to {ComparedValue}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be greater than or equal to {ComparedValue}, but it is {Subject}..
         /// </summary>
         internal static string GreaterOrEqualAssertion {
             get {
@@ -204,7 +204,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have a value, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}have a value, but it is {Subject}..
         /// </summary>
         internal static string HaveValueAssertion {
             get {
@@ -213,7 +213,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be less than {ComparedValue}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be less than {ComparedValue}, but it is {Subject}..
         /// </summary>
         internal static string LessAssertion {
             get {
@@ -222,7 +222,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be less than or equal to {ComparedValue}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be less than or equal to {ComparedValue}, but it is {Subject}..
         /// </summary>
         internal static string LessOrEqualAssertion {
             get {
@@ -231,7 +231,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}match {Expression}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}match {Expression}, but it is {Subject}..
         /// </summary>
         internal static string MatchAssertion {
             get {
@@ -267,7 +267,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be null, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be null, but it is {Subject}..
         /// </summary>
         internal static string NullAssertion {
             get {
@@ -276,7 +276,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be one of {ExpectedValues}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be one of {ExpectedValues}, but it is {Subject}..
         /// </summary>
         internal static string OneOfAssertion {
             get {
@@ -285,7 +285,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be between {MinimumValue} and {MaximumValue}, but it is {Value}..
+        ///   Looks up a localized string similar to The data [{ValueName}] {AssertionType} {Not}be between {MinimumValue} and {MaximumValue}, but it is {Subject}..
         /// </summary>
         internal static string RangeAssertion {
             get {

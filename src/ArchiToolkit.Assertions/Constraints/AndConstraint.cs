@@ -1,10 +1,12 @@
-﻿namespace ArchiToolkit.Assertions.Constraints;
+﻿using ArchiToolkit.Assertions.Assertions;
+
+namespace ArchiToolkit.Assertions.Constraints;
 
 /// <summary>
 ///     Just the And Constraint
 /// </summary>
 /// <typeparam name="TAssertion"></typeparam>
-public class AndConstraint<TAssertion>
+public class AndConstraint<TAssertion> where TAssertion : IAssertion
 {
     internal AndConstraint(TAssertion value)
     {
@@ -15,4 +17,9 @@ public class AndConstraint<TAssertion>
     ///     And things.
     /// </summary>
     public TAssertion And { get; }
+
+    /// <summary>
+    /// And it.
+    /// </summary>
+    public PronounAssertion<TAssertion> AndIt => new(And);
 }

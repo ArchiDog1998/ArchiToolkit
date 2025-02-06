@@ -35,6 +35,7 @@ internal static class GeneralHelper
     {
         return obj switch
         {
+            string str => str,
             IEnumerable enumerable => GetItemsString(enumerable),
             _ => obj?.ToString() ?? "<null>",
         };

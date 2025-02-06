@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Constraints;
+using ArchiToolkit.Assertions.Execution;
 using ArchiToolkit.Assertions.Resources;
 
 namespace ArchiToolkit.Assertions.Assertions;
@@ -15,6 +16,16 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
 {
     internal EnumerableAssertion(TValue subject, string valueName, AssertionType type) : base(subject, valueName, type)
     {
+    }
+
+    private protected EnumerableAssertion(TValue subject, string valueName, AssertionType type, DateTimeOffset createTime,
+        AssertionScope scope) : base(subject, valueName, type, createTime, scope)
+    {
+    }
+
+    private protected override IAssertion Duplicate(AssertionType type)
+    {
+        return new EnumerableAssertion<TValue, TItem>(Subject, ValueName, type, CreateTime, Scope);
     }
 
     internal AndWhichConstraint<EnumerableAssertion<TValue, TItem>, TItem> AssertCheck(Func<TItem> result, bool succeed, AssertionItemType assertionItemType,

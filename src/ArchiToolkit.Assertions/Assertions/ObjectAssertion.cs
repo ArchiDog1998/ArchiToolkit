@@ -18,25 +18,37 @@ namespace ArchiToolkit.Assertions.Assertions;
 public class ObjectAssertion<TValue> : IAssertion
 {
     private readonly List<AssertionItem> _items = [];
-    private readonly AssertionScope _scope;
     private bool _reversed;
-    private readonly AssertionType _type;
-    private readonly DateTimeOffset _createTime;
+
+    private protected readonly AssertionScope Scope;
+    private protected readonly AssertionType Type;
+    private protected readonly DateTimeOffset CreateTime;
 
     internal ObjectAssertion(TValue subject, string valueName, AssertionType type)
+        : this(subject, valueName, type, DateTimeOffset.Now, AssertionScope.Current)
     {
-        Subject = subject;
-        ValueName = string.IsNullOrEmpty(valueName) ? "Unnamed" : valueName;
-        _type = type;
-        _createTime = DateTimeOffset.Now;
-        _scope = AssertionScope.Current;
-        _scope.AddAssertion(this);
     }
 
-    /// <summary>
-    /// The value itself
-    /// </summary>
-    public TValue It => Subject;
+    private protected ObjectAssertion(TValue subject, string valueName, AssertionType type, DateTimeOffset createTime,
+        AssertionScope scope)
+    {
+        Subject = subject;
+        ValueName = string.IsNullOrEmpty(valueName) ? "Unknown" : valueName;
+        Type = type;
+        CreateTime = createTime;
+        Scope = scope;
+        Scope.AddAssertion(this);
+    }
+
+    IAssertion IAssertion.Duplicate(AssertionType type)
+    {
+        return type == Type ? this : Duplicate(type);
+    }
+
+    private protected virtual IAssertion Duplicate(AssertionType type)
+    {
+        return new ObjectAssertion<TValue>(Subject, ValueName, type, CreateTime, Scope);
+    }
 
     internal TValue Subject { get; }
 
@@ -51,10 +63,10 @@ public class ObjectAssertion<TValue> : IAssertion
     IReadOnlyList<AssertionItem> IAssertion.Items => _items;
 
     /// <inheritdoc />
-    AssertionType IAssertion.Type => _type;
+    AssertionType IAssertion.Type => Type;
 
     /// <inheritdoc />
-    DateTimeOffset IAssertion.CreatedTime => _createTime;
+    DateTimeOffset IAssertion.CreatedTime => CreateTime;
 
     /// <summary>
     ///     Not
@@ -69,7 +81,7 @@ public class ObjectAssertion<TValue> : IAssertion
         }
     }
 
-    private protected void ReverseNot() =>  _reversed = !_reversed;
+    private protected void ReverseNot() => _reversed = !_reversed;
 
     #region Match
 
@@ -112,7 +124,8 @@ public class ObjectAssertion<TValue> : IAssertion
     {
         var realComparer = comparer ?? Comparer<TValue>.Default;
 
-        return AssertCheck(realComparer.Compare(Subject, minimumValue) >= 0 && realComparer.Compare(Subject, maximumValue) <= 0,
+        return AssertCheck(
+            realComparer.Compare(Subject, minimumValue) >= 0 && realComparer.Compare(Subject, maximumValue) <= 0,
             AssertionItemType.Range, AssertionLocalization.RangeAssertion,
             [
                 new Argument("MinimumValue", minimumValue),
@@ -386,13 +399,15 @@ public class ObjectAssertion<TValue> : IAssertion
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal AndWhichConstraint<ObjectAssertion<TValue>, TMatchedElement> AssertCheck<TMatchedElement>(Func<TMatchedElement> result, bool succeed, AssertionItemType assertionItemType,
+    internal AndWhichConstraint<ObjectAssertion<TValue>, TMatchedElement> AssertCheck<TMatchedElement>(
+        Func<TMatchedElement> result, bool succeed, AssertionItemType assertionItemType,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string formatString, Argument[] additionalArguments,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat, object?[] reasonArgs)
     {
-        return AssertCheck(new AndWhichConstraint<ObjectAssertion<TValue>, TMatchedElement>(this, result), succeed, assertionItemType, formatString,
+        return AssertCheck(new AndWhichConstraint<ObjectAssertion<TValue>, TMatchedElement>(this, result), succeed,
+            assertionItemType, formatString,
             additionalArguments, reasonFormat, reasonArgs);
     }
 
@@ -414,7 +429,7 @@ public class ObjectAssertion<TValue> : IAssertion
         [
             new(nameof(Subject), ValueString),
             new(nameof(ValueName), ValueName),
-            new(nameof(AssertionType), _type switch
+            new(nameof(AssertionType), Type switch
             {
                 AssertionType.Must => AssertionLocalization.Must,
                 AssertionType.Should => AssertionLocalization.Should,
@@ -448,9 +463,9 @@ public class ObjectAssertion<TValue> : IAssertion
 
     private void AddAssertionItem(AssertionItemType type, string message)
     {
-        var item = new AssertionItem(type, message, new StackTrace(2, true), DateTimeOffset.Now);
+        var item = new AssertionItem(type, message, new StackTrace(4, true), DateTimeOffset.Now);
         _items.Add(item);
-        _scope.PushAssertionItem(item, _type);
+        Scope.PushAssertionItem(item, Type);
     }
 
     #endregion

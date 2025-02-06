@@ -21,4 +21,6 @@ public interface IAssertion
     ///     Assertion Type
     /// </summary>
     AssertionType Type { get; }
+
+    internal IAssertion Duplicate(AssertionType type);
 }

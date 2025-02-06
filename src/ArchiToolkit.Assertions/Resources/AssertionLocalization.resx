@@ -28,10 +28,10 @@
         <value>The data [{ValueName}] {AssertionType} {Not}be assignable to {ExpectedType}, but it is {ValueType}.</value>
     </data>
     <data name="ContainAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Subject}.</value>
     </data>
     <data name="ContainExpressionAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Subject}.</value>
     </data>
     <data name="ContainSingleExpressionAssertion" xml:space="preserve">
         <value>The data [{ValueName}] {AssertionType} {Not}have a single item matching {Expression}, but there are {MatchedCount} item(s).</value>
@@ -55,22 +55,22 @@
         <value>The data [{ValueName}] {AssertionType} {Not}contain at most {ExpectedCount} item(s), but there are {ActualCount} item(s).</value>
     </data>
     <data name="EqualityAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be {ExpectedValue}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be {ExpectedValue}, but it is {Subject}.</value>
     </data>
     <data name="GreaterAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be greater than {ComparedValue}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be greater than {ComparedValue}, but it is {Subject}.</value>
     </data>
     <data name="GreaterOrEqualAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be greater than or equal to {ComparedValue}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be greater than or equal to {ComparedValue}, but it is {Subject}.</value>
     </data>
     <data name="LessAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be less than {ComparedValue}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be less than {ComparedValue}, but it is {Subject}.</value>
     </data>
     <data name="LessOrEqualAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be less than or equal to {ComparedValue}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be less than or equal to {ComparedValue}, but it is {Subject}.</value>
     </data>
     <data name="MatchAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}match {Expression}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}match {Expression}, but it is {Subject}.</value>
     </data>
     <data name="Must" xml:space="preserve">
         <value>MUST</value>
@@ -79,13 +79,13 @@
         <value>not </value>
     </data>
     <data name="NullAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be null, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be null, but it is {Subject}.</value>
     </data>
     <data name="OneOfAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be one of {ExpectedValues}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be one of {ExpectedValues}, but it is {Subject}.</value>
     </data>
     <data name="RangeAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be between {MinimumValue} and {MaximumValue}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be between {MinimumValue} and {MaximumValue}, but it is {Subject}.</value>
     </data>
     <data name="Reason" xml:space="preserve">
         <value>Because: {0}</value>
@@ -98,16 +98,16 @@
         <comment>This is the message displayed on the home page.</comment>
     </data>
     <data name="HaveValueAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}have a value, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}have a value, but it is {Subject}.</value>
     </data>
     <data name="FlagAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}have flag {Flag}, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}have flag {Flag}, but it is {Subject}.</value>
     </data>
     <data name="EnumDefinedAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be defined, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be defined, but it is {Subject}.</value>
     </data>
     <data name="EmptyAssertion" xml:space="preserve">
-        <value>The data [{ValueName}] {AssertionType} {Not}be empty, but it is {Value}.</value>
+        <value>The data [{ValueName}] {AssertionType} {Not}be empty, but it is {Subject}.</value>
     </data>
     <data name="MatchCountAssertion" xml:space="preserve">
         <value>The data [{ValueName}] {AssertionType} {Not}match {Expression} {ExpectedMatchCount} times, but it is {ActualMatchCount} times.</value>
