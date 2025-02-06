@@ -496,7 +496,9 @@ public sealed class ObjectAssertion<TValue> : IAssertion
 
                 if (frame.GetMethod() is not MethodInfo method) continue;
                 if (method.ReturnType.GetInterfaces().All(i => i != typeof(IConstraint))) continue;
-                return index + 1;
+                if (method.DeclaringType?.Assembly == typeof(IAssertion).Assembly
+                    && method.Name.Contains(nameof(ObjectAssertion<object>.AssertCheck))) continue;
+                return index;
             }
 
             throw new InvalidOperationException("Failed to get the frame index!");
