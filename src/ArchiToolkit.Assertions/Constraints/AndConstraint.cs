@@ -6,7 +6,7 @@ namespace ArchiToolkit.Assertions.Constraints;
 ///     Just the And Constraint
 /// </summary>
 /// <typeparam name="TAssertion"></typeparam>
-public class AndConstraint<TAssertion> where TAssertion : IAssertion
+public class AndConstraint<TAssertion> : IConstraint where TAssertion : IAssertion
 {
     internal AndConstraint(TAssertion value)
     {

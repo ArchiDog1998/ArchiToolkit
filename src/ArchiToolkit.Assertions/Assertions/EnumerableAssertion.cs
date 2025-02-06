@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Constraints;
 using ArchiToolkit.Assertions.Execution;
@@ -28,6 +29,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
         return new EnumerableAssertion<TValue, TItem>(Subject, ValueName, type, CreateTime, Scope);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal AndWhichConstraint<EnumerableAssertion<TValue, TItem>, TItem> AssertCheck(Func<TItem> result, bool succeed, AssertionItemType assertionItemType,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string formatString, Argument[] additionalArguments,
@@ -38,6 +40,7 @@ public class EnumerableAssertion<TValue, TItem> : ObjectAssertion<TValue> where 
             additionalArguments, reasonFormat, reasonArgs);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal new AndConstraint<EnumerableAssertion<TValue, TItem>> AssertCheck(bool succeed, AssertionItemType assertionItemType,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string formatString, Argument[] additionalArguments,

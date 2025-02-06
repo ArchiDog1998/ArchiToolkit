@@ -31,11 +31,10 @@ file class DefaultScopeStrategy : IAssertionStrategy
         foreach (var assertion in assertions)
         foreach (var assertionItem in assertion.Items)
         {
-            messageCount++;
-            stringBuilder.AppendLine($"-[{assertionItem.Time:yyyy-MM-dd HH:mm:ss.fff zzz}]{assertionItem.Message}");
+            stringBuilder.AppendLine($"{++messageCount:D2}. [{assertionItem.Time:yyyy-MM-dd HH:mm:ss.fff zzz}]{assertionItem.Message}");
             var frame = assertionItem.StackTrace.GetFrames()[0];
             stringBuilder.AppendLine(
-                $"-at {frame.GetMethod()} in {frame.GetFileName()}:line {frame.GetFileLineNumber()}");
+                $"  at {frame.GetMethod()} in {frame.GetFileName()}:line {frame.GetFileLineNumber()}");
         }
 
         if (messageCount is 0) return;

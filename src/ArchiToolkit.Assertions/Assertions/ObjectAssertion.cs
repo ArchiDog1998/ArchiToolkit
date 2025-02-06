@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Constraints;
@@ -463,9 +464,25 @@ public class ObjectAssertion<TValue> : IAssertion
 
     private void AddAssertionItem(AssertionItemType type, string message)
     {
-        var item = new AssertionItem(type, message, new StackTrace(4, true), DateTimeOffset.Now);
+        var skipIndex = GetIndex(new StackTrace());
+        var item = new AssertionItem(type, message, new StackTrace(skipIndex, true), DateTimeOffset.Now);
         _items.Add(item);
         Scope.PushAssertionItem(item, Type);
+    }
+
+    private static int GetIndex(StackTrace stackTrace)
+    {
+        var index = 0;
+        foreach (var frame in stackTrace.GetFrames())
+        {
+            index++;
+
+            if (frame.GetMethod() is not MethodInfo method) continue;
+            if (method.ReturnType.GetInterfaces().All(i => i != typeof(IConstraint)))continue;
+            return index + 1;
+        }
+
+        throw new InvalidOperationException("Failed to get the frame index!");
     }
 
     #endregion
