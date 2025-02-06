@@ -22,5 +22,5 @@ public class AndWhichConstraint<TValue, TMatchedElement> : AndConstraint<TValue>
     /// <summary>
     ///     The which thing.
     /// </summary>
-    public WhichConstraint<TMatchedElement> Which => new(_itemGetter.Value, And.SubjectName + _suffix);
+    public WhichConstraint<TMatchedElement> Which => new(_itemGetter, And.SubjectName + _suffix);
 }

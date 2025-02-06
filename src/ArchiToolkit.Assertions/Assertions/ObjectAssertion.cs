@@ -21,21 +21,23 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     private readonly List<AssertionItem> _items = [];
     private readonly AssertionScope _scope;
     private readonly AssertionType _type;
+    private readonly bool _isValid;
     private bool _reversed;
 
-    internal ObjectAssertion(TValue subject, string valueName, AssertionType type)
-        : this(subject, valueName, type, DateTimeOffset.Now, AssertionScope.Current)
+    internal ObjectAssertion(TValue subject, string valueName, AssertionType type, bool isValid = true)
+        : this(subject, valueName, type, DateTimeOffset.Now, AssertionScope.Current, isValid)
     {
     }
 
     private ObjectAssertion(TValue subject, string valueName, AssertionType type, DateTimeOffset createTime,
-        AssertionScope scope)
+        AssertionScope scope, bool isValid)
     {
         Subject = subject;
         SubjectName = string.IsNullOrEmpty(valueName) ? "Unknown" : valueName;
         _type = type;
         _createTime = createTime;
         _scope = scope;
+        _isValid = isValid;
         _scope.AddAssertion(this);
     }
 
@@ -75,7 +77,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
 
     internal ObjectAssertion<TValue> Duplicate(AssertionType type)
     {
-        return type == _type ? this : new ObjectAssertion<TValue>(Subject, SubjectName, type, _createTime, _scope);
+        return type == _type ? this : new ObjectAssertion<TValue>(Subject, SubjectName, type, _createTime, _scope, _isValid);
     }
 
 
@@ -468,6 +470,11 @@ public sealed class ObjectAssertion<TValue> : IAssertion
 
     private bool IsSucceed(bool succeed, out bool reverse)
     {
+        if (!_isValid)
+        {
+            reverse = false;
+            return true;
+        }
         try
         {
             reverse = _reversed;

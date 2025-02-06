@@ -21,5 +21,5 @@ public class AndConstraint<TValue> : IConstraint
     /// <summary>
     ///     And it.
     /// </summary>
-    public PronounAssertion<TValue> AndIt => new(And);
+    public PronounConstraint<TValue> AndIt => new(And);
 }

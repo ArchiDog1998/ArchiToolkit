@@ -1,14 +1,16 @@
-﻿namespace ArchiToolkit.Assertions.Assertions;
+﻿using ArchiToolkit.Assertions.Assertions;
+
+namespace ArchiToolkit.Assertions.Constraints;
 
 /// <summary>
 ///     The assertion it.
 /// </summary>
 /// <typeparam name="TValue"></typeparam>
-public class PronounAssertion<TValue>
+public class PronounConstraint<TValue> : IConstraint
 {
     private readonly ObjectAssertion<TValue> _assertion;
 
-    internal PronounAssertion(ObjectAssertion<TValue> assertion)
+    internal PronounConstraint(ObjectAssertion<TValue> assertion)
     {
         _assertion = assertion;
     }

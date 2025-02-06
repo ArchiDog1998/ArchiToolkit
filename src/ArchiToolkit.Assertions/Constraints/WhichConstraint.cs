@@ -7,9 +7,9 @@ namespace ArchiToolkit.Assertions.Constraints;
 public class WhichConstraint<TValue> : IConstraint
 {
     private readonly string _name;
-    private readonly TValue _value;
+    private readonly Lazy<TValue> _value;
 
-    internal WhichConstraint(TValue value, string name)
+    internal WhichConstraint(Lazy<TValue> value, string name)
     {
         _value = value;
         _name = name;
@@ -17,13 +17,28 @@ public class WhichConstraint<TValue> : IConstraint
 
     /// <summary>
     /// </summary>
-    public ObjectAssertion<TValue> Must => new(_value, _name, AssertionType.Must);
+    public ObjectAssertion<TValue> Must => CreateAssertion(AssertionType.Must);
 
     /// <summary>
     /// </summary>
-    public ObjectAssertion<TValue> Should => new(_value, _name, AssertionType.Should);
+    public ObjectAssertion<TValue> Should => CreateAssertion(AssertionType.Should);
 
     /// <summary>
     /// </summary>
-    public ObjectAssertion<TValue> Could => new(_value, _name, AssertionType.Could);
+    public ObjectAssertion<TValue> Could => CreateAssertion(AssertionType.Could);
+
+    private ObjectAssertion<TValue> CreateAssertion(AssertionType assertionType)
+    {
+        TValue value = default!;
+        var isValid = true;
+        try
+        {
+            value = _value.Value;
+        }
+        catch
+        {
+            isValid = false;
+        }
+        return new ObjectAssertion<TValue>(value, _name, assertionType, isValid);
+    }
 }

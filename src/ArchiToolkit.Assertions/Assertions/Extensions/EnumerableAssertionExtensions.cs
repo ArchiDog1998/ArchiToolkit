@@ -43,6 +43,39 @@ public static class EnumerableAssertionExtensions
     }
 
     /// <summary>
+    /// Get if the item contain single.
+    /// </summary>
+    /// <param name="assertion"></param>
+    /// <param name="expectedValue"></param>
+    /// <param name="equalityComparer"></param>
+    /// <param name="reasonFormat"></param>
+    /// <param name="reasonArgs"></param>
+    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TItem"></typeparam>
+    /// <returns></returns>
+    public static AndWhichConstraint<TValue, TItem>
+        ContainSingle<TValue, TItem>(this ObjectAssertion<TValue> assertion,
+            TItem expectedValue,
+            IEqualityComparer<TItem>? equalityComparer = null,
+            [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+            string reasonFormat = "", params object?[] reasonArgs)
+        where TValue : IEnumerable<TItem>
+    {
+        var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
+
+        var items = assertion.Subject.Where(item => comparer.Equals(item, expectedValue)).ToArray();
+
+        return assertion.AssertCheck(() => items.First(), $".SingleBy<{expectedValue}>", items.Length is 1,
+            AssertionItemType.ItemEquality,
+            AssertionLocalization.ContainSingleAssertion,
+            [
+                new Argument("MatchedCount", items.Length),
+                new Argument("ExpectedValue", expectedValue),
+            ],
+            reasonFormat, reasonArgs);
+    }
+
+    /// <summary>
     ///     Contains items
     /// </summary>
     /// <param name="assertion"></param>

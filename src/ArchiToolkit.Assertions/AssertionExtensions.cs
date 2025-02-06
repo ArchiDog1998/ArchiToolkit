@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using ArchiToolkit.Assertions.Assertions;
+using ArchiToolkit.Assertions.Constraints;
 
 namespace ArchiToolkit.Assertions;
 
@@ -8,6 +9,17 @@ namespace ArchiToolkit.Assertions;
 /// </summary>
 public static class AssertionExtensions
 {
+    private static void ThrowIfInvalid<T>(T value)
+    {
+        switch (value)
+        {
+            case IAssertion:
+                throw new InvalidOperationException("You can't create an assertion by an assertion!");
+            case IConstraint:
+                throw new InvalidOperationException("You can't create an assertion by an constraint! Try to use its property!");
+        }
+    }
+
     /// <summary>
     ///     The must assertion
     /// </summary>
@@ -19,6 +31,7 @@ public static class AssertionExtensions
         [CallerArgumentExpression(nameof(value))]
         string valueName = "")
     {
+        ThrowIfInvalid(value);
         return new ObjectAssertion<T>(value, valueName, AssertionType.Must);
     }
 
@@ -33,6 +46,7 @@ public static class AssertionExtensions
         [CallerArgumentExpression(nameof(value))]
         string valueName = "")
     {
+        ThrowIfInvalid(value);
         return new ObjectAssertion<T>(value, valueName, AssertionType.Should);
     }
 
@@ -47,6 +61,7 @@ public static class AssertionExtensions
         [CallerArgumentExpression(nameof(value))]
         string valueName = "")
     {
+        ThrowIfInvalid(value);
         return new ObjectAssertion<T>(value, valueName, AssertionType.Could);
     }
 }
