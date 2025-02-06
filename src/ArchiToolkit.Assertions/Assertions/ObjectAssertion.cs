@@ -51,8 +51,6 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     /// </summary>
     public string SubjectName { get; }
 
-    private string? ValueString => Subject?.GetObjectString();
-
     /// <summary>
     ///     Not
     /// </summary>
@@ -447,7 +445,8 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     {
         Argument[] allArguments =
         [
-            new(nameof(Subject), ValueString),
+            new(nameof(Subject), Subject),
+            new("Subjects", Subject?.GetObjectString()),
             new(nameof(SubjectName), SubjectName),
             new(nameof(AssertionType), _type switch
             {

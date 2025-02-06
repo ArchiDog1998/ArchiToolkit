@@ -28,10 +28,10 @@
         <value>The data [{SubjectName}] {AssertionType} {Not}be assignable to {ExpectedType}, but it is {ValueType}.</value>
     </data>
     <data name="ContainAssertion" xml:space="preserve">
-        <value>The data [{SubjectName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Subject}.</value>
+        <value>The data [{SubjectName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Subjects}.</value>
     </data>
     <data name="ContainExpressionAssertion" xml:space="preserve">
-        <value>The data [{SubjectName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Subject}.</value>
+        <value>The data [{SubjectName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Subjects}.</value>
     </data>
     <data name="ContainSingleExpressionAssertion" xml:space="preserve">
         <value>The data [{SubjectName}] {AssertionType} {Not}have a single item matching {Expression}, but there are {MatchedCount} item(s).</value>

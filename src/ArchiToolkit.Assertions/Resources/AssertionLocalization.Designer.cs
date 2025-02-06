@@ -69,7 +69,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{SubjectName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Subject}..
+        ///   Looks up a localized string similar to The data [{SubjectName}] {AssertionType} {Not}contain {ExpectedValue}, but there are {Subjects}..
         /// </summary>
         internal static string ContainAssertion {
             get {
@@ -78,7 +78,7 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data [{SubjectName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Subject}..
+        ///   Looks up a localized string similar to The data [{SubjectName}] {AssertionType} {Not}have an item matching {Expression}, but there are {Subjects}..
         /// </summary>
         internal static string ContainExpressionAssertion {
             get {

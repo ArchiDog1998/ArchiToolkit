@@ -3,6 +3,4 @@
 /// <summary>
 ///     Just the Constraint
 /// </summary>
-public interface IConstraint
-{
-}
+public interface IConstraint;
