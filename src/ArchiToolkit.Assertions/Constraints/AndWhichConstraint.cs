@@ -10,14 +10,17 @@ namespace ArchiToolkit.Assertions.Constraints;
 public class AndWhichConstraint<TValue, TMatchedElement> : AndConstraint<TValue>
 {
     private readonly Lazy<TMatchedElement> _itemGetter;
+    private readonly string _suffix;
 
-    internal AndWhichConstraint(ObjectAssertion<TValue> value, Func<TMatchedElement> itemGetter) : base(value)
+    internal AndWhichConstraint(ObjectAssertion<TValue> assertion, Func<TMatchedElement> itemGetter, string suffix) :
+        base(assertion)
     {
         _itemGetter = new Lazy<TMatchedElement>(itemGetter);
+        _suffix = suffix;
     }
 
     /// <summary>
     ///     The which thing.
     /// </summary>
-    public TMatchedElement Which => _itemGetter.Value;
+    public WhichConstraint<TMatchedElement> Which => new(_itemGetter.Value, And.SubjectName + _suffix);
 }

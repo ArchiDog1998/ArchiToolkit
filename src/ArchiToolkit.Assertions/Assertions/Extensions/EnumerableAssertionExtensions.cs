@@ -8,7 +8,7 @@ using ArchiToolkit.Assertions.Resources;
 namespace ArchiToolkit.Assertions.Assertions.Extensions;
 
 /// <summary>
-/// For the enumerable things
+///     For the enumerable things
 /// </summary>
 public static class EnumerableAssertionExtensions
 {
@@ -32,7 +32,8 @@ public static class EnumerableAssertionExtensions
         var func = predicate.Compile();
         var items = assertion.Subject.Where(func).ToArray();
 
-        return assertion.AssertCheck(() => items.First(), items.Length is 1, AssertionItemType.ItemEquality,
+        return assertion.AssertCheck(() => items.First(), $".SingleBy[{predicate.Body}]", items.Length is 1,
+            AssertionItemType.ItemEquality,
             AssertionLocalization.ContainSingleExpressionAssertion,
             [
                 new Argument("MatchedCount", items.Length),
@@ -123,7 +124,7 @@ public static class EnumerableAssertionExtensions
     #region Item Count
 
     /// <summary>
-    ///  be empty
+    ///     be empty
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="reasonFormat"></param>
@@ -144,7 +145,7 @@ public static class EnumerableAssertionExtensions
     }
 
     /// <summary>
-    /// have the count.
+    ///     have the count.
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>
@@ -171,7 +172,7 @@ public static class EnumerableAssertionExtensions
     }
 
     /// <summary>
-    /// greater than.
+    ///     greater than.
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>
@@ -199,7 +200,6 @@ public static class EnumerableAssertionExtensions
 
 
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>
@@ -227,7 +227,7 @@ public static class EnumerableAssertionExtensions
     }
 
     /// <summary>
-    /// The count less than.
+    ///     The count less than.
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>
@@ -255,7 +255,7 @@ public static class EnumerableAssertionExtensions
     }
 
     /// <summary>
-    /// The count less than or equal to.
+    ///     The count less than or equal to.
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>

@@ -8,9 +8,9 @@ namespace ArchiToolkit.Assertions.Constraints;
 /// <typeparam name="TValue"></typeparam>
 public class AndConstraint<TValue> : IConstraint
 {
-    internal AndConstraint(ObjectAssertion<TValue> value)
+    internal AndConstraint(ObjectAssertion<TValue> assertion)
     {
-        And = value;
+        And = assertion;
     }
 
     /// <summary>

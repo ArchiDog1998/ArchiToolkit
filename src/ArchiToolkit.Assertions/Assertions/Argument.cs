@@ -1,7 +1,7 @@
 ﻿namespace ArchiToolkit.Assertions.Assertions;
 
 /// <summary>
-/// The string format argument.
+///     The string format argument.
 /// </summary>
 /// <param name="Name"></param>
 /// <param name="Value"></param>

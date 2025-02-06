@@ -17,8 +17,8 @@ namespace ArchiToolkit.Assertions.Assertions;
 /// <typeparam name="TValue"></typeparam>
 public sealed class ObjectAssertion<TValue> : IAssertion
 {
-    private readonly List<AssertionItem> _items = [];
     private readonly DateTimeOffset _createTime;
+    private readonly List<AssertionItem> _items = [];
     private readonly AssertionScope _scope;
     private readonly AssertionType _type;
     private bool _reversed;
@@ -32,19 +32,22 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         AssertionScope scope)
     {
         Subject = subject;
-        ValueName = string.IsNullOrEmpty(valueName) ? "Unknown" : valueName;
+        SubjectName = string.IsNullOrEmpty(valueName) ? "Unknown" : valueName;
         _type = type;
         _createTime = createTime;
         _scope = scope;
         _scope.AddAssertion(this);
     }
 
-     public TValue Subject { get; }
+    /// <summary>
+    ///     The subject.
+    /// </summary>
+    public TValue Subject { get; }
 
     /// <summary>
-    ///     The value name
+    ///     The subject name
     /// </summary>
-    public string ValueName { get; }
+    public string SubjectName { get; }
 
     private string? ValueString => Subject?.GetObjectString();
 
@@ -61,11 +64,6 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         }
     }
 
-    internal ObjectAssertion<TValue> Duplicate(AssertionType type)
-    {
-        return type == _type ? this :new ObjectAssertion<TValue>(Subject, ValueName, type, _createTime, _scope);
-    }
-
     /// <inheritdoc />
     IReadOnlyList<AssertionItem> IAssertion.Items => _items;
 
@@ -74,6 +72,11 @@ public sealed class ObjectAssertion<TValue> : IAssertion
 
     /// <inheritdoc />
     DateTimeOffset IAssertion.CreatedTime => _createTime;
+
+    internal ObjectAssertion<TValue> Duplicate(AssertionType type)
+    {
+        return type == _type ? this : new ObjectAssertion<TValue>(Subject, SubjectName, type, _createTime, _scope);
+    }
 
 
     #region Match
@@ -331,7 +334,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     public AndWhichConstraint<TValue, T?> BeAssignableTo<T>(string reasonFormat = "",
         params object?[] reasonArgs)
     {
-        return AssertCheck(() => Subject is T type ? type : default,
+        return AssertCheck(() => Subject is T type ? type : default, string.Empty,
             Subject is T, AssertionItemType.DataType, AssertionLocalization.AssignableAssertion,
             [
                 new Argument("ValueType", Subject?.GetType().GetFullName()),
@@ -381,7 +384,6 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     #region Assertion Helper Methods
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="succeed"></param>
     /// <param name="assertionItemType"></param>
@@ -402,9 +404,10 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     }
 
     /// <summary>
-    /// Just the check
+    ///     Just the check
     /// </summary>
-    /// <param name="result"></param>
+    /// <param name="resultGetter"></param>
+    /// <param name="suffix"></param>
     /// <param name="succeed"></param>
     /// <param name="assertionItemType"></param>
     /// <param name="formatString"></param>
@@ -415,13 +418,13 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public AndWhichConstraint<TValue, TMatchedElement> AssertCheck<TMatchedElement>(
-        Func<TMatchedElement> result, bool succeed, AssertionItemType assertionItemType,
+        Func<TMatchedElement> resultGetter, string suffix, bool succeed, AssertionItemType assertionItemType,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string formatString, Argument[] additionalArguments,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string reasonFormat, object?[] reasonArgs)
     {
-        return AssertCheck(new AndWhichConstraint<TValue, TMatchedElement>(this, result), succeed,
+        return AssertCheck(new AndWhichConstraint<TValue, TMatchedElement>(this, resultGetter, suffix), succeed,
             assertionItemType, formatString,
             additionalArguments, reasonFormat, reasonArgs);
     }
@@ -443,7 +446,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         Argument[] allArguments =
         [
             new(nameof(Subject), ValueString),
-            new(nameof(ValueName), ValueName),
+            new(nameof(SubjectName), SubjectName),
             new(nameof(AssertionType), _type switch
             {
                 AssertionType.Must => AssertionLocalization.Must,
