@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -8,8 +7,9 @@ using Microsoft.CodeAnalysis.Operations;
 namespace ArchiToolkit.Pure;
 
 /// <summary>
-/// A sample analyzer that reports invalid values being used for the 'speed' parameter of the 'SetSpeed' function.
-/// To make sure that we analyze the method of the specific class, we use semantic analysis instead of the syntax tree, so this analyzer will not work if the project is not compilable.
+///     A sample analyzer that reports invalid values being used for the 'speed' parameter of the 'SetSpeed' function.
+///     To make sure that we analyze the method of the specific class, we use semantic analysis instead of the syntax tree,
+///     so this analyzer will not work if the project is not compilable.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class SampleSemanticAnalyzer : DiagnosticAnalyzer
@@ -19,6 +19,9 @@ public class SampleSemanticAnalyzer : DiagnosticAnalyzer
 
     // Preferred format of DiagnosticId is Your Prefix + Number, e.g. CA1234.
     private const string DiagnosticId = "AB0002";
+
+    // The category of the diagnostic (Design, Naming etc.).
+    private const string Category = "Usage";
 
     // Feel free to use raw strings if you don't need localization.
     private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AB0002Title),
@@ -33,11 +36,8 @@ public class SampleSemanticAnalyzer : DiagnosticAnalyzer
         new LocalizableResourceString(nameof(Resources.AB0002Description), Resources.ResourceManager,
             typeof(Resources));
 
-    // The category of the diagnostic (Design, Naming etc.).
-    private const string Category = "Usage";
-
     private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category,
-        DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        DiagnosticSeverity.Warning, true, Description);
 
     // Keep in mind: you have to list your rules here.
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
@@ -58,7 +58,7 @@ public class SampleSemanticAnalyzer : DiagnosticAnalyzer
     }
 
     /// <summary>
-    /// Executed on the completion of the semantic analysis associated with the Invocation operation.
+    ///     Executed on the completion of the semantic analysis associated with the Invocation operation.
     /// </summary>
     /// <param name="context">Operation context.</param>
     private void AnalyzeOperation(OperationAnalysisContext context)

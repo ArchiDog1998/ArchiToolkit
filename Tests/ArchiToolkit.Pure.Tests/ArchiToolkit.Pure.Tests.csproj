@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\analyzers\ArchiToolkit.Pure\ArchiToolkit.Pure.csproj" />
-      <ProjectReference Include="..\..\src\ArchiToolkit.Pure\ArchiToolkit.Pure.csproj" />
+        <ProjectReference Include="..\..\analyzers\ArchiToolkit.Pure\ArchiToolkit.Pure.csproj"/>
+        <ProjectReference Include="..\..\src\ArchiToolkit.Pure\ArchiToolkit.Pure.csproj"/>
     </ItemGroup>
 </Project>

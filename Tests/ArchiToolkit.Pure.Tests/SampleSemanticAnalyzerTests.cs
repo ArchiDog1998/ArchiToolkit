@@ -1,8 +1,6 @@
-using System.Threading.Tasks;
 using Xunit;
-using Verifier =
-    Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<
-        ArchiToolkit.Pure.SampleSemanticAnalyzer>;
+using Verifier = Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<
+    ArchiToolkit.Pure.SampleSemanticAnalyzer>;
 
 namespace ArchiToolkit.Pure.Tests;
 

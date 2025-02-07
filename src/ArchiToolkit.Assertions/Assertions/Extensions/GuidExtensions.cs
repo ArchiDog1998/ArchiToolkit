@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using ArchiToolkit.Assertions.AssertionItems;
+﻿using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Constraints;
 using ArchiToolkit.Assertions.Resources;
 
@@ -14,17 +13,13 @@ public static class GuidExtensions
     ///     Empty/
     /// </summary>
     /// <param name="assertion"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <returns></returns>
     public static AndConstraint<Guid> BeEmpty(this ObjectAssertion<Guid> assertion,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "", params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
     {
         return assertion.AssertCheck(assertion.Subject == Guid.Empty, AssertionItemType.Empty,
-            AssertionLocalization.EmptyAssertion,
-            [
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.EmptyAssertion),
+            assertionParams);
     }
 }

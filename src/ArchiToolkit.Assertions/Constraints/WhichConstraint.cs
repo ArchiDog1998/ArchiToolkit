@@ -39,6 +39,7 @@ public class WhichConstraint<TValue> : IConstraint
         {
             isValid = false;
         }
+
         return new ObjectAssertion<TValue>(value, _name, assertionType, isValid);
     }
 }

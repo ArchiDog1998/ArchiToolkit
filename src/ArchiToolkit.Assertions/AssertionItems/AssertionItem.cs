@@ -9,8 +9,10 @@ namespace ArchiToolkit.Assertions.AssertionItems;
 /// <param name="Message"></param>
 /// <param name="StackTrace"></param>
 /// <param name="Time"></param>
+/// <param name="Tag"></param>
 public readonly record struct AssertionItem(
     AssertionItemType Type,
     string Message,
     StackTrace StackTrace,
-    DateTimeOffset Time);
+    DateTimeOffset Time,
+    object? Tag);

@@ -7,8 +7,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace ArchiToolkit.Pure;
 
 /// <summary>
-/// A sample analyzer that reports the company name being used in class declarations.
-/// Traverses through the Syntax Tree and checks the name (identifier) of each class node.
+///     A sample analyzer that reports the company name being used in class declarations.
+///     Traverses through the Syntax Tree and checks the name (identifier) of each class node.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class SampleSyntaxAnalyzer : DiagnosticAnalyzer
@@ -17,6 +17,9 @@ public class SampleSyntaxAnalyzer : DiagnosticAnalyzer
 
     // Preferred format of DiagnosticId is Your Prefix + Number, e.g. CA1234.
     public const string DiagnosticId = "AB0001";
+
+    // The category of the diagnostic (Design, Naming etc.).
+    private const string Category = "Naming";
 
     // Feel free to use raw strings if you don't need localization.
     private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AB0001Title),
@@ -31,11 +34,8 @@ public class SampleSyntaxAnalyzer : DiagnosticAnalyzer
         new LocalizableResourceString(nameof(Resources.AB0001Description), Resources.ResourceManager,
             typeof(Resources));
 
-    // The category of the diagnostic (Design, Naming etc.).
-    private const string Category = "Naming";
-
     private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category,
-        DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        DiagnosticSeverity.Warning, true, Description);
 
     // Keep in mind: you have to list your rules here.
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
@@ -57,7 +57,7 @@ public class SampleSyntaxAnalyzer : DiagnosticAnalyzer
     }
 
     /// <summary>
-    /// Executed for each Syntax Node with 'SyntaxKind' is 'ClassDeclaration'.
+    ///     Executed for each Syntax Node with 'SyntaxKind' is 'ClassDeclaration'.
     /// </summary>
     /// <param name="context">Operation context.</param>
     private void AnalyzeSyntax(SyntaxNodeAnalysisContext context)

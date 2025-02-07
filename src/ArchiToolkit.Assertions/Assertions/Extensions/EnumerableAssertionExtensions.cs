@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Constraints;
@@ -19,14 +18,12 @@ public static class EnumerableAssertionExtensions
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="predicate"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <returns></returns>
     public static AndWhichConstraint<TValue, TItem>
         ContainSingle<TValue, TItem>(this ObjectAssertion<TValue> assertion,
             Expression<Func<TItem, bool>> predicate,
-            [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-            string reasonFormat = "", params object?[] reasonArgs)
+            AssertionParams? assertionParams = null)
         where TValue : IEnumerable<TItem>
     {
         var func = predicate.Compile();
@@ -34,22 +31,18 @@ public static class EnumerableAssertionExtensions
 
         return assertion.AssertCheck(() => items.First(), $".SingleBy[{predicate.Body}]", items.Length is 1,
             AssertionItemType.ItemEquality,
-            AssertionLocalization.ContainSingleExpressionAssertion,
-            [
-                new Argument("MatchedCount", items.Length),
-                new Argument("Expression", predicate.Body)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.ContainSingleExpressionAssertion,
+                new Argument("MatchedCount", items.Length), new Argument("Expression", predicate.Body)),
+            assertionParams);
     }
 
     /// <summary>
-    /// Get if the item contain single.
+    ///     Get if the item contain single.
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedValue"></param>
     /// <param name="equalityComparer"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <typeparam name="TValue"></typeparam>
     /// <typeparam name="TItem"></typeparam>
     /// <returns></returns>
@@ -57,8 +50,7 @@ public static class EnumerableAssertionExtensions
         ContainSingle<TValue, TItem>(this ObjectAssertion<TValue> assertion,
             TItem expectedValue,
             IEqualityComparer<TItem>? equalityComparer = null,
-            [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-            string reasonFormat = "", params object?[] reasonArgs)
+            AssertionParams? assertionParams = null)
         where TValue : IEnumerable<TItem>
     {
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
@@ -67,12 +59,8 @@ public static class EnumerableAssertionExtensions
 
         return assertion.AssertCheck(() => items.First(), $".SingleBy<{expectedValue}>", items.Length is 1,
             AssertionItemType.ItemEquality,
-            AssertionLocalization.ContainSingleAssertion,
-            [
-                new Argument("MatchedCount", items.Length),
-                new Argument("ExpectedValue", expectedValue),
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.ContainSingleAssertion, new Argument("MatchedCount", items.Length),
+                new Argument("ExpectedValue", expectedValue)), assertionParams);
     }
 
     /// <summary>
@@ -81,25 +69,20 @@ public static class EnumerableAssertionExtensions
     /// <param name="assertion"></param>
     /// <param name="expectedValue"></param>
     /// <param name="equalityComparer"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <returns></returns>
     public static AndConstraint<TValue> Contain<TValue, TItem>(this ObjectAssertion<TValue> assertion,
         TItem expectedValue,
         IEqualityComparer<TItem>? equalityComparer = null,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "", params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TValue : IEnumerable<TItem>
     {
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
 
         return assertion.AssertCheck(assertion.Subject.Contains(expectedValue, comparer),
             AssertionItemType.ItemEquality,
-            AssertionLocalization.ContainAssertion,
-            [
-                new Argument("ExpectedValue", expectedValue)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.ContainAssertion, new Argument("ExpectedValue", expectedValue)),
+            assertionParams);
     }
 
     /// <summary>
@@ -107,22 +90,17 @@ public static class EnumerableAssertionExtensions
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="predicate"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <returns></returns>
     public static AndConstraint<TValue> Contain<TValue, TItem>(this ObjectAssertion<TValue> assertion,
         Expression<Func<TItem, bool>> predicate,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "", params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TValue : IEnumerable<TItem>
     {
         var func = predicate.Compile();
         return assertion.AssertCheck(assertion.Subject.Any(func), AssertionItemType.ItemEquality,
-            AssertionLocalization.ContainExpressionAssertion,
-            [
-                new Argument("Expression", predicate.Body)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.ContainExpressionAssertion,
+                new Argument("Expression", predicate.Body)), assertionParams);
     }
 
     /// <summary>
@@ -131,25 +109,20 @@ public static class EnumerableAssertionExtensions
     /// <param name="assertion"></param>
     /// <param name="expectedValues"></param>
     /// <param name="equalityComparer"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <returns></returns>
     public static AndConstraint<TValue> Contain<TValue, TItem>(this ObjectAssertion<TValue> assertion,
         IEnumerable<TItem> expectedValues,
         IEqualityComparer<TItem>? equalityComparer = null,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "", params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TValue : IEnumerable<TItem>
     {
         var comparer = equalityComparer ?? EqualityComparer<TItem>.Default;
         var values = expectedValues as TItem[] ?? expectedValues.ToArray();
 
         return assertion.AssertCheck(values.Except(assertion.Subject, comparer).Any(), AssertionItemType.ItemEquality,
-            AssertionLocalization.ContainAssertion,
-            [
-                new Argument("ExpectedValues", values)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.ContainAssertion, new Argument("ExpectedValues", values)),
+            assertionParams);
     }
 
     #endregion
@@ -160,21 +133,16 @@ public static class EnumerableAssertionExtensions
     ///     be empty
     /// </summary>
     /// <param name="assertion"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     public static AndConstraint<TValue> BeEmpty<TValue>(this ObjectAssertion<TValue> assertion,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "",
-        params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TValue : IEnumerable
     {
         return assertion.AssertCheck(GetCount(assertion.Subject) > 0, AssertionItemType.Empty,
             AssertionLocalization.EmptyAssertion,
-            [
-            ],
-            reasonFormat, reasonArgs);
+            assertionParams);
     }
 
     /// <summary>
@@ -182,26 +150,19 @@ public static class EnumerableAssertionExtensions
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     public static AndConstraint<TValue> HaveCount<TValue>(this ObjectAssertion<TValue> assertion, int expectedCount,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "",
-        params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TValue : IEnumerable
     {
         var actualCount = GetCount(assertion.Subject);
 
 
         return assertion.AssertCheck(actualCount == expectedCount, AssertionItemType.ItemCount,
-            AssertionLocalization.CountAssertion,
-            [
-                new Argument("ActualCount", actualCount),
-                new Argument("ExpectedCount", expectedCount)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.CountAssertion, new Argument("ActualCount", actualCount),
+                new Argument("ExpectedCount", expectedCount)), assertionParams);
     }
 
     /// <summary>
@@ -209,26 +170,20 @@ public static class EnumerableAssertionExtensions
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     public static AndConstraint<TValue> HaveCountGreaterThan<TValue>(this ObjectAssertion<TValue> assertion,
         int expectedCount,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "",
-        params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TValue : IEnumerable
     {
         var actualCount = GetCount(assertion.Subject);
 
         return assertion.AssertCheck(actualCount > expectedCount, AssertionItemType.ItemCount,
-            AssertionLocalization.CountGreaterAssertion,
-            [
-                new Argument("ActualCount", actualCount),
-                new Argument("ExpectedCount", expectedCount)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.CountGreaterAssertion, new Argument("ActualCount", actualCount),
+                new Argument("ExpectedCount", expectedCount)),
+            assertionParams);
     }
 
 
@@ -236,27 +191,21 @@ public static class EnumerableAssertionExtensions
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     public static AndConstraint<TValue> HaveCountGreaterThanOrEqualTo<TValue>(this ObjectAssertion<TValue> assertion,
         int expectedCount,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "",
-        params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TValue : IEnumerable
 
     {
         var actualCount = GetCount(assertion.Subject);
 
         return assertion.AssertCheck(actualCount >= expectedCount, AssertionItemType.ItemCount,
-            AssertionLocalization.CountGreaterOrEqualAssertion,
-            [
-                new Argument("ActualCount", actualCount),
-                new Argument("ExpectedCount", expectedCount)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.CountGreaterOrEqualAssertion,
+                new Argument("ActualCount", actualCount), new Argument("ExpectedCount", expectedCount)),
+            assertionParams);
     }
 
     /// <summary>
@@ -264,27 +213,21 @@ public static class EnumerableAssertionExtensions
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     public static AndConstraint<TValue> HaveCountLessThan<TValue>(this ObjectAssertion<TValue> assertion,
         int expectedCount,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "",
-        params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TValue : IEnumerable
 
     {
         var actualCount = GetCount(assertion.Subject);
 
         return assertion.AssertCheck(actualCount < expectedCount, AssertionItemType.ItemCount,
-            AssertionLocalization.CountLessAssertion,
-            [
-                new Argument("ActualCount", actualCount),
-                new Argument("ExpectedCount", expectedCount)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.CountLessAssertion, new Argument("ActualCount", actualCount),
+                new Argument("ExpectedCount", expectedCount)),
+            assertionParams);
     }
 
     /// <summary>
@@ -292,24 +235,19 @@ public static class EnumerableAssertionExtensions
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="expectedCount"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     public static AndConstraint<TValue> HaveCountLessThanOrEqualTo<TValue>(this ObjectAssertion<TValue> assertion,
         int expectedCount,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "", params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TValue : IEnumerable
     {
         var actualCount = GetCount(assertion.Subject);
         return assertion.AssertCheck(actualCount <= expectedCount, AssertionItemType.ItemCount,
-            AssertionLocalization.CountLessOrEqualAssertion,
-            [
-                new Argument("ActualCount", actualCount),
-                new Argument("ExpectedCount", expectedCount)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.CountLessOrEqualAssertion, new Argument("ActualCount", actualCount),
+                new Argument("ExpectedCount", expectedCount)),
+            assertionParams);
     }
 
     private static int GetCount(IEnumerable enumerable)

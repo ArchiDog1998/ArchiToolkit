@@ -59,8 +59,8 @@ public class AssertionScope : IDisposable
         _assertions.Add(assertion);
     }
 
-    internal void PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType)
+    internal void PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag)
     {
-        _strategy.HandleFailure(_context, assertionType, assertionItem);
+        _strategy.HandleFailure(_context, assertionType, assertionItem, tag);
     }
 }

@@ -16,7 +16,8 @@ public static class AssertionExtensions
             case IAssertion:
                 throw new InvalidOperationException("You can't create an assertion by an assertion!");
             case IConstraint:
-                throw new InvalidOperationException("You can't create an assertion by an constraint! Try to use its property!");
+                throw new InvalidOperationException(
+                    "You can't create an assertion by an constraint! Try to use its property!");
         }
     }
 

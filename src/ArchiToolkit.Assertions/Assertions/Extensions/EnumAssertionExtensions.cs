@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using ArchiToolkit.Assertions.AssertionItems;
+﻿using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Constraints;
 using ArchiToolkit.Assertions.Resources;
 
@@ -15,41 +14,32 @@ public static class EnumAssertionExtensions
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="flag"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <typeparam name="TEnum"></typeparam>
     /// <returns></returns>
     public static AndConstraint<TEnum> HaveFlag<TEnum>(this ObjectAssertion<TEnum> assertion,
         TEnum flag,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "", params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TEnum : Enum
     {
         return assertion.AssertCheck(assertion.Subject.HasFlag(flag), AssertionItemType.Flag,
-            AssertionLocalization.FlagAssertion,
-            [
-                new Argument("Flag", flag)
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.FlagAssertion, new Argument("Flag", flag)),
+            assertionParams);
     }
 
     /// <summary>
     ///     Be defined.
     /// </summary>
     /// <param name="assertion"></param>
-    /// <param name="reasonFormat"></param>
-    /// <param name="reasonArgs"></param>
+    /// <param name="assertionParams"></param>
     /// <typeparam name="TEnum"></typeparam>
     /// <returns></returns>
     public static AndConstraint<TEnum> BeDefined<TEnum>(this ObjectAssertion<TEnum> assertion,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string reasonFormat = "", params object?[] reasonArgs)
+        AssertionParams? assertionParams = null)
         where TEnum : Enum
     {
         return assertion.AssertCheck(Enum.IsDefined(typeof(TEnum), assertion.Subject), AssertionItemType.Defined,
-            AssertionLocalization.EnumDefinedAssertion,
-            [
-            ],
-            reasonFormat, reasonArgs);
+            new AssertMessage(AssertionLocalization.EnumDefinedAssertion),
+            assertionParams);
     }
 }

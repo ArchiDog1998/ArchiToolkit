@@ -21,5 +21,6 @@ public interface IAssertionStrategy
     /// <param name="context"></param>
     /// <param name="assertionType"></param>
     /// <param name="assertion"></param>
-    void HandleFailure(string context, AssertionType assertionType, AssertionItem assertion);
+    /// <param name="tag"></param>
+    void HandleFailure(string context, AssertionType assertionType, AssertionItem assertion, object? tag);
 }
