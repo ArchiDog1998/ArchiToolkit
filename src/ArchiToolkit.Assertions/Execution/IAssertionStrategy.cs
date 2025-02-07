@@ -1,11 +1,16 @@
-﻿using ArchiToolkit.Assertions.AssertionItems;
+﻿using System.Diagnostics;
+using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Assertions;
 using ArchiToolkit.Assertions.Constraints;
 
 namespace ArchiToolkit.Assertions.Execution;
 
 /// <summary>
-///     The strategy to handle the exceptions
+///     The strategy to handle the exceptions.
+///     <remarks>
+///         It is recommended to use the attribute <see cref="DebuggerHiddenAttribute" /> to all the method that this
+///         has.
+///     </remarks>
 /// </summary>
 public interface IAssertionStrategy
 {
@@ -24,6 +29,6 @@ public interface IAssertionStrategy
     /// <param name="assertionType"></param>
     /// <param name="assertion"></param>
     /// <param name="tag"></param>
-    /// <returns>This value will push to <see cref="IAndConstraint.FailureReturnValue"/></returns>
+    /// <returns>This value will push to <see cref="IAndConstraint.FailureReturnValue" /></returns>
     object? HandleFailure(string context, AssertionType assertionType, AssertionItem assertion, object? tag);
 }

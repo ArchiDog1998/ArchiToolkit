@@ -10,7 +10,7 @@ namespace ArchiToolkit.Assertions;
 [DebuggerNonUserCode]
 file class DefaultPushStrategy : IAssertionStrategy
 {
-    public object? HandleFailure(string context, AssertionType assertionType, AssertionItem assertion, object? tag)
+    public object HandleFailure(string context, AssertionType assertionType, AssertionItem assertion, object? tag)
     {
         var message = $"{assertion.Message}\nwhen [{assertion.Time:yyyy-MM-dd HH:mm:ss.fff zzz}]{context}";
         throw new AssertionException(message);
