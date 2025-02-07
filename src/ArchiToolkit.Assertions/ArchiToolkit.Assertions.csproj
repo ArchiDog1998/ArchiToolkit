@@ -2,7 +2,7 @@
     <PropertyGroup>
         <Title>Assertion</Title>
         <Description>Some amazing assertion.</Description>
-        <Version>0.9.2</Version>
+        <Version>0.9.3</Version>
     </PropertyGroup>
 
     <ItemGroup>
