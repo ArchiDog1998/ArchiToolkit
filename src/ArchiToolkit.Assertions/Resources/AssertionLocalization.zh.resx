@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
-                xmlns="" id="root">
-        <xsd:element name="root" msdata:IsDataSet="true">
+  <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns="" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
 
         </xsd:element>
   </xsd:schema>
@@ -26,10 +25,10 @@
         <value>数值[{SubjectName}]{AssertionType}{Not}可被转为{ExpectedType}但它是{ValueType}。</value>
     </data>
   <data name="ContainAssertion" xml:space="preserve">
-        <value>数值[{SubjectName}]{AssertionType}{Not}包含{ExpectedValue}，但这里是{Subject}。</value>
+        <value>数值[{SubjectName}]{AssertionType}{Not}包含{ExpectedValue}，但它们是{Subjects}。</value>
     </data>
   <data name="ContainExpressionAssertion" xml:space="preserve">
-        <value>数值[{SubjectName}]{AssertionType}{Not}包含一个元素能匹配{Expression}，但是他们是{Subject}。</value>
+        <value>数值[{SubjectName}]{AssertionType}{Not}有一个元素匹配{Expression}，但它们是{Subjects}。</value>
     </data>
   <data name="ContainSingleExpressionAssertion" xml:space="preserve">
         <value>数值[{SubjectName}]{AssertionType}{Not}有且仅有一个元素能匹配{Expression}，但是这儿有{MatchedCount}个能够匹配。</value>
@@ -68,7 +67,7 @@
         <value>数值[{SubjectName}]{AssertionType}{Not}大于或等于{ComparedValue}，但它是{Subject}。</value>
     </data>
   <data name="MatchAssertion" xml:space="preserve">
-        <value>数值[{SubjectName}]{AssertionType}{Not}匹配{Expression}，但它是{Subject}。</value>
+        <value>数值[{SubjectName}]{AssertionType}{Not}能匹配{Expression}，但它是{Subject}。</value>
     </data>
   <data name="Must" xml:space="preserve">
         <value>必须</value>
