@@ -47,10 +47,19 @@ public class AssertionScope : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
+        HandleFailure();
         if (_parent is not null) CurrentScope.Value = _parent;
-
         GC.SuppressFinalize(this);
+    }
 
+    private bool _handledFailure;
+    /// <summary>
+    /// Manually handle failure
+    /// </summary>
+    public void HandleFailure()
+    {
+        if (_handledFailure) return;
+        _handledFailure = true;
         _strategy.HandleFailure(_context, _assertions);
     }
 
