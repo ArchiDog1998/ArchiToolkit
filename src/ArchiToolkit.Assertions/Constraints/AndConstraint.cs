@@ -6,12 +6,15 @@ namespace ArchiToolkit.Assertions.Constraints;
 ///     Just the And Constraint
 /// </summary>
 /// <typeparam name="TValue"></typeparam>
-public class AndConstraint<TValue> : IConstraint
+public class AndConstraint<TValue> : IAndConstraint
 {
     internal AndConstraint(ObjectAssertion<TValue> assertion)
     {
         And = assertion;
     }
+
+    /// <inheritdoc />
+    public object? FailureReturnValue { get; set; }
 
     /// <summary>
     ///     And things.

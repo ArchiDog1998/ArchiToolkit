@@ -44,23 +44,28 @@ public class AssertionScope : IDisposable
         set => CurrentScope.Value = value;
     }
 
+
+    private bool _handledFailure;
     /// <inheritdoc />
     public void Dispose()
     {
-        HandleFailure();
+        if (!_handledFailure)
+        {
+            HandleFailure();
+        }
+
         if (_parent is not null) CurrentScope.Value = _parent;
         GC.SuppressFinalize(this);
     }
 
-    private bool _handledFailure;
     /// <summary>
     /// Manually handle failure
     /// </summary>
-    public void HandleFailure()
+    /// <returns></returns>
+    public object? HandleFailure()
     {
-        if (_handledFailure) return;
         _handledFailure = true;
-        _strategy.HandleFailure(_context, _assertions);
+        return _strategy.HandleFailure(_context, _assertions);
     }
 
     internal void AddAssertion(IAssertion assertion)
@@ -68,8 +73,8 @@ public class AssertionScope : IDisposable
         _assertions.Add(assertion);
     }
 
-    internal void PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag)
+    internal object? PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag)
     {
-        _strategy.HandleFailure(_context, assertionType, assertionItem, tag);
+        return _strategy.HandleFailure(_context, assertionType, assertionItem, tag);
     }
 }

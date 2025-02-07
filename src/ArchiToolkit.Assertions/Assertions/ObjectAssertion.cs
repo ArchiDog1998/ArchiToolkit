@@ -368,11 +368,12 @@ public sealed class ObjectAssertion<TValue> : IAssertion
 
     private TResult AssertCheck<TResult>(TResult result, bool succeed, AssertionItemType assertionItemType,
         AssertMessage message, AssertionParams? assertionParams)
+        where TResult : IAndConstraint
     {
         if (IsSucceed(succeed, out var reverse)) return result;
         var msg = FormatString(message.Format, assertionParams?.Reason ?? string.Empty, reverse,
             message.AdditionalArguments);
-        AddAssertionItem(assertionItemType, msg, assertionParams?.Tag);
+        result.FailureReturnValue = AddAssertionItem(assertionItemType, msg, assertionParams?.Tag);
         return result;
     }
 
@@ -421,13 +422,12 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         }
     }
 
-    private void AddAssertionItem(AssertionItemType type, string message, object? tag)
+    private object? AddAssertionItem(AssertionItemType type, string message, object? tag)
     {
         var skipIndex = GetIndex(new StackTrace());
         var item = new AssertionItem(type, message, new StackTrace(skipIndex, true), DateTimeOffset.Now, tag);
         _items.Add(item);
-        _scope.PushAssertionItem(item, _type, tag);
-        return;
+        return _scope.PushAssertionItem(item, _type, tag);
 
         static int GetIndex(StackTrace stackTrace)
         {
