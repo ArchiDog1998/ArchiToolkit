@@ -1,24 +1,18 @@
-﻿using Wpf.Ui.Appearance;
+﻿using Wpf.Ui.Abstractions.Controls;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 public partial class SettingsViewModel : ObservableObject, INavigationAware
 {
-    private bool _isInitialized = false;
+    private bool _isInitialized;
 
     [ObservableProperty]
-    private string _appVersion = String.Empty;
+    private string _appVersion = string.Empty;
 
     [ObservableProperty]
     private ApplicationTheme _currentTheme = ApplicationTheme.Unknown;
 
-    public void OnNavigatedTo()
-    {
-        if (!_isInitialized)
-            InitializeViewModel();
-    }
-
-    public void OnNavigatedFrom() { }
 
     private void InitializeViewModel()
     {
@@ -57,5 +51,17 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
 
                 break;
         }
+    }
+
+    public Task OnNavigatedToAsync()
+    {
+        if (!_isInitialized)
+            InitializeViewModel();
+        return Task.CompletedTask;
+    }
+
+    public Task OnNavigatedFromAsync()
+    {
+        return Task.CompletedTask;
     }
 }

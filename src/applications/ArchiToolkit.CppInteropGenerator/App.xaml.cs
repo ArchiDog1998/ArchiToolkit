@@ -10,6 +10,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Threading;
 using Wpf.Ui;
+using Wpf.Ui.Abstractions;
 
 namespace ArchiToolkit.CppInteropGenerator;
 /// <summary>
@@ -22,15 +23,15 @@ public partial class App
     // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
     // https://docs.microsoft.com/dotnet/core/extensions/configuration
     // https://docs.microsoft.com/dotnet/core/extensions/logging
-    private static readonly IHost _host = Host
+    private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
         .CreateDefaultBuilder()
-        .ConfigureAppConfiguration(c => { c.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)); })
-        .ConfigureServices((context, services) =>
+        .ConfigureAppConfiguration(c => { c.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location) ?? string.Empty); })
+        .ConfigureServices((_, services) =>
         {
             services.AddHostedService<ApplicationHostService>();
 
             // Page resolver service
-            services.AddSingleton<IPageService, PageService>();
+            services.AddSingleton<INavigationViewPageProvider, PageService>();
 
             // Theme manipulation
             services.AddSingleton<IThemeService, ThemeService>();
@@ -58,10 +59,10 @@ public partial class App
     /// </summary>
     /// <typeparam name="T">Type of the service to get.</typeparam>
     /// <returns>Instance of the service or <see langword="null"/>.</returns>
-    public static T GetService<T>()
+    public static T? GetService<T>()
         where T : class
     {
-        return _host.Services.GetService(typeof(T)) as T;
+        return Host.Services.GetService(typeof(T)) as T;
     }
 
     /// <summary>
@@ -69,7 +70,7 @@ public partial class App
     /// </summary>
     private void OnStartup(object sender, StartupEventArgs e)
     {
-        _host.Start();
+        Host.Start();
     }
 
     /// <summary>
@@ -77,9 +78,9 @@ public partial class App
     /// </summary>
     private async void OnExit(object sender, ExitEventArgs e)
     {
-        await _host.StopAsync();
+        await Host.StopAsync();
 
-        _host.Dispose();
+        Host.Dispose();
     }
 
     /// <summary>

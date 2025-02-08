@@ -1,22 +1,15 @@
 ﻿using ArchiToolkit.CppInteropGenerator.Models;
 using System.Windows.Media;
+using Wpf.Ui.Abstractions.Controls;
 using Wpf.Ui.Controls;
 
 namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 public partial class DataViewModel : ObservableObject, INavigationAware
 {
-    private bool _isInitialized = false;
+    private bool _isInitialized;
 
     [ObservableProperty]
-    private IEnumerable<DataColor> _colors;
-
-    public void OnNavigatedTo()
-    {
-        if (!_isInitialized)
-            InitializeViewModel();
-    }
-
-    public void OnNavigatedFrom() { }
+    private IEnumerable<DataColor> _colors = [];
 
     private void InitializeViewModel()
     {
@@ -29,7 +22,7 @@ public partial class DataViewModel : ObservableObject, INavigationAware
                 {
                     Color = new SolidColorBrush(
                         Color.FromArgb(
-                            (byte)200,
+                            200,
                             (byte)random.Next(0, 250),
                             (byte)random.Next(0, 250),
                             (byte)random.Next(0, 250)
@@ -41,5 +34,17 @@ public partial class DataViewModel : ObservableObject, INavigationAware
         Colors = colorCollection;
 
         _isInitialized = true;
+    }
+
+    public Task OnNavigatedToAsync()
+    {
+        if (!_isInitialized)
+            InitializeViewModel();
+        return Task.CompletedTask;
+    }
+
+    public Task OnNavigatedFromAsync()
+    {
+        return Task.CompletedTask;
     }
 }

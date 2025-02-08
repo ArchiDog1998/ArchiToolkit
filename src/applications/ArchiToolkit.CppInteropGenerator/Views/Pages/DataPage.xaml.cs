@@ -1,5 +1,5 @@
 ﻿using ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
-using Wpf.Ui.Controls;
+using Wpf.Ui.Abstractions.Controls;
 
 namespace ArchiToolkit.CppInteropGenerator.Views.Pages;
 public partial class DataPage : INavigableView<DataViewModel>
