@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\ArchiToolkit.Assertions\ArchiToolkit.Assertions.csproj"/>
+        <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Assertions\ArchiToolkit.Assertions.csproj"/>
     </ItemGroup>
 
 </Project>
