@@ -1,13 +1,15 @@
-﻿namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
+﻿using System.IO;
+
+namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 
 public partial class DashboardViewModel : ObservableObject
 {
-    [ObservableProperty]
-    private int _counter = 0;
+    public bool IsReadyForConverting => IsDirectoryExists;
 
-    [RelayCommand]
-    private void OnCounterIncrement()
-    {
-        Counter++;
-    }
+    public bool IsDirectoryExists => Directory.Exists(OutputPath);
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsDirectoryExists))]
+    [NotifyPropertyChangedFor(nameof(IsReadyForConverting))]
+    public partial string OutputPath { get; set; } = string.Empty;
 }
