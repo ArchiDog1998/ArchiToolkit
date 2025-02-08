@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.PureConst", "src\analyzers\ArchiToolkit.PureConst\ArchiToolkit.PureConst.csproj", "{BBABB8BD-18B1-4203-BAAD-774EAB747942}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions", "src\libraries\ArchiToolkit.Assertions\ArchiToolkit.Assertions.csproj", "{92BD61C0-02F8-4E26-A6A8-9403646E4C42}"
@@ -19,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{4B1F
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{752493CD-971A-4559-B5F1-C931C2AB58BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.CppInteropGenerator", "src\applications\ArchiToolkit.CppInteropGenerator\ArchiToolkit.CppInteropGenerator.csproj", "{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,12 +51,20 @@ Global
 		{7145BF83-C901-4886-B377-BE3E02553B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7145BF83-C901-4886-B377-BE3E02553B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7145BF83-C901-4886-B377-BE3E02553B4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{BBABB8BD-18B1-4203-BAAD-774EAB747942} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
+		{92BD61C0-02F8-4E26-A6A8-9403646E4C42} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 		{C1023E10-C928-43B3-8051-5EC91898CF8B} = {42762D80-B827-4395-8973-3B5D19960DD0}
 		{66F2B9EC-3A07-40A3-B633-5AC8C7F0E108} = {42762D80-B827-4395-8973-3B5D19960DD0}
 		{7145BF83-C901-4886-B377-BE3E02553B4A} = {42762D80-B827-4395-8973-3B5D19960DD0}
-		{92BD61C0-02F8-4E26-A6A8-9403646E4C42} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
-		{BBABB8BD-18B1-4203-BAAD-774EAB747942} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
+		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 	EndGlobalSection
 EndGlobal

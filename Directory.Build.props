@@ -11,45 +11,54 @@
         <IsRoslynProject>$(MSBuildProjectDirectory.Contains('\analyzers\'))</IsRoslynProject>
         <IsApplicationProject>$(MSBuildProjectDirectory.Contains('\applications\'))</IsApplicationProject>
         <IsLibraryProject>$(MSBuildProjectDirectory.Contains('\libraries\'))</IsLibraryProject>
+
+        <NeedPackage>False</NeedPackage>
+        <NeedPackage Condition="!$(IsTestProject) and !$(IsApplicationProject)">True</NeedPackage>
+        <NeedRoslyn>False</NeedRoslyn>
+        <NeedRoslyn Condition="!$(IsTestProject) and $(IsRoslynProject)">True</NeedRoslyn>
+        <NeedAlmostAllFrameWorks>False</NeedAlmostAllFrameWorks>
+        <NeedAlmostAllFrameWorks Condition="!$(IsTestProject) and $(IsLibraryProject)">True</NeedAlmostAllFrameWorks>
+        <NeedTestsPackage>False</NeedTestsPackage>
+        <NeedTestsPackage Condition="$(IsTestProject)">True</NeedTestsPackage>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(IsTestProject)">
+    <PropertyGroup Condition="$(NeedTestsPackage)">
         <IsPackable>false</IsPackable>
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup Condition="!$(IsTestProject) and !$(IsApplicationProject)">
+    <PropertyGroup Condition="$(NeedPackage)">
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
-    <PropertyGroup Condition="!$(IsTestProject) and $(IsRoslynProject)">
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <IsRoslynComponent>true</IsRoslynComponent>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="!$(IsTestProject) and !$(IsRoslynProject)">
-        <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0;net472;net48</TargetFrameworks>
-    </PropertyGroup>
-
-    <ItemGroup Condition="!$(IsTestProject) and !$(IsRoslynProject)">
-
-        <PackageReference Include="PolySharp" Version="1.15.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup Condition="!$(IsTestProject) and !$(IsApplicationProject)">
+    <ItemGroup Condition="$(NeedPackage)">
         <None Include="README.md">
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
     </ItemGroup>
 
-    <ItemGroup Condition="!$(IsTestProject) and $(IsRoslynProject)">
+    <PropertyGroup Condition="$(NeedRoslyn)">
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <IsRoslynComponent>true</IsRoslynComponent>
+    </PropertyGroup>
+
+    <ItemGroup Condition="$(NeedRoslyn)">
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0"/>
+    </ItemGroup>
+
+    <PropertyGroup Condition="$(NeedAlmostAllFrameWorks)">
+        <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0;net472;net48</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup Condition="$(NeedAlmostAllFrameWorks)">
+        <PackageReference Include="PolySharp" Version="1.15.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 </Project>
