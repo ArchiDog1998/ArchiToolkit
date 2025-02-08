@@ -1,4 +1,5 @@
 ﻿<Page
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     Title="HeaderFilesPage"
     d:DataContext="{d:DesignInstance local:HeaderFilesPage,
                                      IsDesignTimeCreatable=False}"
@@ -16,7 +17,9 @@
     xmlns:vc="clr-namespace:ArchiToolkit.CppInteropGenerator.Views.UserControls"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <DockPanel>
-        <ui:TextBlock DockPanel.Dock="Top">Some fucking description</ui:TextBlock>
+        <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+            <ui:TextBlock Text="{Binding ViewModel.PageDescription}" />
+        </StackPanel>
 
         <ui:ListView
             ItemsSource="{Binding ViewModel.ConvertItemViewModels}"

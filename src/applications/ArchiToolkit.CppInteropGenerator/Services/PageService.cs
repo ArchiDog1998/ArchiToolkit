@@ -3,17 +3,17 @@
 namespace ArchiToolkit.CppInteropGenerator.Services;
 
 /// <summary>
-/// Service that provides pages for navigation.
+///     Service that provides pages for navigation.
 /// </summary>
 public class PageService : INavigationViewPageProvider
 {
     /// <summary>
-    /// Service which provides the instances of pages.
+    ///     Service which provides the instances of pages.
     /// </summary>
     private readonly IServiceProvider _serviceProvider;
 
     /// <summary>
-    /// Creates new instance and attaches the <see cref="IServiceProvider"/>.
+    ///     Creates new instance and attaches the <see cref="IServiceProvider" />.
     /// </summary>
     public PageService(IServiceProvider serviceProvider)
     {

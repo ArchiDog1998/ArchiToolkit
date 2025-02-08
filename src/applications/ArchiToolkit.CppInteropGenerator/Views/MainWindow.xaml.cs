@@ -1,16 +1,13 @@
-﻿using System.Windows.Controls;
-using Wpf.Ui.Appearance;
-using ArchiToolkit.CppInteropGenerator.ViewModels;
+﻿using ArchiToolkit.CppInteropGenerator.ViewModels;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace ArchiToolkit.CppInteropGenerator.Views;
 
 public partial class MainWindow : INavigationWindow
 {
-    public MainWindowViewModel ViewModel { get; }
-
     public MainWindow(MainWindowViewModel viewModel,
         INavigationViewPageProvider pageService,
         INavigationService navigationService,
@@ -27,15 +24,18 @@ public partial class MainWindow : INavigationWindow
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
     }
 
-    protected override void OnClosed(EventArgs e)
+    public MainWindowViewModel ViewModel { get; }
+
+    public INavigationView GetNavigation()
     {
-        base.OnClosed(e);
-        Application.Current.Shutdown();
+        return RootNavigation;
     }
 
-    public INavigationView GetNavigation() => RootNavigation;
+    public bool Navigate(Type pageType)
+    {
+        return RootNavigation.Navigate(pageType);
+    }
 
-    public bool Navigate(Type pageType) => RootNavigation.Navigate(pageType);
     public void SetServiceProvider(IServiceProvider serviceProvider)
     {
     }
@@ -45,7 +45,19 @@ public partial class MainWindow : INavigationWindow
         RootNavigation.SetPageProviderService(navigationViewPageProvider);
     }
 
-    public void ShowWindow() => Show();
+    public void ShowWindow()
+    {
+        Show();
+    }
 
-    public void CloseWindow() => Close();
+    public void CloseWindow()
+    {
+        Close();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        Application.Current.Shutdown();
+    }
 }

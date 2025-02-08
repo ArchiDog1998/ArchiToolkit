@@ -24,7 +24,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ui:FluentWindow.InputBindings>
-        <KeyBinding Command="{Binding ViewModel.ConvertTheFilesCommand}" Key="Enter" />
+        <KeyBinding Command="{Binding ViewModel.NextMajorStepCommand}" Key="Enter" />
     </ui:FluentWindow.InputBindings>
 
     <Grid>
@@ -37,11 +37,14 @@
             </ui:TitleBar.Icon>
             <ui:TitleBar.TrailingContent>
                 <ui:Button
-                    Command="{Binding ViewModel.ConvertTheFilesCommand}"
-                    Content="Calculate"
-                    Icon="{ui:SymbolIcon TriangleRight16}"
-                    ToolTip="Hi sth wrong!"
-                    ToolTipService.ShowOnDisabled="True" />
+                    Command="{Binding ViewModel.NextMajorStepCommand}"
+                    Content="{Binding ViewModel.MajorStepName}"
+                    ToolTip="{Binding ViewModel.MajorStepTooltip}"
+                    ToolTipService.ShowOnDisabled="True">
+                    <ui:Button.Icon>
+                        <ui:SymbolIcon Symbol="{Binding ViewModel.MajorStepSymbol}" />
+                    </ui:Button.Icon>
+                </ui:Button>
             </ui:TitleBar.TrailingContent>
         </ui:TitleBar>
 
@@ -51,14 +54,14 @@
             IsBackButtonVisible="Visible"
             IsPaneOpen="False"
             IsPaneToggleVisible="True"
-            MenuItemsSource="{Binding ViewModel.MenuItems, Mode=OneWay}"
+            MenuItemsSource="{Binding ViewModel.MenuItems, Mode=OneTime}"
             OpenPaneLength="310"
             Padding="42,0,42,0"
             PaneDisplayMode="Left"
             TitleBar="{Binding ElementName=TitleBar, Mode=OneWay}"
             x:Name="RootNavigation">
             <ui:NavigationView.Header>
-                <ui:BreadcrumbBar Margin="42,32,42,20" x:Name="BreadcrumbBar" />
+                <ui:BreadcrumbBar Margin="42,32,42,10" x:Name="BreadcrumbBar" />
             </ui:NavigationView.Header>
 
             <ui:NavigationView.ContentOverlay>
@@ -66,7 +69,6 @@
             </ui:NavigationView.ContentOverlay>
         </ui:NavigationView>
     </Grid>
-
 
 
     <!-- <StackPanel Orientation="Vertical"> -->

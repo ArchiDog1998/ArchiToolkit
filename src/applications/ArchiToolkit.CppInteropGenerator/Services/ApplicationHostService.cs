@@ -1,11 +1,12 @@
 ﻿using ArchiToolkit.CppInteropGenerator.Views;
+using ArchiToolkit.CppInteropGenerator.Views.Pages;
 using Microsoft.Extensions.Hosting;
 using Wpf.Ui;
 
 namespace ArchiToolkit.CppInteropGenerator.Services;
 
 /// <summary>
-/// Managed host of the application.
+///     Managed host of the application.
 /// </summary>
 public class ApplicationHostService(IServiceProvider serviceProvider) : IHostedService
 {
@@ -20,7 +21,7 @@ public class ApplicationHostService(IServiceProvider serviceProvider) : IHostedS
         )!;
         _navigationWindow.ShowWindow();
 
-        _navigationWindow.Navigate(typeof(Views.Pages.DashboardPage));
+        _navigationWindow.Navigate(typeof(DashboardPage));
         return Task.CompletedTask;
     }
 

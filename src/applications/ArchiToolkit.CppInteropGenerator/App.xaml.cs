@@ -1,23 +1,27 @@
-﻿using ArchiToolkit.CppInteropGenerator.Services;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Windows.Threading;
+using ArchiToolkit.CppInteropGenerator.Services;
 using ArchiToolkit.CppInteropGenerator.ViewModels;
 using ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 using ArchiToolkit.CppInteropGenerator.Views;
 using ArchiToolkit.CppInteropGenerator.Views.Pages;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 
 namespace ArchiToolkit.CppInteropGenerator;
+
 public partial class App
 {
     private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
         .CreateDefaultBuilder()
-        .ConfigureAppConfiguration(c => { c.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location) ?? string.Empty); })
+        .ConfigureAppConfiguration(c =>
+        {
+            c.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location) ?? string.Empty);
+        })
         .ConfigureServices((_, services) =>
         {
             services.AddHostedService<ApplicationHostService>();
@@ -37,7 +41,10 @@ public partial class App
         }).Build();
 
 
-    private void OnStartup(object sender, StartupEventArgs e) => Host.Start();
+    private void OnStartup(object sender, StartupEventArgs e)
+    {
+        Host.Start();
+    }
 
     private async void OnExit(object sender, ExitEventArgs e)
     {
@@ -54,6 +61,5 @@ public partial class App
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-
     }
 }

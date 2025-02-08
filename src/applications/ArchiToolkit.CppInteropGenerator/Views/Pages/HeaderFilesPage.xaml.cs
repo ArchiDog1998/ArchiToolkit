@@ -5,12 +5,12 @@ namespace ArchiToolkit.CppInteropGenerator.Views.Pages;
 
 public partial class HeaderFilesPage : INavigableView<HeaderFilesViewModel>
 {
-    public HeaderFilesViewModel ViewModel { get; }
-
     public HeaderFilesPage(HeaderFilesViewModel viewModel)
     {
         ViewModel = viewModel;
         DataContext = this;
         InitializeComponent();
     }
+
+    public HeaderFilesViewModel ViewModel { get; }
 }

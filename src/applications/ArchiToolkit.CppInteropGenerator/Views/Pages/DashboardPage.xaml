@@ -1,4 +1,5 @@
 ﻿<Page
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     Title="DashboardPage"
     d:DataContext="{d:DesignInstance local:DashboardPage,
                                      IsDesignTimeCreatable=False}"
@@ -14,10 +15,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid>
-        <ui:Button
-            Content="Hello"
-            IsEnabled="False"
-            ToolTip=" Hi" />
-    </Grid>
+
+    <StackPanel Orientation="Vertical">
+        <ui:TextBlock Text="{Binding ViewModel.PageDescription}" />
+    </StackPanel>
 </Page>
