@@ -6,6 +6,7 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>wpfui-icon.ico</ApplicationIcon>
         <UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
@@ -44,11 +45,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>ApplicationLocalization.resx</DependentUpon>
         </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Helpers\"/>
-        <Folder Include="Models\"/>
     </ItemGroup>
 
     <ItemGroup>

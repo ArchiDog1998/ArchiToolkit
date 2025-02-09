@@ -1,4 +1,5 @@
 ﻿using ArchiToolkit.CppInteropGenerator.ViewModels;
+using Microsoft.Extensions.Logging;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Appearance;

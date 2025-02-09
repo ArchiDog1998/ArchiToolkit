@@ -1,11 +1,11 @@
 ﻿<ui:FluentWindow
     ExtendsContentIntoTitleBar="True"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    Height="250"
+    Height="400"
     MinHeight="0"
     MinWidth="0"
     Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}"
-    Width="500"
+    Width="800"
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
@@ -69,24 +69,4 @@
             </ui:NavigationView.ContentOverlay>
         </ui:NavigationView>
     </Grid>
-
-
-    <!-- <StackPanel Orientation="Vertical"> -->
-    <!--     <ui:CardExpander Icon="{ui:SymbolIcon List16}"> -->
-    <!--         <ui:CardExpander.Header> -->
-    <!--             <DockPanel Margin="5,0"> -->
-    <!--  <ui:Button  -->
-    <!--  Content="Import header files"  -->
-    <!--  DockPanel.Dock="Right"  -->
-    <!--  Icon="{ui:SymbolIcon ArrowRight24}" />  -->
-    <!--                 <ui:TextBlock FontTypography="Body">你好</ui:TextBlock> -->
-    <!--             </DockPanel> -->
-    <!--         </ui:CardExpander.Header> -->
-    <!--     </ui:CardExpander> -->
-    <!--    -->
-    <!--     <ui:Card> -->
-    <!--         <ui:ToggleSwitch HorizontalAlignment="Right" /> -->
-    <!--     </ui:Card> -->
-    <!-- </StackPanel> -->
-
 </ui:FluentWindow>

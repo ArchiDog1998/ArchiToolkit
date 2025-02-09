@@ -1,12 +1,9 @@
-﻿using System.IO;
-using System.Reflection;
-using System.Windows.Threading;
+﻿using System.Windows.Threading;
 using ArchiToolkit.CppInteropGenerator.Services;
 using ArchiToolkit.CppInteropGenerator.ViewModels;
 using ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 using ArchiToolkit.CppInteropGenerator.Views;
 using ArchiToolkit.CppInteropGenerator.Views.Pages;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Wpf.Ui;
@@ -18,10 +15,20 @@ public partial class App
 {
     private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
         .CreateDefaultBuilder()
-        .ConfigureAppConfiguration(c =>
-        {
-            c.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location) ?? string.Empty);
-        })
+        // .ConfigureAppConfiguration(builder =>
+        // {
+        //     builder
+        //         .SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location) ?? string.Empty)
+        //         .AddJsonFile("appsettings.json", true, true)
+        //         .AddEnvironmentVariables();
+        // })
+        // .ConfigureLogging((context, builder) =>
+        // {
+        //     builder.AddConsole(options =>
+        //     {
+        //         options.FormatterName = ConsoleFormatterNames.Simple; // Change to "simple", "json", or a custom formatter
+        //     });
+        // })
         .ConfigureServices((_, services) =>
         {
             services.AddHostedService<ApplicationHostService>();

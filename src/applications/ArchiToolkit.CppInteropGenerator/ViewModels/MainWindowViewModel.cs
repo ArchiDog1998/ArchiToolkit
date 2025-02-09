@@ -33,7 +33,7 @@ public partial class MainWindowViewModel : ObservableObject
         void PageOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName != nameof(IsReadyViewModel.IsReadyForConverting)) return;
-            CheckPage();
+            Application.Current.Dispatcher.Invoke(CheckPage);
         }
 
         void CheckPage()
@@ -42,7 +42,10 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 if (page.IsReadyForConverting) continue;
                 NeedEditPage = page;
+                return;
             }
+
+            NeedEditPage = null;
         }
     }
 
@@ -76,30 +79,25 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private Task NextMajorStepAsync()
+    private Task NextMajorStepAsync() => Task.Run(() =>
     {
-        return Task.Run(() =>
+        if (NeedEditPage is not null)
         {
-            if (NeedEditPage is not null)
-            {
-                _navigationService.Navigate(NeedEditPage.PageType);
-                return;
-            }
+            _navigationService.Navigate(NeedEditPage.PageType);
+            return;
+        }
 
-            var succeedsCount = 0;
-            foreach (var succeed in _headerFilesViewModel.ConvertItemViewModels.AsParallel()
-                         .Where(i => i.Convert(_dashboardViewModel.OutputPath)))
-            {
-                succeedsCount++;
-                _headerFilesViewModel.ConvertItemViewModels.Remove(succeed);
-            }
+        var succeedsCount = _headerFilesViewModel.ConvertItemViewModels
+            .AsParallel().Count(i => i.Convert(_dashboardViewModel.OutputPath));
 
+        Application.Current.Dispatcher.Invoke(() =>
+        {
             _snackbarService.Show("Finished!",
-                $"Succeed with {succeedsCount} items! {_headerFilesViewModel.ConvertItemViewModels.Count} faileds.",
+                $"Succeed with {succeedsCount} items! {_headerFilesViewModel.ConvertItemViewModels.Count - succeedsCount} faileds.",
                 ControlAppearance.Info, new SymbolIcon
                 {
                     Symbol = SymbolRegular.Check24
                 }, TimeSpan.FromSeconds(5));
         });
-    }
+    });
 }

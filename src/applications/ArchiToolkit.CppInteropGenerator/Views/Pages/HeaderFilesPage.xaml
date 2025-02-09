@@ -15,11 +15,45 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vc="clr-namespace:ArchiToolkit.CppInteropGenerator.Views.UserControls"
+    xmlns:vmc="clr-namespace:ArchiToolkit.CppInteropGenerator.ViewModels.UserControls"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-            <ui:TextBlock Text="{Binding ViewModel.PageDescription}" />
-        </StackPanel>
+        <DockPanel DockPanel.Dock="Top">
+            <ui:TextBlock DockPanel.Dock="Top" Text="{Binding ViewModel.PageDescription}" />
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <ui:Card Padding="5">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Margin="4,0" Symbol="Eraser24" />
+                        <ui:TextBlock
+                            Margin="4,0"
+                            Text="Clear"
+                            VerticalAlignment="Center" />
+
+                        <ui:Button
+                            Command="{Binding ViewModel.ClearAllFilesCommand}"
+                            Icon="{ui:SymbolIcon Delete16}"
+                            Margin="4,0"
+                            ToolTip="Clear All" />
+                        <ui:Button
+                            Command="{Binding ViewModel.ClearSucceedFilesCommand}"
+                            Icon="{ui:SymbolIcon Checkmark16}"
+                            Margin="4,0"
+                            ToolTip="Clear Succeed" />
+                        <ui:Button
+                            Command="{Binding ViewModel.ClearFailedFilesCommand}"
+                            Icon="{ui:SymbolIcon Warning16}"
+                            Margin="4,0"
+                            ToolTip="Clear Failed" />
+                    </StackPanel>
+                </ui:Card>
+
+                <ui:Button
+                    Command="{Binding ViewModel.ImportHeaderFilesCommand}"
+                    Content="Import Header Files"
+                    Icon="{ui:SymbolIcon ArrowDownload16}"
+                    Margin="4,0" />
+            </StackPanel>
+        </DockPanel>
 
         <ui:ListView
             ItemsSource="{Binding ViewModel.ConvertItemViewModels}"
