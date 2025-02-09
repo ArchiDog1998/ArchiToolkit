@@ -18,37 +18,40 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
-            <ui:TextBlock DockPanel.Dock="Top" Text="{Binding ViewModel.PageDescription}" />
+            <ui:TextBlock
+                DockPanel.Dock="Top"
+                Text="{Binding ViewModel.PageDescription}"
+                TextWrapping="Wrap" />
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                 <ui:Card Padding="5">
                     <StackPanel Orientation="Horizontal">
                         <ui:SymbolIcon Margin="4,0" Symbol="Eraser24" />
                         <ui:TextBlock
                             Margin="4,0"
-                            Text="Clear"
+                            Text="{Binding ViewModel.ClearCard, Mode=OneTime}"
                             VerticalAlignment="Center" />
 
                         <ui:Button
                             Command="{Binding ViewModel.ClearAllFilesCommand}"
                             Icon="{ui:SymbolIcon Delete16}"
                             Margin="4,0"
-                            ToolTip="Clear All" />
+                            ToolTip="{Binding ViewModel.ClearAll, Mode=OneTime}" />
                         <ui:Button
                             Command="{Binding ViewModel.ClearSucceedFilesCommand}"
                             Icon="{ui:SymbolIcon Checkmark16}"
                             Margin="4,0"
-                            ToolTip="Clear Succeed" />
+                            ToolTip="{Binding ViewModel.ClearSucceed}" />
                         <ui:Button
                             Command="{Binding ViewModel.ClearFailedFilesCommand}"
                             Icon="{ui:SymbolIcon Warning16}"
                             Margin="4,0"
-                            ToolTip="Clear Failed" />
+                            ToolTip="{Binding ViewModel.ClearFailed}" />
                     </StackPanel>
                 </ui:Card>
 
                 <ui:Button
                     Command="{Binding ViewModel.ImportHeaderFilesCommand}"
-                    Content="Import Header Files"
+                    Content="{Binding ViewModel.ImportFiles}"
                     Icon="{ui:SymbolIcon ArrowDownload16}"
                     Margin="4,0" />
             </StackPanel>

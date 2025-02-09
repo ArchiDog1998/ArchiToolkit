@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using ArchiToolkit.CppInteropGenerator.Models;
+using ArchiToolkit.CppInteropGenerator.Resources;
 using ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 using Wpf.Ui.Controls;
 
@@ -32,6 +33,10 @@ public partial class ConvertItemViewModel(
     [NotifyPropertyChangedFor(nameof(Information))]
     [ObservableProperty]
     public partial string LibraryName { get; set; } = libraryName;
+
+    public string LeadingNameSpaceName => ApplicationLocalization.LeadingNameSpace;
+    public string DllNameName => ApplicationLocalization.DllName;
+    public string ConvertTypeName => ApplicationLocalization.ConvertType;
 
     public SymbolRegular StatusSymbol => Status switch
     {

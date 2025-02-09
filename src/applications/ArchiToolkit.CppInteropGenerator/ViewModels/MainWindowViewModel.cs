@@ -54,10 +54,10 @@ public partial class MainWindowViewModel : ObservableObject
     public SymbolRegular MajorStepSymbol => NeedEditPage?.PageIcon ?? SymbolRegular.TriangleRight16;
 
     public string MajorStepName =>
-        NeedEditPage is null ? "Calculate" : string.Format("Move {0}", NeedEditPage.PageName);
+        NeedEditPage is null ? ApplicationLocalization.ConvertButton : string.Format(ApplicationLocalization.MoveToButton, NeedEditPage.PageName);
 
     public string? MajorStepTooltip =>
-        NeedEditPage is null ? null : string.Format("Move to {0} to edit the page.", NeedEditPage.PageName);
+        NeedEditPage is null ? null : string.Format(ApplicationLocalization.MoveToButtonDescription, NeedEditPage.PageName);
 
 
     [NotifyPropertyChangedFor(nameof(MajorStepSymbol))]

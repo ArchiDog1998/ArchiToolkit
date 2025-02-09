@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using ArchiToolkit.CppInteropGenerator.Models;
+using ArchiToolkit.CppInteropGenerator.Resources;
 using ArchiToolkit.CppInteropGenerator.Views.Pages;
 using Wpf.Ui.Controls;
 
@@ -12,11 +13,16 @@ public partial class DashboardViewModel : IsReadyViewModel
 
     public override bool IsReadyForConverting => IsDirectoryExists;
 
-    public override string PageName => "Home";
-    public override string PageDescription => "Just the home page. And what can this tool do for you.";
+    public override string PageName => ApplicationLocalization.DashboardPage;
+    public override string PageDescription => ApplicationLocalization.DashboardPageDescription;
     public override SymbolRegular PageIcon => SymbolRegular.Home16;
     public override Type PageType => typeof(DashboardPage);
 
+    public string FolderDontExist => ApplicationLocalization.FolderDontExist;
+    public string OutputFolderPath => ApplicationLocalization.OutputFolderPath;
+    public string LeadingNameSpaceName => ApplicationLocalization.LeadingNameSpace;
+    public string DllNameName => ApplicationLocalization.DllName;
+    public string ConvertTypeName => ApplicationLocalization.ConvertType;
     public bool IsDirectoryExists => Directory.Exists(OutputPath);
 
     public Visibility WarningVisibility => IsDirectoryExists ? Visibility.Collapsed : Visibility.Visible;

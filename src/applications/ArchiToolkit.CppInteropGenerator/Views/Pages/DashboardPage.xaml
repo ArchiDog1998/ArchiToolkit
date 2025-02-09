@@ -17,12 +17,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <StackPanel Orientation="Vertical">
-        <ui:TextBlock Margin="0,0,0,10" Text="{Binding ViewModel.PageDescription}" />
+        <ui:TextBlock
+            Margin="0,0,0,10"
+            Text="{Binding ViewModel.PageDescription}"
+            TextWrapping="Wrap" />
         <DockPanel Margin="0,5">
             <ui:TextBlock
                 DockPanel.Dock="Bottom"
                 Margin="20,0"
-                Text="This folder doesn't exist."
+                Text="{Binding ViewModel.FolderDontExist}"
                 Visibility="{Binding ViewModel.WarningVisibility}" />
             <ui:Button
                 Command="{Binding ViewModel.OpenFolderDialogCommand}"
@@ -30,19 +33,19 @@
                 Icon="{ui:SymbolIcon Folder16}"
                 Margin="5,0,0,0" />
             <ui:TextBox
-                PlaceholderText="The out put folder path"
+                PlaceholderText="{Binding ViewModel.OutputFolderPath, Mode=OneTime}"
                 Text="{Binding ViewModel.OutputPath}"
                 TextChanged="TextBoxBase_OnTextChanged" />
         </DockPanel>
 
         <ui:TextBox
             Margin="0,5"
-            PlaceholderText="Leading Name Space"
+            PlaceholderText="{Binding ViewModel.LeadingNameSpaceName, Mode=OneTime}"
             Text="{Binding ViewModel.LeadingNameSpace}" />
 
         <ui:TextBox
             Margin="0,5"
-            PlaceholderText="Default dynamic Library Name"
+            PlaceholderText="{Binding ViewModel.DllNameName}"
             Text="{Binding ViewModel.DefaultDllName}" />
 
         <DockPanel Margin="0,5">
@@ -53,7 +56,7 @@
                 Width="200" />
             <ui:TextBlock
                 HorizontalAlignment="Left"
-                Text="Convert Type"
+                Text="{Binding ViewModel.ConvertTypeName}"
                 VerticalAlignment="Center" />
         </DockPanel>
     </StackPanel>

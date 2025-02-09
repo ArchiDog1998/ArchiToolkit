@@ -33,21 +33,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Update="Resources\ApplicationLocalization.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Localization.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="Resources\ApplicationLocalization.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>ApplicationLocalization.resx</DependentUpon>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
         <Page Update="Views\MainWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
@@ -58,6 +43,21 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\ApplicationLocalization.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>ApplicationLocalization.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\ApplicationLocalization.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ApplicationLocalization.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

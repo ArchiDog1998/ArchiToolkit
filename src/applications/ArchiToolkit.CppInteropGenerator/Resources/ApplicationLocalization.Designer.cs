@@ -60,6 +60,177 @@ namespace ArchiToolkit.CppInteropGenerator.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clear all file items..
+        /// </summary>
+        internal static string ClearAllButtonDescription {
+            get {
+                return ResourceManager.GetString("ClearAllButtonDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        internal static string ClearCard {
+            get {
+                return ResourceManager.GetString("ClearCard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear all failed items..
+        /// </summary>
+        internal static string ClearFailedButtonDescription {
+            get {
+                return ResourceManager.GetString("ClearFailedButtonDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear all succeed items..
+        /// </summary>
+        internal static string ClearSucceedButtonDescription {
+            get {
+                return ResourceManager.GetString("ClearSucceedButtonDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Convert them.
+        /// </summary>
+        internal static string ConvertButton {
+            get {
+                return ResourceManager.GetString("ConvertButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Convert Type.
+        /// </summary>
+        internal static string ConvertType {
+            get {
+                return ResourceManager.GetString("ConvertType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dashboard.
+        /// </summary>
+        internal static string DashboardPage {
+            get {
+                return ResourceManager.GetString("DashboardPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So here, you can convert the .h file to the wrap .cpp file and wrap .cs file..
+        /// </summary>
+        internal static string DashboardPageDescription {
+            get {
+                return ResourceManager.GetString("DashboardPageDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dynamic Library Name.
+        /// </summary>
+        internal static string DllName {
+            get {
+                return ResourceManager.GetString("DllName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This folder doesn&apos;t exist..
+        /// </summary>
+        internal static string FolderDontExist {
+            get {
+                return ResourceManager.GetString("FolderDontExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Header Files.
+        /// </summary>
+        internal static string HeaderFilePage {
+            get {
+                return ResourceManager.GetString("HeaderFilePage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can modify the h files here..
+        /// </summary>
+        internal static string HeaderFilePageDescription {
+            get {
+                return ResourceManager.GetString("HeaderFilePageDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Header Files.
+        /// </summary>
+        internal static string HFileName {
+            get {
+                return ResourceManager.GetString("HFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import Header Files.
+        /// </summary>
+        internal static string ImportFilesButton {
+            get {
+                return ResourceManager.GetString("ImportFilesButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Leading Name Space.
+        /// </summary>
+        internal static string LeadingNameSpace {
+            get {
+                return ResourceManager.GetString("LeadingNameSpace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move to {0}.
+        /// </summary>
+        internal static string MoveToButton {
+            get {
+                return ResourceManager.GetString("MoveToButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move to {0} to edit the page..
+        /// </summary>
+        internal static string MoveToButtonDescription {
+            get {
+                return ResourceManager.GetString("MoveToButtonDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The out put folder path.
+        /// </summary>
+        internal static string OutputFolderPath {
+            get {
+                return ResourceManager.GetString("OutputFolderPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Header Files.
+        /// </summary>
+        internal static string SelectHFilesTittle {
+            get {
+                return ResourceManager.GetString("SelectHFilesTittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cpp Interop Generator.
         /// </summary>
         internal static string Tittle {

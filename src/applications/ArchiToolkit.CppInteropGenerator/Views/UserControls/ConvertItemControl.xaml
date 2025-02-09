@@ -28,12 +28,12 @@
         <StackPanel>
             <ui:TextBox
                 Margin="0,5"
-                PlaceholderText="Leading Name Space"
+                PlaceholderText="{Binding LeadingNameSpaceName}"
                 Text="{Binding LeadingNameSpace}" />
 
             <ui:TextBox
                 Margin="0,5"
-                PlaceholderText="Default dynamic Library Name"
+                PlaceholderText="{Binding DllNameName}"
                 Text="{Binding LibraryName}" />
 
             <DockPanel Margin="0,5">
@@ -50,15 +50,10 @@
                 <ui:TextBlock
                     HorizontalAlignment="Left"
                     Margin="5,0"
-                    Text="Convert Type"
+                    Text="{Binding ConvertTypeName}"
                     VerticalAlignment="Center" />
             </DockPanel>
 
-
         </StackPanel>
-
-
-
-
     </ui:CardExpander>
 </UserControl>

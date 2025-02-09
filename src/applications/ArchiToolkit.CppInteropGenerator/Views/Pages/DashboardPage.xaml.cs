@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Windows.Controls;
-using System.Windows.Input;
 using ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 using Wpf.Ui.Abstractions.Controls;
 using TextBox = Wpf.Ui.Controls.TextBox;

@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
+using ArchiToolkit.CppInteropGenerator.Resources;
 using ArchiToolkit.CppInteropGenerator.ViewModels.UserControls;
 using ArchiToolkit.CppInteropGenerator.Views.Pages;
-using Microsoft.Win32;
 using Wpf.Ui.Controls;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 
@@ -12,9 +12,15 @@ public partial class HeaderFilesViewModel(DashboardViewModel dashboardViewModel)
 {
     public override bool IsReadyForConverting => ConvertItemViewModels.Any();
     public override Type PageType => typeof(HeaderFilesPage);
-    public override string PageName => "Header Files";
-    public override string PageDescription => "A lot of header files.";
+    public override string PageName => ApplicationLocalization.HeaderFilePage;
+    public override string PageDescription => ApplicationLocalization.HeaderFilePageDescription;
     public override SymbolRegular PageIcon => SymbolRegular.DocumentHeader16;
+
+    public string ClearCard  => ApplicationLocalization.ClearCard;
+    public string ClearAll  => ApplicationLocalization.ClearAllButtonDescription;
+    public string ClearSucceed  => ApplicationLocalization.ClearSucceedButtonDescription;
+    public string ClearFailed  => ApplicationLocalization.ClearFailedButtonDescription;
+    public string ImportFiles  => ApplicationLocalization.ImportFilesButton;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsReadyForConverting))]
@@ -49,9 +55,10 @@ public partial class HeaderFilesViewModel(DashboardViewModel dashboardViewModel)
     {
         var openFileDialog = new OpenFileDialog
         {
-            Filter = "Header Files (*.h)|*.h",  // Only allow .h files
-            Multiselect = true,  // Allow multiple file selection
-            Title = "Select Header Files"
+            // ReSharper disable once LocalizableElement
+            Filter = ApplicationLocalization.HFileName + " (*.h)|*.h",
+            Multiselect = true,
+            Title = ApplicationLocalization.SelectHFilesTittle,
         };
 
         if (openFileDialog.ShowDialog() is not DialogResult.OK) return;
