@@ -78,6 +78,7 @@ public partial class HeaderFilesViewModel(DashboardViewModel dashboardViewModel)
 
             ConvertItemViewModels.Add(new ConvertItemViewModel(fileName, dashboardViewModel.LeadingNameSpace, libraryName,
                 dashboardViewModel.ConvertType, this));
+            OnPropertyChanged(nameof(IsReadyForConverting));
         }
     }
 }

@@ -72,8 +72,8 @@ public partial class ConvertItemViewModel(
     {
         ErrorMessage = string.Empty;
         Status = ConvertingStatus.Converting;
-        Task.Delay(500).Wait();
-        Status = ConvertingStatus.Success;
+        ErrorMessage = new ConvertItem(FilePath, LeadingNameSpace, LibraryName, ConvertType).Convert();
+        Status = string.IsNullOrEmpty(ErrorMessage) ? ConvertingStatus.Success : ConvertingStatus.Error;
         return true;
     }
 
