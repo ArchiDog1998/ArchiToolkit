@@ -50,13 +50,13 @@
 
         <ui:NavigationView
             BreadcrumbBar="{Binding ElementName=BreadcrumbBar}"
-            FrameMargin="0"
-            IsBackButtonVisible="Visible"
+            IsBackButtonVisible="Collapsed"
             IsPaneOpen="False"
             IsPaneToggleVisible="True"
+            Margin="0,5,0,0"
             MenuItemsSource="{Binding ViewModel.MenuItems, Mode=OneTime}"
-            OpenPaneLength="310"
-            Padding="42,0,42,0"
+            OpenPaneLength="200"
+            Padding="42,0"
             PaneDisplayMode="Left"
             TitleBar="{Binding ElementName=TitleBar, Mode=OneWay}"
             x:Name="RootNavigation">

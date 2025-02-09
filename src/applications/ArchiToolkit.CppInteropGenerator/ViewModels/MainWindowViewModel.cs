@@ -83,7 +83,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (NeedEditPage is not null)
         {
-            _navigationService.Navigate(NeedEditPage.PageType);
+            Application.Current.Dispatcher.Invoke(() =>
+                _navigationService.Navigate(NeedEditPage.PageType));
             return;
         }
 

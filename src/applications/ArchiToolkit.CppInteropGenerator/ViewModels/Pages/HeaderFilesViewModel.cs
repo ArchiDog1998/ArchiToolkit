@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
 using ArchiToolkit.CppInteropGenerator.ViewModels.UserControls;
 using ArchiToolkit.CppInteropGenerator.Views.Pages;
 using Microsoft.Win32;
@@ -7,7 +8,7 @@ using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 
 namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 
-public partial class HeaderFilesViewModel : IsReadyViewModel
+public partial class HeaderFilesViewModel(DashboardViewModel dashboardViewModel) : IsReadyViewModel
 {
     public override bool IsReadyForConverting => ConvertItemViewModels.Any();
     public override Type PageType => typeof(HeaderFilesPage);
@@ -17,11 +18,7 @@ public partial class HeaderFilesViewModel : IsReadyViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsReadyForConverting))]
-    public partial ObservableCollection<ConvertItemViewModel> ConvertItemViewModels { get; set; } = [new(), new()];
-
-    public HeaderFilesViewModel(DashboardViewModel dashboardViewModel)
-    {
-    }
+    public partial ObservableCollection<ConvertItemViewModel> ConvertItemViewModels { get; set; } = [];
 
     [RelayCommand]
     private void ClearSucceedFiles()
@@ -61,7 +58,19 @@ public partial class HeaderFilesViewModel : IsReadyViewModel
 
         foreach (var fileName in openFileDialog.FileNames)
         {
+            var libraryName = dashboardViewModel.DefaultDllName;
+            if (string.IsNullOrEmpty(libraryName))
+            {
+                libraryName = Path.GetFileNameWithoutExtension(fileName);
+            }
 
+            foreach (var model in ConvertItemViewModels.Where(i => i.FilePath == fileName).ToArray())
+            {
+                ConvertItemViewModels.Remove(model);
+            }
+
+            ConvertItemViewModels.Add(new ConvertItemViewModel(fileName, dashboardViewModel.LeadingNameSpace, libraryName,
+                dashboardViewModel.ConvertType, this));
         }
     }
 }

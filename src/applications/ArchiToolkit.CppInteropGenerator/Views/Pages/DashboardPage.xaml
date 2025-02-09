@@ -18,18 +18,17 @@
 
     <StackPanel Orientation="Vertical">
         <ui:TextBlock Margin="0,0,0,10" Text="{Binding ViewModel.PageDescription}" />
-
         <DockPanel Margin="0,5">
-            <ui:Button
-                Command="{Binding ViewModel.OpenFolderDialogCommand}"
-                DockPanel.Dock="Right"
-                Icon="{ui:SymbolIcon Folder16}"
-                Margin="5,0,0,0" />
             <ui:TextBlock
                 DockPanel.Dock="Bottom"
                 Margin="20,0"
                 Text="This folder doesn't exist."
                 Visibility="{Binding ViewModel.WarningVisibility}" />
+            <ui:Button
+                Command="{Binding ViewModel.OpenFolderDialogCommand}"
+                DockPanel.Dock="Right"
+                Icon="{ui:SymbolIcon Folder16}"
+                Margin="5,0,0,0" />
             <ui:TextBox
                 PlaceholderText="The out put folder path"
                 Text="{Binding ViewModel.OutputPath}"
@@ -45,5 +44,17 @@
             Margin="0,5"
             PlaceholderText="Default dynamic Library Name"
             Text="{Binding ViewModel.DefaultDllName}" />
+
+        <DockPanel Margin="0,5">
+            <ComboBox
+                DockPanel.Dock="Right"
+                ItemsSource="{Binding ViewModel.ConvertTypes}"
+                SelectedItem="{Binding ViewModel.ConvertType}"
+                Width="200" />
+            <ui:TextBlock
+                HorizontalAlignment="Left"
+                Text="Convert Type"
+                VerticalAlignment="Center" />
+        </DockPanel>
     </StackPanel>
 </Page>

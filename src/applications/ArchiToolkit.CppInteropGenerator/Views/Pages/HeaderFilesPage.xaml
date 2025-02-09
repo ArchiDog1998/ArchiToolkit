@@ -15,7 +15,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vc="clr-namespace:ArchiToolkit.CppInteropGenerator.Views.UserControls"
-    xmlns:vmc="clr-namespace:ArchiToolkit.CppInteropGenerator.ViewModels.UserControls"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
@@ -55,15 +54,12 @@
             </StackPanel>
         </DockPanel>
 
-        <ui:ListView
-            ItemsSource="{Binding ViewModel.ConvertItemViewModels}"
-            VirtualizingPanel.IsVirtualizing="True"
-            VirtualizingPanel.VirtualizationMode="Recycling">
-            <ui:ListView.ItemTemplate>
+        <ItemsControl ItemsSource="{Binding ViewModel.ConvertItemViewModels}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <vc:ConvertItemControl />
                 </DataTemplate>
-            </ui:ListView.ItemTemplate>
-        </ui:ListView>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </DockPanel>
 </Page>

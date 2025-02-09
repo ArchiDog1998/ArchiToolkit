@@ -13,5 +13,52 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vm="clr-namespace:ArchiToolkit.CppInteropGenerator.ViewModels.UserControls"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <ui:Card />
+    <ui:CardExpander Icon="{ui:SymbolIcon DocumentHeader16}">
+        <ui:CardExpander.Header>
+            <DockPanel>
+                <ui:TextBlock DockPanel.Dock="Top" Text="{Binding Tittle}" />
+                <ui:SymbolIcon DockPanel.Dock="Left" Symbol="{Binding StatusSymbol}" />
+                <ui:TextBlock
+                    FontTypography="Caption"
+                    Text="{Binding Information}"
+                    VerticalAlignment="Center" />
+            </DockPanel>
+        </ui:CardExpander.Header>
+
+        <StackPanel>
+            <ui:TextBox
+                Margin="0,5"
+                PlaceholderText="Leading Name Space"
+                Text="{Binding LeadingNameSpace}" />
+
+            <ui:TextBox
+                Margin="0,5"
+                PlaceholderText="Default dynamic Library Name"
+                Text="{Binding LibraryName}" />
+
+            <DockPanel Margin="0,5">
+                <ui:Button
+                    Command="{Binding RemoveCommand}"
+                    DockPanel.Dock="Left"
+                    Foreground="DarkRed"
+                    Icon="{ui:SymbolIcon Delete16}" />
+                <ComboBox
+                    DockPanel.Dock="Right"
+                    ItemsSource="{Binding ConvertTypes}"
+                    SelectedItem="{Binding ConvertType}"
+                    Width="200" />
+                <ui:TextBlock
+                    HorizontalAlignment="Left"
+                    Margin="5,0"
+                    Text="Convert Type"
+                    VerticalAlignment="Center" />
+            </DockPanel>
+
+
+        </StackPanel>
+
+
+
+
+    </ui:CardExpander>
 </UserControl>

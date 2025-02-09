@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using ArchiToolkit.CppInteropGenerator.Models;
 using ArchiToolkit.CppInteropGenerator.Views.Pages;
 using Wpf.Ui.Controls;
 
@@ -6,6 +7,9 @@ namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 
 public partial class DashboardViewModel : IsReadyViewModel
 {
+    public static ConvertTypeModel[] AllConvertTypes { get; } =
+        [..Enum.GetValues<ConvertType>().Select(t => new ConvertTypeModel(t))];
+
     public override bool IsReadyForConverting => IsDirectoryExists;
 
     public override string PageName => "Home";
@@ -25,8 +29,12 @@ public partial class DashboardViewModel : IsReadyViewModel
 
     [ObservableProperty] public partial string LeadingNameSpace { get; set; } = "Cpp";
 
-
     [ObservableProperty] public partial string DefaultDllName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial ConvertTypeModel ConvertType { get; set; } = new (Models.ConvertType.NativeLibrary);
+
+    public ConvertTypeModel[] ConvertTypes => AllConvertTypes;
 
     [RelayCommand]
     private void OpenFolderDialog()
@@ -36,7 +44,7 @@ public partial class DashboardViewModel : IsReadyViewModel
             SelectedPath = OutputPath,
         };
 
-        if(folderPicker.ShowDialog() is not DialogResult.OK) return;
+        if (folderPicker.ShowDialog() is not DialogResult.OK) return;
         OutputPath = folderPicker.SelectedPath;
     }
 }
