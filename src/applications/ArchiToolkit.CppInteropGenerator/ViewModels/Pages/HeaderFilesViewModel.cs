@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
+using ArchiToolkit.CppInteropGenerator.Data;
 using ArchiToolkit.CppInteropGenerator.Resources;
 using ArchiToolkit.CppInteropGenerator.ViewModels.UserControls;
 using ArchiToolkit.CppInteropGenerator.Views.Pages;
@@ -8,7 +9,7 @@ using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 
 namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 
-public partial class HeaderFilesViewModel(DashboardViewModel dashboardViewModel) : IsReadyViewModel
+public partial class HeaderFilesViewModel(DashboardViewModel dashboardViewModel, AppDbContext dbContext) : IsReadyViewModel(dbContext)
 {
     public override bool IsReadyForConverting => ConvertItemViewModels.Any();
     public override Type PageType => typeof(HeaderFilesPage);

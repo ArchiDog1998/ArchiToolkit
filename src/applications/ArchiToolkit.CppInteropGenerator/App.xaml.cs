@@ -1,4 +1,5 @@
 ﻿using System.Windows.Threading;
+using ArchiToolkit.CppInteropGenerator.Data;
 using ArchiToolkit.CppInteropGenerator.Services;
 using ArchiToolkit.CppInteropGenerator.ViewModels;
 using ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
@@ -31,14 +32,14 @@ public partial class App
         // })
         .ConfigureServices((_, services) =>
         {
-            services.AddHostedService<ApplicationHostService>();
+            services.AddDbContext<AppDbContext>();
 
             services.AddSingleton<INavigationViewPageProvider, PageService>();
             services.AddSingleton<IThemeService, ThemeService>();
             services.AddSingleton<ISnackbarService, SnackbarService>();
             services.AddSingleton<INavigationService, NavigationService>();
 
-            services.AddSingleton<INavigationWindow, MainWindow>();
+            services.AddSingleton<MainWindow>();
             services.AddSingleton<MainWindowViewModel>();
 
             services.AddSingleton<DashboardPage>();
@@ -51,6 +52,10 @@ public partial class App
     private void OnStartup(object sender, StartupEventArgs e)
     {
         Host.Start();
+
+        var window = Host.Services.GetRequiredService<MainWindow>();
+        window.ShowWindow();
+        window.Navigate(typeof(DashboardPage));
     }
 
     private async void OnExit(object sender, ExitEventArgs e)

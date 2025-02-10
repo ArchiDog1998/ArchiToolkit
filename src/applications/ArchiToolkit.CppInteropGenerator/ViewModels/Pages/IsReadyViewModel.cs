@@ -1,6 +1,9 @@
-﻿namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
+﻿using ArchiToolkit.CppInteropGenerator.Data;
 
-public abstract class IsReadyViewModel : PageViewModel
+namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
+
+public abstract class IsReadyViewModel(AppDbContext dbContext) : PageViewModel
 {
+    protected AppDbContext DbContext { get; } = dbContext;
     public abstract bool IsReadyForConverting { get; }
 }

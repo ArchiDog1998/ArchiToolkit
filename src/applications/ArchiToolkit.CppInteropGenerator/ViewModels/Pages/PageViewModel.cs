@@ -1,4 +1,5 @@
-﻿using Wpf.Ui.Controls;
+﻿using ArchiToolkit.CppInteropGenerator.Data;
+using Wpf.Ui.Controls;
 
 namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 

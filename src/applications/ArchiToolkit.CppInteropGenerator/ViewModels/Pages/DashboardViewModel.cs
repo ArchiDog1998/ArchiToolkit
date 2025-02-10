@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using ArchiToolkit.CppInteropGenerator.Data;
 using ArchiToolkit.CppInteropGenerator.Models;
 using ArchiToolkit.CppInteropGenerator.Resources;
 using ArchiToolkit.CppInteropGenerator.Views.Pages;
@@ -6,7 +7,7 @@ using Wpf.Ui.Controls;
 
 namespace ArchiToolkit.CppInteropGenerator.ViewModels.Pages;
 
-public partial class DashboardViewModel : IsReadyViewModel
+public partial class DashboardViewModel(AppDbContext dbContext) : IsReadyViewModel(dbContext)
 {
     public static ConvertTypeModel[] AllConvertTypes { get; } =
         [..Enum.GetValues<ConvertType>().Select(t => new ConvertTypeModel(t))];
