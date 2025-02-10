@@ -18,63 +18,63 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Tittle" xml:space="preserve">
-        <value>Cpp Interop Generator</value>
+        <value>Cpp 交互生成器</value>
     </data>
   <data name="ConvertButton" xml:space="preserve">
-        <value>Convert them</value>
+        <value>转换它们</value>
     </data>
   <data name="MoveToButton" xml:space="preserve">
-        <value>Move to {0}</value>
+        <value>移动到{0}</value>
     </data>
   <data name="MoveToButtonDescription" xml:space="preserve">
-        <value>Move to {0} to edit the page.</value>
+        <value>移动到{0}以编辑页面。</value>
     </data>
   <data name="ClearCard" xml:space="preserve">
-        <value>Clear</value>
+        <value>清除</value>
     </data>
   <data name="ClearAllButtonDescription" xml:space="preserve">
-        <value>Clear all file items.</value>
+        <value>清除所有文件项。</value>
     </data>
   <data name="ClearSucceedButtonDescription" xml:space="preserve">
-        <value>Clear all succeed items.</value>
+        <value>清除所有成功项。</value>
     </data>
   <data name="ClearFailedButtonDescription" xml:space="preserve">
-        <value>Clear all failed items.</value>
+        <value>清除所有失败项。</value>
     </data>
   <data name="ImportFilesButton" xml:space="preserve">
-        <value>Import Header Files</value>
+        <value>导入头文件</value>
     </data>
   <data name="SelectHFilesTittle" xml:space="preserve">
-        <value>Select Header Files</value>
+        <value>选择头文件</value>
     </data>
   <data name="HFileName" xml:space="preserve">
-        <value>Header Files</value>
+        <value>头文件</value>
     </data>
   <data name="HeaderFilePage" xml:space="preserve">
-        <value>Header Files</value>
+        <value>头文件</value>
     </data>
   <data name="HeaderFilePageDescription" xml:space="preserve">
-        <value>You can modify the h files here.</value>
+        <value>您可以在此修改头文件。</value>
     </data>
   <data name="DashboardPage" xml:space="preserve">
-        <value>Dashboard</value>
+        <value>主页</value>
     </data>
   <data name="DashboardPageDescription" xml:space="preserve">
-        <value>So here, you can convert the .h file to the wrap .cpp file and wrap .cs file.</value>
+        <value>在这里, 你可以将 .h 文件转换为 wrap .cpp 文件和 wrap .cs 文件。</value>
     </data>
   <data name="FolderDontExist" xml:space="preserve">
-        <value>This folder doesn't exist.</value>
+        <value>这个文件夹不存在。</value>
     </data>
   <data name="OutputFolderPath" xml:space="preserve">
-        <value>The out put folder path</value>
+        <value>输出的文件夹路径</value>
     </data>
   <data name="LeadingNameSpace" xml:space="preserve">
-        <value>Leading Name Space</value>
+        <value>前置命名空间</value>
     </data>
   <data name="DllName" xml:space="preserve">
-        <value>Dynamic Library Name</value>
+        <value>动态链接库名称</value>
     </data>
   <data name="ConvertType" xml:space="preserve">
-        <value>Convert Type</value>
+        <value>转换类型</value>
     </data>
 </root>
