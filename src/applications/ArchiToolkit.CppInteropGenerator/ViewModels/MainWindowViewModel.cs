@@ -49,8 +49,6 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    public string ApplicationTitle { get; } = ApplicationLocalization.Tittle;
-
     public SymbolRegular MajorStepSymbol => NeedEditPage?.PageIcon ?? SymbolRegular.TriangleRight16;
 
     public string MajorStepName =>

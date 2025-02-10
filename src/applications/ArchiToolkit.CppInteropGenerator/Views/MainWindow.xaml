@@ -20,6 +20,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ArchiToolkit.CppInteropGenerator.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rs="clr-namespace:ArchiToolkit.CppInteropGenerator.Resources"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
@@ -30,7 +31,7 @@
     <Grid>
         <ui:TitleBar
             CloseWindowByDoubleClickOnIcon="True"
-            Title="{Binding ViewModel.ApplicationTitle}"
+            Title="{x:Static rs:ApplicationLocalization.Tittle}"
             x:Name="TitleBar">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="pack://application:,,,/Assets/wpfui-icon-256.png" />

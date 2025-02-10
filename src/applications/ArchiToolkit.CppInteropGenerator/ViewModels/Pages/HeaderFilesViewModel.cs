@@ -17,12 +17,6 @@ public partial class HeaderFilesViewModel(DashboardViewModel dashboardViewModel,
     public override string PageDescription => ApplicationLocalization.HeaderFilePageDescription;
     public override SymbolRegular PageIcon => SymbolRegular.DocumentHeader16;
 
-    public string ClearCard  => ApplicationLocalization.ClearCard;
-    public string ClearAll  => ApplicationLocalization.ClearAllButtonDescription;
-    public string ClearSucceed  => ApplicationLocalization.ClearSucceedButtonDescription;
-    public string ClearFailed  => ApplicationLocalization.ClearFailedButtonDescription;
-    public string ImportFiles  => ApplicationLocalization.ImportFilesButton;
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsReadyForConverting))]
     public partial ObservableCollection<ConvertItemViewModel> ConvertItemViewModels { get; set; } = [];

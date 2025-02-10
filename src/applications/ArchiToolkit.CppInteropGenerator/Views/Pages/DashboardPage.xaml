@@ -13,6 +13,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ArchiToolkit.CppInteropGenerator.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rs="clr-namespace:ArchiToolkit.CppInteropGenerator.Resources"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
@@ -25,7 +26,7 @@
             <ui:TextBlock
                 DockPanel.Dock="Bottom"
                 Margin="20,0"
-                Text="{Binding ViewModel.FolderDontExist}"
+                Text="{x:Static rs:ApplicationLocalization.FolderDontExist}"
                 Visibility="{Binding ViewModel.WarningVisibility}" />
             <ui:Button
                 Command="{Binding ViewModel.OpenFolderDialogCommand}"
@@ -33,19 +34,19 @@
                 Icon="{ui:SymbolIcon Folder16}"
                 Margin="5,0,0,0" />
             <ui:TextBox
-                PlaceholderText="{Binding ViewModel.OutputFolderPath, Mode=OneTime}"
+                PlaceholderText="{x:Static rs:ApplicationLocalization.OutputFolderPath}"
                 Text="{Binding ViewModel.OutputPath}"
                 TextChanged="TextBoxBase_OnTextChanged" />
         </DockPanel>
 
         <ui:TextBox
             Margin="0,5"
-            PlaceholderText="{Binding ViewModel.LeadingNameSpaceName, Mode=OneTime}"
+            PlaceholderText="{x:Static rs:ApplicationLocalization.LeadingNameSpace}"
             Text="{Binding ViewModel.LeadingNameSpace}" />
 
         <ui:TextBox
             Margin="0,5"
-            PlaceholderText="{Binding ViewModel.DllNameName}"
+            PlaceholderText="{x:Static rs:ApplicationLocalization.DllName}"
             Text="{Binding ViewModel.DefaultDllName}" />
 
         <DockPanel Margin="0,5">
@@ -56,7 +57,7 @@
                 Width="200" />
             <ui:TextBlock
                 HorizontalAlignment="Left"
-                Text="{Binding ViewModel.ConvertTypeName}"
+                Text="{x:Static rs:ApplicationLocalization.ConvertType}"
                 VerticalAlignment="Center" />
         </DockPanel>
     </StackPanel>

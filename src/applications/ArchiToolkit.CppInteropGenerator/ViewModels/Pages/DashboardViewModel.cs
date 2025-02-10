@@ -19,11 +19,6 @@ public partial class DashboardViewModel(AppDbContext dbContext) : IsReadyViewMod
     public override SymbolRegular PageIcon => SymbolRegular.Home16;
     public override Type PageType => typeof(DashboardPage);
 
-    public string FolderDontExist => ApplicationLocalization.FolderDontExist;
-    public string OutputFolderPath => ApplicationLocalization.OutputFolderPath;
-    public string LeadingNameSpaceName => ApplicationLocalization.LeadingNameSpace;
-    public string DllNameName => ApplicationLocalization.DllName;
-    public string ConvertTypeName => ApplicationLocalization.ConvertType;
     public bool IsDirectoryExists => Directory.Exists(OutputPath);
 
     public Visibility WarningVisibility => IsDirectoryExists ? Visibility.Collapsed : Visibility.Visible;

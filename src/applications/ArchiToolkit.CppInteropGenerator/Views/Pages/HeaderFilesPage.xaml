@@ -13,6 +13,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ArchiToolkit.CppInteropGenerator.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rs="clr-namespace:ArchiToolkit.CppInteropGenerator.Resources"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vc="clr-namespace:ArchiToolkit.CppInteropGenerator.Views.UserControls"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -28,30 +29,30 @@
                         <ui:SymbolIcon Margin="4,0" Symbol="Eraser24" />
                         <ui:TextBlock
                             Margin="4,0"
-                            Text="{Binding ViewModel.ClearCard, Mode=OneTime}"
+                            Text="{}"
                             VerticalAlignment="Center" />
 
                         <ui:Button
                             Command="{Binding ViewModel.ClearAllFilesCommand}"
                             Icon="{ui:SymbolIcon Delete16}"
                             Margin="4,0"
-                            ToolTip="{Binding ViewModel.ClearAll, Mode=OneTime}" />
+                            ToolTip="{x:Static rs:ApplicationLocalization.ClearAllButtonDescription}" />
                         <ui:Button
                             Command="{Binding ViewModel.ClearSucceedFilesCommand}"
                             Icon="{ui:SymbolIcon Checkmark16}"
                             Margin="4,0"
-                            ToolTip="{Binding ViewModel.ClearSucceed}" />
+                            ToolTip="{x:Static rs:ApplicationLocalization.ClearSucceedButtonDescription}" />
                         <ui:Button
                             Command="{Binding ViewModel.ClearFailedFilesCommand}"
                             Icon="{ui:SymbolIcon Warning16}"
                             Margin="4,0"
-                            ToolTip="{Binding ViewModel.ClearFailed}" />
+                            ToolTip="{x:Static rs:ApplicationLocalization.ClearFailedButtonDescription}" />
                     </StackPanel>
                 </ui:Card>
 
                 <ui:Button
                     Command="{Binding ViewModel.ImportHeaderFilesCommand}"
-                    Content="{Binding ViewModel.ImportFiles}"
+                    Content="{x:Static rs:ApplicationLocalization.ImportFilesButton}"
                     Icon="{ui:SymbolIcon ArrowDownload16}"
                     Margin="4,0" />
             </StackPanel>
