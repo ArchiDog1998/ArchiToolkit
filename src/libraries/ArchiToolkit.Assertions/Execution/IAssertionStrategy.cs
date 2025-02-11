@@ -17,18 +17,18 @@ public interface IAssertionStrategy
     /// <summary>
     ///     handel the assertion.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="scope"></param>
     /// <param name="assertions"></param>
     /// <returns></returns>
-    object? HandleFailure(string context, IReadOnlyList<IAssertion> assertions);
+    object? HandleFailure(AssertionScope scope, IReadOnlyList<IAssertion> assertions);
 
     /// <summary>
     ///     Handle the assertions items.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="scope"></param>
     /// <param name="assertionType"></param>
     /// <param name="assertion"></param>
     /// <param name="tag"></param>
     /// <returns>This value will push to <see cref="IAndConstraint.FailureReturnValue" /></returns>
-    object? HandleFailure(string context, AssertionType assertionType, AssertionItem assertion, object? tag);
+    object? HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion, object? tag);
 }

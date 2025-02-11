@@ -10,13 +10,13 @@ namespace ArchiToolkit.Assertions;
 [DebuggerNonUserCode]
 file class DefaultPushStrategy : IAssertionStrategy
 {
-    public object HandleFailure(string context, AssertionType assertionType, AssertionItem assertion, object? tag)
+    public object HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion, object? tag)
     {
-        var message = $"{assertion.Message}\nwhen [{assertion.Time:yyyy-MM-dd HH:mm:ss.fff zzz}]{context}";
+        var message = $"{assertion.Message}\nwhen [{assertion.Time:yyyy-MM-dd HH:mm:ss.fff zzz}]{scope.Context}";
         throw new AssertionException(message);
     }
 
-    public object? HandleFailure(string context, IReadOnlyList<IAssertion> assertions)
+    public object? HandleFailure(AssertionScope scope, IReadOnlyList<IAssertion> assertions)
     {
         return null;
     }
@@ -25,7 +25,7 @@ file class DefaultPushStrategy : IAssertionStrategy
 [DebuggerNonUserCode]
 file class DefaultScopeStrategy : IAssertionStrategy
 {
-    public object? HandleFailure(string context, IReadOnlyList<IAssertion> assertions)
+    public object? HandleFailure(AssertionScope scope, IReadOnlyList<IAssertion> assertions)
     {
         var stringBuilder = new StringBuilder();
         var messageCount = 0;
@@ -41,11 +41,11 @@ file class DefaultScopeStrategy : IAssertionStrategy
 
         if (messageCount is 0) return null;
         stringBuilder.Insert(0,
-            $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz}][{messageCount} message(s)]{context}\n");
+            $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz}][{messageCount} message(s)]{scope.Context}\n");
         throw new AssertionException(stringBuilder.ToString());
     }
 
-    public object? HandleFailure(string context, AssertionType assertionType, AssertionItem assertion, object? tag)
+    public object? HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion, object? tag)
     {
         return null;
     }

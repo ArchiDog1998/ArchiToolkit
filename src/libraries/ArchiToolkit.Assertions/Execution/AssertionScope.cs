@@ -9,15 +9,25 @@ public class AssertionScope : IDisposable
 {
     private static readonly AsyncLocal<AssertionScope?> CurrentScope = new();
     private readonly List<IAssertion> _assertions = [];
-    private readonly string _context;
     private readonly AssertionScope? _parent;
     private readonly IAssertionStrategy _strategy;
 
     /// <summary>
+    /// The Context.
+    /// </summary>
+    public string Context { get; }
+
+    /// <summary>
+    /// The tag to show.
+    /// </summary>
+    public object? Tag { get; }
+
+    /// <summary>
     /// </summary>
     /// <param name="context"></param>
-    public AssertionScope(string context = "")
-        : this(AssertionService.DefaultScopeStrategy, context)
+    /// <param name="tag"></param>
+    public AssertionScope(string context = "", object? tag = null)
+        : this(AssertionService.DefaultScopeStrategy, context, tag)
     {
     }
 
@@ -26,19 +36,18 @@ public class AssertionScope : IDisposable
     /// </summary>
     /// <param name="strategy"></param>
     /// <param name="context"></param>
-    public AssertionScope(IAssertionStrategy strategy, string context = "")
+    /// <param name="tag"></param>
+    public AssertionScope(IAssertionStrategy strategy, string context = "", object? tag = null)
     {
         _strategy = strategy;
         _parent = CurrentScope.Value;
-        _context = context;
+        Context = context;
+        Tag = tag;
 
         CurrentScope.Value = this;
     }
 
-    /// <summary>
-    ///     The current scope
-    /// </summary>
-    public static AssertionScope Current
+    internal static AssertionScope Current
     {
         get => CurrentScope.Value ?? new AssertionScope(AssertionService.DefaultPushStrategy, string.Empty);
         set => CurrentScope.Value = value;
@@ -47,7 +56,7 @@ public class AssertionScope : IDisposable
 
     private bool _handledFailure;
     /// <inheritdoc />
-    public void Dispose()
+    void IDisposable.Dispose()
     {
         if (!_handledFailure)
         {
@@ -65,7 +74,7 @@ public class AssertionScope : IDisposable
     public object? HandleFailure()
     {
         _handledFailure = true;
-        return _strategy.HandleFailure(_context, _assertions);
+        return _strategy.HandleFailure(this, _assertions);
     }
 
     internal void AddAssertion(IAssertion assertion)
@@ -75,6 +84,6 @@ public class AssertionScope : IDisposable
 
     internal object? PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag)
     {
-        return _strategy.HandleFailure(_context, assertionType, assertionItem, tag);
+        return _strategy.HandleFailure(this, assertionType, assertionItem, tag);
     }
 }
