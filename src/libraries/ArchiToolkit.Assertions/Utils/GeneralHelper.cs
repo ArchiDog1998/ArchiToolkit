@@ -35,7 +35,6 @@ internal static class GeneralHelper
     {
         return obj switch
         {
-            string str when string.IsNullOrEmpty(str) => "<empty>",
             string str => str,
             IEnumerable enumerable => GetItemsString(enumerable),
             _ => obj?.ToString() ?? "<null>"

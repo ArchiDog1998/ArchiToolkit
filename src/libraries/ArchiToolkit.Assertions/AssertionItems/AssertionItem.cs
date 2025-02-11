@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using ArchiToolkit.Assertions.Assertions;
 
 namespace ArchiToolkit.Assertions.AssertionItems;
 
@@ -12,7 +13,7 @@ namespace ArchiToolkit.Assertions.AssertionItems;
 /// <param name="Tag"></param>
 public readonly record struct AssertionItem(
     AssertionItemType Type,
-    string Message,
+    AssertMessage Message,
     StackTrace StackTrace,
     DateTimeOffset Time,
     object? Tag);

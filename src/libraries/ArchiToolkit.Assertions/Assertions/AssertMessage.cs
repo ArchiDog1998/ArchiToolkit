@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using ArchiToolkit.Assertions.Utils;
 
 namespace ArchiToolkit.Assertions.Assertions;
 
 /// <summary>
 /// </summary>
-/// <param name="Format">
+/// <param name="structuredFormat">
 /// <list type="table">
 ///   <listheader>
 ///     <term>Key Name</term>
@@ -33,12 +34,41 @@ namespace ArchiToolkit.Assertions.Assertions;
 ///   </item>
 /// </list>
 /// </param>
-/// <param name="AdditionalArguments"></param>
-public readonly record struct AssertMessage(
+/// <param name="additionalArguments"></param>
+public readonly struct AssertMessage(
     [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-    string Format,
-    params Argument[] AdditionalArguments)
+    string structuredFormat,
+    params Argument[] additionalArguments)
 {
+
+    /// <summary>
+    /// The Structured Format
+    /// </summary>
+    public string StructuredFormat => structuredFormat;
+
+    /// <summary>
+    /// The general format
+    /// </summary>
+    public string Format
+    {
+        get
+        {
+            var index = 0;
+            return additionalArguments.Aggregate(structuredFormat,
+                (current, argument) => current.ReplacePlaceHolder(argument.Name, (index++).ToString()));
+        }
+    }
+
+    /// <summary>
+    /// The structured Arguments
+    /// </summary>
+    internal Argument[] StructuredArguments => additionalArguments;
+
+    /// <summary>
+    /// The argument
+    /// </summary>
+    public object?[] Arguments => StructuredArguments.Select(a => a.Value).ToArray();
+
     /// <summary>
     ///     convert by the default string.
     /// </summary>
@@ -48,4 +78,7 @@ public readonly record struct AssertMessage(
     {
         return new AssertMessage(reason);
     }
+
+    /// <inheritdoc />
+    public override string ToString() => string.Format(Format, [..Arguments.Select(a => a.GetObjectString())]);
 }

@@ -371,15 +371,15 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         where TResult : IAndConstraint
     {
         if (IsSucceed(succeed, out var reverse)) return result;
-        var msg = FormatString(message.Format, assertionParams?.Reason ?? string.Empty, reverse,
-            message.AdditionalArguments);
+        var msg = AddMoreArguments(message, assertionParams?.Reason ?? string.Empty, reverse);
         result.FailureReturnValue = AddAssertionItem(assertionItemType, msg, assertionParams?.Tag);
         return result;
     }
 
-    private string FormatString(string formatString, string reason, bool reverse, params Argument[] arguments)
+    private AssertMessage AddMoreArguments(AssertMessage message, string reason, bool reverse)
     {
-        Argument[] allArguments =
+        var basicFormat = message.StructuredFormat;
+        List<Argument> basicArguments =
         [
             new(nameof(Subject), Subject),
             new("Subjects", Subject?.GetObjectString()),
@@ -392,15 +392,16 @@ public sealed class ObjectAssertion<TValue> : IAssertion
                 _ => "Unknown"
             }),
             new("Not", reverse ? AssertionLocalization.Not : string.Empty),
-            ..arguments
+            ..message.StructuredArguments,
         ];
-        var index = 0;
-        formatString = allArguments.Aggregate(formatString,
-            (current, argument) => current.ReplacePlaceHolder(argument.Name, (index++).ToString()));
-        var result = string.Format(formatString, [..allArguments.Select(a => a.Value.GetObjectString())]);
-        if (!string.IsNullOrWhiteSpace(reason)) result += $"\n{string.Format(AssertionLocalization.Reason, reason)}";
 
-        return result;
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            basicFormat += $"\n{string.Format(AssertionLocalization.Reason, "{Reason}")}";
+            basicArguments.Add(new Argument("Reason", reason));
+        }
+
+        return new AssertMessage(basicFormat, basicArguments.ToArray());
     }
 
     private bool IsSucceed(bool succeed, out bool reverse)
@@ -422,7 +423,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         }
     }
 
-    private object? AddAssertionItem(AssertionItemType type, string message, object? tag)
+    private object? AddAssertionItem(AssertionItemType type, AssertMessage message, object? tag)
     {
         var skipIndex = GetIndex(new StackTrace());
         var item = new AssertionItem(type, message, new StackTrace(skipIndex, true), DateTimeOffset.Now, tag);
