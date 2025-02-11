@@ -12,7 +12,6 @@ public class AssertionScope : IDisposable
     private readonly AssertionScope? _parent;
     private readonly MergedAssertionStrategy _strategy;
 
-
     private bool _handledFailure;
 
     /// <summary>
@@ -62,7 +61,7 @@ public class AssertionScope : IDisposable
     }
 
     /// <inheritdoc />
-    void IDisposable.Dispose()
+    public void Dispose()
     {
         if (!_handledFailure) HandleFailure();
 

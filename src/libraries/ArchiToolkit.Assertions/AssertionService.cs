@@ -118,7 +118,7 @@ public readonly struct AssertionService(IAssertionStrategy pushStrategy, IAssert
     ///     Set the service
     /// </summary>
     /// <param name="service"></param>
-    public static void AddService(AssertionService service)
+    public static void Add(AssertionService service)
     {
         CurrentServices.Add(service);
         MergedPushStrategyAsyncLocal.Value = CalculateMergedPushStrategy();
@@ -128,7 +128,7 @@ public readonly struct AssertionService(IAssertionStrategy pushStrategy, IAssert
     /// <summary>
     ///     Clear the services
     /// </summary>
-    public static void ClearServices()
+    public static void Clear()
     {
         while (CurrentServices.TryTake(out _))
         {
