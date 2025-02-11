@@ -19,5 +19,5 @@ public enum AssertionType : byte
     /// <summary>
     ///     Must way.
     /// </summary>
-    Must,
+    Must
 }

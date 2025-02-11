@@ -10,7 +10,8 @@ internal class MergedAssertionStrategy(params IAssertionStrategy[] strategies)
         return strategies.Select(strategy => strategy.HandleFailure(scope, assertions)).ToArray();
     }
 
-    public object?[] HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion, object? tag)
+    public object?[] HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion,
+        object? tag)
     {
         return strategies.Select(strategy => strategy.HandleFailure(scope, assertionType, assertion, tag)).ToArray();
     }

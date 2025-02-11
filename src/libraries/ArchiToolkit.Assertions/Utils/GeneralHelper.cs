@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace ArchiToolkit.Assertions.Utils;
 
 /// <summary>
-/// Some general helpers.
+///     Some general helpers.
 /// </summary>
 public static class GeneralHelper
 {
@@ -67,10 +67,12 @@ public static class GeneralHelper
     }
 
     /// <summary>
-    /// A better way of showing the stack frame.
+    ///     A better way of showing the stack frame.
     /// </summary>
     /// <param name="frame"></param>
     /// <returns></returns>
-    public static string GetString(this StackFrame frame) =>
-        $"{frame.GetMethod()} in {frame.GetFileName()}:line {frame.GetFileLineNumber()}";
+    public static string GetString(this StackFrame frame)
+    {
+        return $"{frame.GetMethod()} in {frame.GetFileName()}:line {frame.GetFileLineNumber()}";
+    }
 }

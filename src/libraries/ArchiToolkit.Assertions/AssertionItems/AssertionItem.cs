@@ -19,7 +19,7 @@ public readonly record struct AssertionItem(
     object? Tag)
 {
     /// <summary>
-    /// The basic Frame
+    ///     The basic Frame
     /// </summary>
     public StackFrame? StackFrame => StackTrace.GetFrame(0);
 }

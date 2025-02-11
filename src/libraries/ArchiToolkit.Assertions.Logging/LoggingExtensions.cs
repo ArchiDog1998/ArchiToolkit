@@ -35,7 +35,7 @@ file class LoggerStrategy(AssertionLogOptions options) : IAssertionStrategy
             arguments = arguments.Append(tag);
         }
 
-        if (options.ShowFrame && assertion.StackFrame is {} frame)
+        if (options.ShowFrame && assertion.StackFrame is { } frame)
         {
             format += "\nStackFrame: {StackFrame}";
             arguments = arguments.Append(options.StackFrameFormat?.Invoke(frame) ?? frame.GetString());
@@ -46,19 +46,19 @@ file class LoggerStrategy(AssertionLogOptions options) : IAssertionStrategy
             AssertionType.Must => LogLevel.Error,
             AssertionType.Should => LogLevel.Warning,
             AssertionType.Could => LogLevel.Information,
-            _ => LogLevel.Debug,
+            _ => LogLevel.Debug
         }, format, [..arguments]);
         return null;
     }
 }
 
 /// <summary>
-/// The extensions for the logging
+///     The extensions for the logging
 /// </summary>
 public static class LoggingExtensions
 {
     /// <summary>
-    /// Add the logging scope
+    ///     Add the logging scope
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="context"></param>
@@ -69,7 +69,7 @@ public static class LoggingExtensions
     }
 
     /// <summary>
-    /// Create the scope with the strategy.
+    ///     Create the scope with the strategy.
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="strategy"></param>
@@ -81,15 +81,16 @@ public static class LoggingExtensions
     }
 
     /// <summary>
-    /// Add the assertions to the <see cref="ILogger"/>.
+    ///     Add the assertions to the <see cref="ILogger" />.
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="changeOptions"></param>
     /// <returns></returns>
-    public static ILoggingBuilder AddArchiToolkitAssertion(this ILoggingBuilder builder, Func<AssertionLogOptions, AssertionLogOptions>? changeOptions = null)
+    public static ILoggingBuilder AddArchiToolkitAssertion(this ILoggingBuilder builder,
+        Func<AssertionLogOptions, AssertionLogOptions>? changeOptions = null)
     {
         var defaultOptions = new AssertionLogOptions(true, true, true);
-        var loggerStrategy = new LoggerStrategy( changeOptions?.Invoke(defaultOptions) ?? defaultOptions );
+        var loggerStrategy = new LoggerStrategy(changeOptions?.Invoke(defaultOptions) ?? defaultOptions);
         AssertionService.AddService(new AssertionService(loggerStrategy, loggerStrategy));
 
         //Exceptions.

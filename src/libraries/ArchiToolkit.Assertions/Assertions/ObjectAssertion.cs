@@ -392,7 +392,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
                 _ => "Unknown"
             }),
             new("Not", reverse ? AssertionLocalization.Not : string.Empty),
-            ..message.StructuredArguments,
+            ..message.StructuredArguments
         ];
 
         if (!string.IsNullOrWhiteSpace(reason))

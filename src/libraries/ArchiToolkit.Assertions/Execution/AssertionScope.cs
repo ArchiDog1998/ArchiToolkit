@@ -12,15 +12,8 @@ public class AssertionScope : IDisposable
     private readonly AssertionScope? _parent;
     private readonly MergedAssertionStrategy _strategy;
 
-    /// <summary>
-    /// The Context.
-    /// </summary>
-    public string Context { get; }
 
-    /// <summary>
-    /// The tag to show.
-    /// </summary>
-    public object? Tag { get; }
+    private bool _handledFailure;
 
     /// <summary>
     /// </summary>
@@ -50,8 +43,17 @@ public class AssertionScope : IDisposable
     public AssertionScope(IAssertionStrategy strategy, string context = "", object? tag = null)
         : this(new MergedAssertionStrategy(strategy), context, tag)
     {
-
     }
+
+    /// <summary>
+    ///     The Context.
+    /// </summary>
+    public string Context { get; }
+
+    /// <summary>
+    ///     The tag to show.
+    /// </summary>
+    public object? Tag { get; }
 
     internal static AssertionScope Current
     {
@@ -59,22 +61,17 @@ public class AssertionScope : IDisposable
         set => CurrentScope.Value = value;
     }
 
-
-    private bool _handledFailure;
     /// <inheritdoc />
     void IDisposable.Dispose()
     {
-        if (!_handledFailure)
-        {
-            HandleFailure();
-        }
+        if (!_handledFailure) HandleFailure();
 
         if (_parent is not null) CurrentScope.Value = _parent;
         GC.SuppressFinalize(this);
     }
 
     /// <summary>
-    /// Manually handle failure
+    ///     Manually handle failure
     /// </summary>
     /// <returns></returns>
     public object?[] HandleFailure()

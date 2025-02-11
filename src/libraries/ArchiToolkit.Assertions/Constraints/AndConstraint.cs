@@ -13,9 +13,6 @@ public class AndConstraint<TValue> : IAndConstraint
         And = assertion;
     }
 
-    /// <inheritdoc />
-    public object?[] FailureReturnValue { get; set; } = [];
-
     /// <summary>
     ///     And things.
     /// </summary>
@@ -25,4 +22,7 @@ public class AndConstraint<TValue> : IAndConstraint
     ///     And it.
     /// </summary>
     public PronounConstraint<TValue> AndIt => new(And);
+
+    /// <inheritdoc />
+    public object?[] FailureReturnValue { get; set; } = [];
 }
