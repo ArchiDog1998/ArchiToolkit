@@ -11,7 +11,8 @@ public partial class MainWindow : INavigationWindow
     public MainWindow(MainWindowViewModel viewModel,
         INavigationViewPageProvider pageService,
         INavigationService navigationService,
-        ISnackbarService snackbarService)
+        ISnackbarService snackbarService,
+        IContentDialogService contentDialogService)
     {
         ViewModel = viewModel;
         DataContext = this;
@@ -22,6 +23,7 @@ public partial class MainWindow : INavigationWindow
         SetPageService(pageService);
         navigationService.SetNavigationControl(RootNavigation);
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
+        contentDialogService.SetDialogHost(ContentDialogPresenter);
     }
 
     public MainWindowViewModel ViewModel { get; }

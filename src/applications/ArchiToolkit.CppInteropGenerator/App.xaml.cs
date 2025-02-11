@@ -7,6 +7,7 @@ using ArchiToolkit.CppInteropGenerator.Views;
 using ArchiToolkit.CppInteropGenerator.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 
@@ -23,13 +24,10 @@ public partial class App
         //         .AddJsonFile("appsettings.json", true, true)
         //         .AddEnvironmentVariables();
         // })
-        // .ConfigureLogging((context, builder) =>
-        // {
-        //     builder.AddConsole(options =>
-        //     {
-        //         options.FormatterName = ConsoleFormatterNames.Simple; // Change to "simple", "json", or a custom formatter
-        //     });
-        // })
+        .ConfigureLogging((context, builder) =>
+        {
+            builder.AddSeq();
+        })
         .ConfigureServices((_, services) =>
         {
             services.AddDbContext<AppDbContext>();
@@ -38,6 +36,7 @@ public partial class App
             services.AddSingleton<IThemeService, ThemeService>();
             services.AddSingleton<ISnackbarService, SnackbarService>();
             services.AddSingleton<INavigationService, NavigationService>();
+            services.AddSingleton<IContentDialogService, ContentDialogService>();
 
             services.AddSingleton<MainWindow>();
             services.AddSingleton<MainWindowViewModel>();
