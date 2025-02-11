@@ -28,12 +28,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.CppInteropGene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions.Logging", "src\libraries\ArchiToolkit.Assertions.Logging\ArchiToolkit.Assertions.Logging.csproj", "{D22419AF-0ED1-446A-B64B-C567EA383586}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NukeBuilder", "build\NukeBuilder.csproj", "{B37146A5-7936-47DD-A517-333A4A2A8546}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B37146A5-7936-47DD-A517-333A4A2A8546}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B37146A5-7936-47DD-A517-333A4A2A8546}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBABB8BD-18B1-4203-BAAD-774EAB747942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BBABB8BD-18B1-4203-BAAD-774EAB747942}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBABB8BD-18B1-4203-BAAD-774EAB747942}.Release|Any CPU.ActiveCfg = Release|Any CPU
