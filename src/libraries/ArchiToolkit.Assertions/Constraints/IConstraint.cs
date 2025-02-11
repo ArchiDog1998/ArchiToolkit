@@ -13,5 +13,5 @@ public interface IAndConstraint : IConstraint
     /// <summary>
     /// The failure return Value
     /// </summary>
-    object? FailureReturnValue { get; set; }
+    object?[] FailureReturnValue { get; set; }
 }

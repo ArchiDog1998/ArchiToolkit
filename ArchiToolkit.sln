@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{752493CD-971
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.CppInteropGenerator", "src\applications\ArchiToolkit.CppInteropGenerator\ArchiToolkit.CppInteropGenerator.csproj", "{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions.Logging", "src\libraries\ArchiToolkit.Assertions.Logging\ArchiToolkit.Assertions.Logging.csproj", "{D22419AF-0ED1-446A-B64B-C567EA383586}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D22419AF-0ED1-446A-B64B-C567EA383586}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D22419AF-0ED1-446A-B64B-C567EA383586}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D22419AF-0ED1-446A-B64B-C567EA383586}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D22419AF-0ED1-446A-B64B-C567EA383586}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,5 +72,6 @@ Global
 		{66F2B9EC-3A07-40A3-B633-5AC8C7F0E108} = {42762D80-B827-4395-8973-3B5D19960DD0}
 		{7145BF83-C901-4886-B377-BE3E02553B4A} = {42762D80-B827-4395-8973-3B5D19960DD0}
 		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
+		{D22419AF-0ED1-446A-B64B-C567EA383586} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 	EndGlobalSection
 EndGlobal

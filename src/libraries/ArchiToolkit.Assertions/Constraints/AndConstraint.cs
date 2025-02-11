@@ -14,7 +14,7 @@ public class AndConstraint<TValue> : IAndConstraint
     }
 
     /// <inheritdoc />
-    public object? FailureReturnValue { get; set; }
+    public object?[] FailureReturnValue { get; set; } = [];
 
     /// <summary>
     ///     And things.

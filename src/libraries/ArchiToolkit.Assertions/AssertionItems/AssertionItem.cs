@@ -16,4 +16,10 @@ public readonly record struct AssertionItem(
     AssertMessage Message,
     StackTrace StackTrace,
     DateTimeOffset Time,
-    object? Tag);
+    object? Tag)
+{
+    /// <summary>
+    /// The basic Frame
+    /// </summary>
+    public StackFrame? StackFrame => StackTrace.GetFrame(0);
+}

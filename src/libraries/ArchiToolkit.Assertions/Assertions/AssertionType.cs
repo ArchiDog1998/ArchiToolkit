@@ -6,9 +6,10 @@
 public enum AssertionType : byte
 {
     /// <summary>
-    ///     Must way.
+    ///     Could way.
     /// </summary>
-    Must,
+    Could,
+
 
     /// <summary>
     ///     Should way.
@@ -16,7 +17,7 @@ public enum AssertionType : byte
     Should,
 
     /// <summary>
-    ///     Could way.
+    ///     Must way.
     /// </summary>
-    Could
+    Must,
 }

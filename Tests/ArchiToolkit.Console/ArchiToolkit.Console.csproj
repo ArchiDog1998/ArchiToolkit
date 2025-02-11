@@ -5,7 +5,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Assertions\ArchiToolkit.Assertions.csproj"/>
+        <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Assertions.Logging\ArchiToolkit.Assertions.Logging.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.1" />
+      <PackageReference Include="Seq.Extensions.Logging" Version="8.0.0" />
     </ItemGroup>
 
 </Project>

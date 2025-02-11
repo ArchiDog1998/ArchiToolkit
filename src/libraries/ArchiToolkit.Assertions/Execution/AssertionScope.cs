@@ -10,7 +10,7 @@ public class AssertionScope : IDisposable
     private static readonly AsyncLocal<AssertionScope?> CurrentScope = new();
     private readonly List<IAssertion> _assertions = [];
     private readonly AssertionScope? _parent;
-    private readonly IAssertionStrategy _strategy;
+    private readonly MergedAssertionStrategy _strategy;
 
     /// <summary>
     /// The Context.
@@ -27,17 +27,11 @@ public class AssertionScope : IDisposable
     /// <param name="context"></param>
     /// <param name="tag"></param>
     public AssertionScope(string context = "", object? tag = null)
-        : this(AssertionService.DefaultScopeStrategy, context, tag)
+        : this(AssertionService.MergedScopeStrategy, context, tag)
     {
     }
 
-    /// <summary>
-    ///     Add the assertion.
-    /// </summary>
-    /// <param name="strategy"></param>
-    /// <param name="context"></param>
-    /// <param name="tag"></param>
-    public AssertionScope(IAssertionStrategy strategy, string context = "", object? tag = null)
+    internal AssertionScope(MergedAssertionStrategy strategy, string context = "", object? tag = null)
     {
         _strategy = strategy;
         _parent = CurrentScope.Value;
@@ -47,9 +41,21 @@ public class AssertionScope : IDisposable
         CurrentScope.Value = this;
     }
 
+    /// <summary>
+    ///     Add the assertion.
+    /// </summary>
+    /// <param name="strategy"></param>
+    /// <param name="context"></param>
+    /// <param name="tag"></param>
+    public AssertionScope(IAssertionStrategy strategy, string context = "", object? tag = null)
+        : this(new MergedAssertionStrategy(strategy), context, tag)
+    {
+
+    }
+
     internal static AssertionScope Current
     {
-        get => CurrentScope.Value ?? new AssertionScope(AssertionService.DefaultPushStrategy, string.Empty);
+        get => CurrentScope.Value ?? new AssertionScope(AssertionService.MergedPushStrategy);
         set => CurrentScope.Value = value;
     }
 
@@ -71,7 +77,7 @@ public class AssertionScope : IDisposable
     /// Manually handle failure
     /// </summary>
     /// <returns></returns>
-    public object? HandleFailure()
+    public object?[] HandleFailure()
     {
         _handledFailure = true;
         return _strategy.HandleFailure(this, _assertions);
@@ -82,7 +88,7 @@ public class AssertionScope : IDisposable
         _assertions.Add(assertion);
     }
 
-    internal object? PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag)
+    internal object?[] PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag)
     {
         return _strategy.HandleFailure(this, assertionType, assertionItem, tag);
     }

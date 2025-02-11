@@ -1,18 +1,28 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace ArchiToolkit.Assertions.Utils;
 
-internal static class GeneralHelper
+/// <summary>
+/// Some general helpers.
+/// </summary>
+public static class GeneralHelper
 {
-    public static string ReplacePlaceHolder(this string input, string placeholder, string replacementValue)
+    internal static Match PlaceHolderMatch(this string input, string placeholder)
+    {
+        var pattern = $@"\{{({placeholder})(:.*?)?\}}";
+        return Regex.Match(input, pattern);
+    }
+
+    internal static string ReplacePlaceHolder(this string input, string placeholder, string replacementValue)
     {
         var pattern = $@"\{{({placeholder})(:.*?)?\}}";
         var replacement = $"{{{replacementValue}$2}}";
         return Regex.Replace(input, pattern, replacement);
     }
 
-    public static string GetFullName(this Type type)
+    internal static string GetFullName(this Type type)
     {
         if (!type.IsGenericType)
             return GetTypeName(type);
@@ -31,7 +41,7 @@ internal static class GeneralHelper
         }
     }
 
-    public static string GetObjectString(this object? obj)
+    internal static string GetObjectString(this object? obj)
     {
         return obj switch
         {
@@ -51,8 +61,16 @@ internal static class GeneralHelper
             : $"[{string.Join(", ", objects.Select(GetObjectString))}]";
     }
 
-    public static int Count(this IEnumerable enumerable)
+    internal static int Count(this IEnumerable enumerable)
     {
         return Enumerable.Count(enumerable.Cast<object?>());
     }
+
+    /// <summary>
+    /// A better way of showing the stack frame.
+    /// </summary>
+    /// <param name="frame"></param>
+    /// <returns></returns>
+    public static string GetString(this StackFrame frame) =>
+        $"{frame.GetMethod()} in {frame.GetFileName()}:line {frame.GetFileLineNumber()}";
 }

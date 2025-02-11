@@ -423,7 +423,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         }
     }
 
-    private object? AddAssertionItem(AssertionItemType type, AssertMessage message, object? tag)
+    private object?[] AddAssertionItem(AssertionItemType type, AssertMessage message, object? tag)
     {
         var skipIndex = GetIndex(new StackTrace());
         var item = new AssertionItem(type, message, new StackTrace(skipIndex, true), DateTimeOffset.Now, tag);
