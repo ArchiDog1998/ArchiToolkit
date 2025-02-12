@@ -14,6 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.PureConst\ArchiToolkit.PureConst.csproj" />
+        <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.PureConst.Analyzer\ArchiToolkit.PureConst.Analyzer.csproj" />
     </ItemGroup>
 </Project>

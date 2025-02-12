@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35707.178 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.PureConst", "src\analyzers\ArchiToolkit.PureConst\ArchiToolkit.PureConst.csproj", "{BBABB8BD-18B1-4203-BAAD-774EAB747942}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.PureConst.Analyzer", "src\analyzers\ArchiToolkit.PureConst.Analyzer\ArchiToolkit.PureConst.Analyzer.csproj", "{BBABB8BD-18B1-4203-BAAD-774EAB747942}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions", "src\libraries\ArchiToolkit.Assertions\ArchiToolkit.Assertions.csproj", "{92BD61C0-02F8-4E26-A6A8-9403646E4C42}"
 EndProject
@@ -19,7 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{4B1F
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
-		src\libraries\ArchiToolkit.Assertions.props = src\libraries\ArchiToolkit.Assertions.props
+		src\ArchiToolkit.Assertions.props = src\ArchiToolkit.Assertions.props
+		src\ArchiToolkit.PureConst.props = src\ArchiToolkit.PureConst.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{752493CD-971A-4559-B5F1-C931C2AB58BE}"
@@ -29,6 +30,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions.Logging", "src\libraries\ArchiToolkit.Assertions.Logging\ArchiToolkit.Assertions.Logging.csproj", "{D22419AF-0ED1-446A-B64B-C567EA383586}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NukeBuilder", "build\NukeBuilder.csproj", "{B37146A5-7936-47DD-A517-333A4A2A8546}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.PureConst", "src\libraries\ArchiToolkit.PureConst\ArchiToolkit.PureConst.csproj", "{305AF198-B752-414A-8BF3-2E698EF01FED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +69,10 @@ Global
 		{D22419AF-0ED1-446A-B64B-C567EA383586}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D22419AF-0ED1-446A-B64B-C567EA383586}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D22419AF-0ED1-446A-B64B-C567EA383586}.Release|Any CPU.Build.0 = Release|Any CPU
+		{305AF198-B752-414A-8BF3-2E698EF01FED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{305AF198-B752-414A-8BF3-2E698EF01FED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{305AF198-B752-414A-8BF3-2E698EF01FED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{305AF198-B752-414A-8BF3-2E698EF01FED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,5 +85,6 @@ Global
 		{7145BF83-C901-4886-B377-BE3E02553B4A} = {42762D80-B827-4395-8973-3B5D19960DD0}
 		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 		{D22419AF-0ED1-446A-B64B-C567EA383586} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
+		{305AF198-B752-414A-8BF3-2E698EF01FED} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 	EndGlobalSection
 EndGlobal

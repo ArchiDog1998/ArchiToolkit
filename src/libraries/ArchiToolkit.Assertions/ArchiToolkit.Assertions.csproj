@@ -4,7 +4,7 @@
         <Description>Some amazing assertion.</Description>
     </PropertyGroup>
 
-    <Import Project="..\ArchiToolkit.Assertions.props"/>
+    <Import Project="..\..\ArchiToolkit.Assertions.props"/>
 
     <ItemGroup>
         <EmbeddedResource Update="Resources\AssertionLocalization.resx">

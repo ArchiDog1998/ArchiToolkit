@@ -13,7 +13,7 @@
         <IsLibraryProject>$(MSBuildProjectDirectory.Contains('\libraries\'))</IsLibraryProject>
 
         <NeedPackage>False</NeedPackage>
-        <NeedPackage Condition="!$(IsTestProject) and !$(IsApplicationProject)">True</NeedPackage>
+        <NeedPackage Condition="!$(IsTestProject) and !$(IsApplicationProject) and !$(IsRoslynProject)  and '$(Configuration)' == 'Release'">True</NeedPackage>
         <NeedRoslyn>False</NeedRoslyn>
         <NeedRoslyn Condition="!$(IsTestProject) and $(IsRoslynProject)">True</NeedRoslyn>
         <NeedAlmostAllFrameWorks>False</NeedAlmostAllFrameWorks>
@@ -52,7 +52,7 @@
     </ItemGroup>
 
     <PropertyGroup Condition="$(NeedAlmostAllFrameWorks)">
-        <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0;net472;net48</TargetFrameworks>
+        <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0;net472;net48;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup Condition="$(NeedAlmostAllFrameWorks)">

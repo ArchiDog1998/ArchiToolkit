@@ -1,11 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <Title>Pure</Title>
-        <Description>Check the method for pure</Description>
-        <Version>0.9.0</Version>
-        <RootNamespace>ArchiToolkit.Pure</RootNamespace>
-    </PropertyGroup>
+    <Import Project="..\..\ArchiToolkit.Assertions.props"/>
 
     <ItemGroup>
         <EmbeddedResource Update="Resources.resx">
