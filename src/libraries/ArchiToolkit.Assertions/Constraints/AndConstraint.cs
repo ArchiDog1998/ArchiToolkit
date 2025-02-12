@@ -1,4 +1,5 @@
 ﻿using ArchiToolkit.Assertions.Assertions;
+using ArchiToolkit.Assertions.Execution;
 
 namespace ArchiToolkit.Assertions.Constraints;
 
@@ -24,5 +25,5 @@ public class AndConstraint<TValue> : IAndConstraint
     public PronounConstraint<TValue> AndIt => new(And);
 
     /// <inheritdoc />
-    public object?[] FailureReturnValue { get; set; } = [];
+    public IDictionary<IAssertionStrategy, object>? FailureReturnValues { get; set; }
 }

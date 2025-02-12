@@ -372,7 +372,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     {
         if (IsSucceed(succeed, out var reverse)) return result;
         var msg = AddMoreArguments(message, assertionParams?.Reason ?? string.Empty, reverse);
-        result.FailureReturnValue = AddAssertionItem(assertionItemType, msg, assertionParams?.Tag);
+        result.FailureReturnValues = AddAssertionItem(assertionItemType, msg, assertionParams?.Tag);
         return result;
     }
 
@@ -423,7 +423,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         }
     }
 
-    private object?[] AddAssertionItem(AssertionItemType type, AssertMessage message, object? tag)
+    private IDictionary<IAssertionStrategy, object> AddAssertionItem(AssertionItemType type, AssertMessage message, object? tag)
     {
         var skipIndex = GetIndex(new StackTrace());
         var item = new AssertionItem(type, message, new StackTrace(skipIndex, true), DateTimeOffset.Now, tag);

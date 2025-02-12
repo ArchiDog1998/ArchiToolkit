@@ -1,4 +1,6 @@
-﻿namespace ArchiToolkit.Assertions.Constraints;
+﻿using ArchiToolkit.Assertions.Execution;
+
+namespace ArchiToolkit.Assertions.Constraints;
 
 /// <summary>
 ///     Just the Constraint
@@ -13,5 +15,5 @@ public interface IAndConstraint : IConstraint
     /// <summary>
     ///     The failure return Value
     /// </summary>
-    object?[] FailureReturnValue { get; set; }
+    IDictionary<IAssertionStrategy, object>? FailureReturnValues { get; set; }
 }

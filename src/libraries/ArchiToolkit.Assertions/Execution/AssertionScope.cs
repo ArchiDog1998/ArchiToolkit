@@ -73,7 +73,7 @@ public class AssertionScope : IDisposable
     ///     Manually handle failure
     /// </summary>
     /// <returns></returns>
-    public object?[] HandleFailure()
+    public IDictionary<IAssertionStrategy, object> HandleFailure()
     {
         _handledFailure = true;
         return _strategy.HandleFailure(this, _assertions);
@@ -84,7 +84,7 @@ public class AssertionScope : IDisposable
         _assertions.Add(assertion);
     }
 
-    internal object?[] PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag)
+    internal IDictionary<IAssertionStrategy, object> PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag)
     {
         return _strategy.HandleFailure(this, assertionType, assertionItem, tag);
     }
