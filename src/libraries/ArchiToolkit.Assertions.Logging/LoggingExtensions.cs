@@ -69,7 +69,7 @@ public static class LoggingExtensions
     /// <param name="messageFormat"></param>
     /// <param name="args"></param>
     /// <returns></returns>
-    public static IDisposable BeginAssertionScope(this ILogger logger, string? messageFormat,
+    public static IDisposable BeginAssertionScope(this ILogger logger, string? messageFormat = null,
         params object?[] args)
     {
         var logScope = logger.BeginScope(messageFormat, args);
@@ -85,7 +85,7 @@ public static class LoggingExtensions
     /// <param name="args"></param>
     /// <returns></returns>
     public static IDisposable BeginAssertionScope(this ILogger logger, IAssertionStrategy strategy,
-        string? messageFormat,
+        string? messageFormat  = null,
         params object?[] args)
     {
         var logScope = logger.BeginScope(messageFormat, args);
