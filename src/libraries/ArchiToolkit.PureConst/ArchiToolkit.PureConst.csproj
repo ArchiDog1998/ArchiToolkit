@@ -3,6 +3,7 @@
     <PropertyGroup>
         <Title>Pure Const</Title>
         <Description>Check the method for pure and the const thing</Description>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     </PropertyGroup>
     <Import Project="..\..\ArchiToolkit.PureConst.props"/>
     <ItemGroup>

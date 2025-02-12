@@ -26,6 +26,8 @@
       "enum": [
         "Clean",
         "Compile",
+        "CopyNuGetPackages",
+        "Push",
         "Restore"
       ]
     },
@@ -107,6 +109,16 @@
             "Debug",
             "Release"
           ]
+        },
+        "NuGetApiKey": {
+          "type": "string"
+        },
+        "NuGetSource": {
+          "type": "string"
+        },
+        "Solution": {
+          "type": "string",
+          "description": "Path to a solution file that is automatically loaded"
         }
       }
     },
