@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
@@ -50,69 +52,112 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
+            OutputDirectory.CreateOrCleanDirectory();
             var packageFiles = RootDirectory.GlobFiles("**/*.nupkg");
-
-            if (OutputDirectory.Exists())
-            {
-                OutputDirectory.DeleteDirectory();
-            }
-            OutputDirectory.CreateDirectory();
 
             foreach (var package in packageFiles)
             {
-                package.Copy(OutputDirectory / package.Name);
+                package.Copy(OutputDirectory / package.Name, ExistsPolicy.FileOverwriteIfNewer);
                 package.DeleteFile();
             }
         });
 
-    Target Push => d => d
+    Target PushNugetPackages => d => d
         .DependsOn(CopyNuGetPackages)
         .OnlyWhenStatic(() => NuGetApiKey != null)
         .Executes(() =>
         {
             foreach (var package in OutputDirectory.GlobFiles("*.nupkg"))
             {
-                if (IsPackageVersionOnNuGet(package)) continue;
+                var existVersions = GetPackageVersions(package, out var packageId, out var version);
+                foreach (var deletingVersion in VersionsShouldDelete(existVersions))
+                {
+                    DeletePackage(packageId, deletingVersion);
+                }
 
-                try
-                {
-                    DotNetTasks.DotNetNuGetPush(s => s
-                        .SetTargetPath(package)
-                        .SetSource(NuGetSource)
-                        .SetApiKey(NuGetApiKey)
-                    );
-                }
-                catch
-                {
-                    // ignored
-                }
+                if (existVersions.Contains(version)) continue;
+
+                PushPackage(package);
             }
         });
 
-    public static int Main() => Execute<Build>(x => x.Push);
+    public static int Main() => Execute<Build>(x => x.PushNugetPackages);
 
-    bool IsPackageVersionOnNuGet(AbsolutePath packagePath)
+    IEnumerable<Version> VersionsShouldDelete(Version[] versions)
     {
-        var packageNameVersion = packagePath.NameWithoutExtension; // "MyPackage.1.0.0"
+        var canDelete = versions.OrderDescending().Skip(10).ToArray();
+
+        foreach (var version in canDelete.GroupBy(v => new { v.Major, v.Minor })
+                     .SelectMany(v => v.OrderDescending().Skip(1)))
+        {
+            yield return version;
+        }
+    }
+
+    void DeletePackage(string packageId, Version version)
+    {
+        try
+        {
+            DotNetTasks.DotNetNuGetDelete(s => s
+                .SetSource(NuGetSource)
+                .SetApiKey(NuGetApiKey)
+                .SetPackageId(packageId)
+                .SetPackageVersion(version.ToString()));
+            Log.Information($"Deleted the nuget package {packageId} {version}");
+        }
+        catch
+        {
+            Log.Warning($"Failed to delete the nuget package {packageId} {version}");
+        }
+    }
+
+    void PushPackage(AbsolutePath package)
+    {
+        try
+        {
+            DotNetTasks.DotNetNuGetPush(s => s
+                .SetTargetPath(package)
+                .SetSource(NuGetSource)
+                .SetApiKey(NuGetApiKey)
+            );
+        }
+        catch
+        {
+            Log.Warning($"Failed to push the nuget package {package}");
+        }
+    }
+
+    Version[] GetPackageVersions(AbsolutePath packagePath, out string packageName, out Version version)
+    {
+        var packageNameVersion = packagePath.NameWithoutExtension;
         var parts = packageNameVersion.Split('.');
-        if (parts.Length < 2) return false;
+        if (parts.Length < 2)
+        {
+            packageName = string.Empty;
+            version = null!;
+            return [];
+        }
 
-        var packageName = string.Join(".", parts.TakeWhile(p => !uint.TryParse(p, out _))); // Extract "MyPackage"
-        var packageVersion = string.Join(".", parts.SkipWhile(p => !uint.TryParse(p, out _))); // Extract "1.0.0"
+        packageName = string.Join(".", parts.TakeWhile(p => !uint.TryParse(p, out _))).ToLower();
+        if (!Version.TryParse(string.Join(".", parts.SkipWhile(p => !uint.TryParse(p, out _))), out version))
+        {
+            return [];
+        }
 
-        var nugetCheckUrl = $"https://api.nuget.org/v3-flatcontainer/{packageName.ToLower()}/index.json";
+        var nugetCheckUrl = $"https://api.nuget.org/v3-flatcontainer/{packageName}/index.json";
 
         try
         {
             using var client = new HttpClient();
             var response = client.GetStringAsync(nugetCheckUrl).Result;
 
-            return response.Contains($"\"{packageVersion}\"");
+            using var jsonDoc = JsonDocument.Parse(response);
+            return jsonDoc.RootElement.GetProperty("versions").Deserialize<Version[]>();
         }
         catch
         {
-            Log.Warning($"Failed to check NuGet for {packageName} {packageVersion}. Assuming it doesn't exist.");
-            return false;
+            Log.Warning($"Failed to check NuGet for {packageName} {version}. Assuming it doesn't exist.");
+            return [];
         }
     }
 }

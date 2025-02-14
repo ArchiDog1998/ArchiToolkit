@@ -27,7 +27,7 @@
         "Clean",
         "Compile",
         "CopyNuGetPackages",
-        "Push",
+        "PushNugetPackages",
         "Restore"
       ]
     },
