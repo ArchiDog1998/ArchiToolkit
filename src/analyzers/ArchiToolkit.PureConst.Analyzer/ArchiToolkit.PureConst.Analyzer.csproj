@@ -1,6 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\..\ArchiToolkit.Assertions.props"/>
-
     <ItemGroup>
         <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>

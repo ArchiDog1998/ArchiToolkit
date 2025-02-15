@@ -5,8 +5,6 @@
         <Description>To make assertions to the logging.</Description>
     </PropertyGroup>
     
-    <Import Project="..\..\ArchiToolkit.Assertions.props"/>
-    
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0"/>
     </ItemGroup>

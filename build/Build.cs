@@ -1,24 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using Nuke.Common;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
 using Serilog;
 
+[GitHubActions("nuke", GitHubActionsImage.UbuntuLatest,
+    On = [GitHubActionsTrigger.Push],
+    ImportSecrets = [nameof(NuGetApiKey)],
+    InvokedTargets = [nameof(PushNugetPackages)])]
 class Build : NukeBuild
 {
-    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-
-    [Solution(GenerateProjects = true)] readonly Solution Solution;
-
     [Parameter] readonly string NuGetApiKey = Environment.GetEnvironmentVariable("NUGET_API_KEY");
     [Parameter] readonly string NuGetSource = "https://api.nuget.org/v3/index.json";
+    [Solution(GenerateProjects = true)] readonly Solution Solution;
 
     AbsolutePath OutputDirectory => RootDirectory / "output";
 
@@ -71,9 +71,7 @@ class Build : NukeBuild
             {
                 var existVersions = GetPackageVersions(package, out var packageId, out var version);
                 foreach (var deletingVersion in VersionsShouldDelete(existVersions))
-                {
                     DeletePackage(packageId, deletingVersion);
-                }
 
                 if (existVersions.Contains(version)) continue;
 
@@ -89,9 +87,7 @@ class Build : NukeBuild
 
         foreach (var version in canDelete.GroupBy(v => new { v.Major, v.Minor })
                      .SelectMany(v => v.OrderDescending().Skip(1)))
-        {
             yield return version;
-        }
     }
 
     void DeletePackage(string packageId, Version version)
@@ -139,10 +135,7 @@ class Build : NukeBuild
         }
 
         packageName = string.Join(".", parts.TakeWhile(p => !uint.TryParse(p, out _))).ToLower();
-        if (!Version.TryParse(string.Join(".", parts.SkipWhile(p => !uint.TryParse(p, out _))), out version))
-        {
-            return [];
-        }
+        if (!Version.TryParse(string.Join(".", parts.SkipWhile(p => !uint.TryParse(p, out _))), out version)) return [];
 
         var nugetCheckUrl = $"https://api.nuget.org/v3-flatcontainer/{packageName}/index.json";
 
