@@ -28,7 +28,8 @@
         "Compile",
         "CopyNuGetPackages",
         "PushNugetPackages",
-        "Restore"
+        "Restore",
+        "Test"
       ]
     },
     "Verbosity": {

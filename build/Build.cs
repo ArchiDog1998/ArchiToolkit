@@ -48,8 +48,16 @@ class Build : NukeBuild
                 .EnableNoRestore());
         });
 
-    Target CopyNuGetPackages => d => d
+    Target Test => d => d
         .DependsOn(Compile)
+        .Executes(() =>
+        {
+            TestProject(Solution.tests.ArchiToolkit_Assertions_Tests);
+            TestProject(Solution.tests.ArchiToolkit_PureConst_Tests);
+        });
+
+    Target CopyNuGetPackages => d => d
+        .DependsOn(Test)
         .Executes(() =>
         {
             OutputDirectory.CreateOrCleanDirectory();
@@ -78,6 +86,14 @@ class Build : NukeBuild
                 PushPackage(package);
             }
         });
+
+    private static void TestProject(Project project) =>
+        DotNetTasks.DotNetTest(s => s
+            .SetProjectFile(project)
+            .SetConfiguration(Configuration.Release)
+            .EnableNoRestore()
+            .EnableNoBuild()
+            .SetLoggers("trx"));
 
     public static int Main() => Execute<Build>(x => x.PushNugetPackages);
 
