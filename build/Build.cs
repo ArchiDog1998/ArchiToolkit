@@ -10,7 +10,7 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
 using Serilog;
 
-[GitHubActions("nuke", GitHubActionsImage.WindowsLatest,
+[GitHubActions("nuke", GitHubActionsImage.UbuntuLatest,
     On = [GitHubActionsTrigger.Push],
     ImportSecrets = [nameof(NuGetApiKey)],
     InvokedTargets = [nameof(PushNugetPackages)])]
