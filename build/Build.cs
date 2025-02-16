@@ -264,7 +264,7 @@ partial class Build : NukeBuild
         {
             var version = GetVersionTag();
             var link = string.IsNullOrEmpty(TagName)
-                ? Repository.GetGitHubCommitUrl(version)
+                ? $"https://github.com/{Repository.Identifier}/commits/{version}"
                 : Repository.GetGitHubCompareTagsUrl(TagName, version);
             ReleaseNote.AppendLine($"# [{version[1..]}]({link}) ({DateTime.UtcNow.Date.ToString("yyyy-M-d dddd")})");
             var client = new GitHubClient(new ProductHeaderValue("NUKE-GetDescription"))
