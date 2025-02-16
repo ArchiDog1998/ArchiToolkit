@@ -59,7 +59,7 @@ public class ContributorManager
         }
 
         builder.AppendLine(
-            "\nYour hard work and dedication help make this project better, and we truly appreciate all the time and effort you've invested.");
+            "\nYour hard work and dedication helped improve this project, and we truly appreciate all the time and effort you've invested.");
         builder.AppendLine("Thank you for being a part of this amazing community! 🙏");
         return builder;
     }
