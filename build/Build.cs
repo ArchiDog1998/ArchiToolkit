@@ -17,10 +17,11 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitHub;
-using NukeBuilder;
 using Octokit;
 using Serilog;
 using Project = Nuke.Common.ProjectModel.Project;
+
+namespace NukeBuilder;
 
 [GitHubActions("nuke", GitHubActionsImage.WindowsLatest,
     On = [GitHubActionsTrigger.Push],
@@ -276,8 +277,6 @@ partial class Build : NukeBuild
             ReleaseNote.Append(IssuesNote);
             ReleaseNote.Append(CommitsNote);
             ReleaseNote.Append(Contributors.ToStringBuilder());
-
-            File.WriteAllText(@"D:\Desktop\test.md", ReleaseNote.ToString());
         });
 
     private readonly StringBuilder CommitsNote = new();
