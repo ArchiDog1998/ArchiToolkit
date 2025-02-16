@@ -27,9 +27,19 @@
         "Clean",
         "Compile",
         "CopyNuGetPackages",
+        "CreateGitHubRelease",
+        "CreateReleaseNote",
+        "GetCommitNote",
+        "GetCommits",
+        "GetGitmoji",
+        "GetIssuesNote",
+        "GetLastTag",
+        "GetPullRequestNote",
+        "PushMain",
         "PushNugetPackages",
         "Restore",
-        "Test"
+        "Test",
+        "UploadGitHubReleasePackages"
       ]
     },
     "Verbosity": {
@@ -103,6 +113,9 @@
   "allOf": [
     {
       "properties": {
+        "GithubToken": {
+          "type": "string"
+        },
         "NuGetApiKey": {
           "type": "string"
         },

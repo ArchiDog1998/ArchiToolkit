@@ -31,7 +31,8 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
-      - name: 'Run: PushNugetPackages'
-        run: ./build.cmd PushNugetPackages
+      - name: 'Run: PushMain'
+        run: ./build.cmd PushMain
         env:
           NuGetApiKey: ${{ secrets.NUGET_API_KEY }}
+          GithubToken: ${{ secrets.GITHUB_TOKEN }}

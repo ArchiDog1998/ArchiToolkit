@@ -1,23 +1,38 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Nuke.Common;
 using Nuke.Common.CI.GitHubActions;
+using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.GitHub;
+using NukeBuilder;
+using Octokit;
 using Serilog;
+using Project = Nuke.Common.ProjectModel.Project;
 
 [GitHubActions("nuke", GitHubActionsImage.WindowsLatest,
     On = [GitHubActionsTrigger.Push],
-    ImportSecrets = [nameof(NuGetApiKey)],
-    InvokedTargets = [nameof(PushNugetPackages)])]
-class Build : NukeBuild
+    ImportSecrets = [nameof(NuGetApiKey), nameof(GithubToken)],
+    InvokedTargets = [nameof(PushMain)])]
+partial class Build : NukeBuild
 {
+    [Parameter] readonly string GithubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
     [Parameter] readonly string NuGetApiKey = Environment.GetEnvironmentVariable("NUGET_API_KEY");
     [Parameter] readonly string NuGetSource = "https://api.nuget.org/v3/index.json";
+
+    [GitRepository] readonly GitRepository Repository;
     [Solution(GenerateProjects = true)] readonly Solution Solution;
 
     AbsolutePath OutputDirectory => RootDirectory / "output";
@@ -33,9 +48,7 @@ class Build : NukeBuild
         .DependsOn(Clean)
         .Executes(() =>
         {
-            DotNetTasks.DotNetRestore(s => s
-                .SetProjectFile(Solution)
-            );
+            DotNetTasks.DotNetRestore(s => s.SetProjectFile(Solution));
         });
 
     Target Compile => d => d
@@ -54,7 +67,37 @@ class Build : NukeBuild
         {
             TestProject(Solution.tests.ArchiToolkit_Assertions_Tests);
             TestProject(Solution.tests.ArchiToolkit_PureConst_Tests);
+            return;
+
+            static void TestProject(Project project)
+            {
+                DotNetTasks.DotNetTest(s => s
+                    .SetProjectFile(project)
+                    .SetConfiguration(Configuration.Release)
+                    .EnableNoRestore()
+                    .EnableNoBuild()
+                    .SetLoggers("trx"));
+            }
         });
+
+    Target PushMain => d => d
+        .DependsOn(PushNugetPackages, CreateGitHubRelease, UploadGitHubReleasePackages)
+        .OnlyWhenStatic(() => !Repository.Tags.Contains(GetVersionTag()))
+        .Executes(() =>
+        {
+        });
+
+    private string GetVersionTag()
+    {
+        var propsFile = RootDirectory / "Directory.Build.props";
+        var doc = XDocument.Load(propsFile);
+        var versionElement = doc.Descendants("Version").FirstOrDefault();
+        return $"v{versionElement?.Value ?? throw new Exception("Version not found in Directory.Build.props")}";
+    }
+
+    public static int Main() => Execute<Build>(x => x.PushMain);
+
+    #region Nuget Package
 
     Target CopyNuGetPackages => d => d
         .DependsOn(Test)
@@ -72,7 +115,7 @@ class Build : NukeBuild
 
     Target PushNugetPackages => d => d
         .DependsOn(CopyNuGetPackages)
-        .OnlyWhenStatic(() => NuGetApiKey != null)
+        .OnlyWhenStatic(() => !string.IsNullOrEmpty(NuGetApiKey))
         .Executes(() =>
         {
             foreach (var package in OutputDirectory.GlobFiles("*.nupkg"))
@@ -82,20 +125,9 @@ class Build : NukeBuild
                     DeletePackage(packageId, deletingVersion);
 
                 if (existVersions.Contains(version)) continue;
-
                 PushPackage(package);
             }
         });
-
-    private static void TestProject(Project project) =>
-        DotNetTasks.DotNetTest(s => s
-            .SetProjectFile(project)
-            .SetConfiguration(Configuration.Release)
-            .EnableNoRestore()
-            .EnableNoBuild()
-            .SetLoggers("trx"));
-
-    public static int Main() => Execute<Build>(x => x.PushNugetPackages);
 
     IEnumerable<Version> VersionsShouldDelete(Version[] versions)
     {
@@ -106,7 +138,7 @@ class Build : NukeBuild
             yield return version;
     }
 
-    void DeletePackage(string packageId, Version version)
+    private void DeletePackage(string packageId, Version version)
     {
         try
         {
@@ -123,7 +155,7 @@ class Build : NukeBuild
         }
     }
 
-    void PushPackage(AbsolutePath package)
+    private void PushPackage(AbsolutePath package)
     {
         try
         {
@@ -139,7 +171,7 @@ class Build : NukeBuild
         }
     }
 
-    Version[] GetPackageVersions(AbsolutePath packagePath, out string packageName, out Version version)
+    private Version[] GetPackageVersions(AbsolutePath packagePath, out string packageName, out Version version)
     {
         var packageNameVersion = packagePath.NameWithoutExtension;
         var parts = packageNameVersion.Split('.');
@@ -169,4 +201,252 @@ class Build : NukeBuild
             return [];
         }
     }
+
+    #endregion
+
+    #region GitHub Release
+
+    private Release NewRelease;
+
+    Target CreateGitHubRelease => d => d
+        .DependsOn(Test, CreateReleaseNote)
+        .OnlyWhenStatic(() => !string.IsNullOrEmpty(GithubToken))
+        .Executes(async () =>
+        {
+            var client = new GitHubClient(new ProductHeaderValue("NUKE-Release"))
+            {
+                Credentials = new Credentials(GithubToken)
+            };
+
+            var version = GetVersionTag();
+            var release = new NewRelease(version)
+            {
+                Name = version[1..],
+                Body = ReleaseNote.ToString(),
+                Draft = false,
+                Prerelease = false
+            };
+
+            NewRelease = await client.Repository.Release.Create(Repository.GetGitHubOwner(), Repository.GetGitHubName(),
+                release);
+        });
+
+    Target UploadGitHubReleasePackages => d => d
+        .DependsOn(CreateGitHubRelease, CopyNuGetPackages)
+        .Executes(async () =>
+        {
+            var client = new GitHubClient(new ProductHeaderValue("NUKE-Release-Upload"))
+            {
+                Credentials = new Credentials(GithubToken)
+            };
+
+            foreach (var package in OutputDirectory.GlobFiles("*.nupkg"))
+            {
+                using var packageStream = File.OpenRead(package);
+                var upload = new ReleaseAssetUpload
+                {
+                    FileName = Path.GetFileName(package),
+                    ContentType = "application/octet-stream",
+                    RawData = packageStream
+                };
+                await client.Repository.Release.UploadAsset(NewRelease, upload);
+            }
+        });
+
+
+    private readonly StringBuilder ReleaseNote = new();
+    private readonly ContributorManager Contributors = new();
+
+    Target CreateReleaseNote => d => d
+        .DependsOn(GetCommitNote, GetLastTag, GetPullRequestNote, GetIssuesNote)
+        .Executes(async () =>
+        {
+            var version = GetVersionTag();
+            var link = string.IsNullOrEmpty(TagName)
+                ? Repository.GetGitHubCommitUrl(version)
+                : Repository.GetGitHubCompareTagsUrl(TagName, version);
+            ReleaseNote.AppendLine($"# [{version[1..]}]({link}) ({DateTime.UtcNow.Date.ToString("yyyy-M-d dddd")})");
+            var client = new GitHubClient(new ProductHeaderValue("NUKE-GetDescription"))
+            {
+                Credentials = new Credentials(GithubToken)
+            };
+            var repository = await client.Repository.Get(Repository.GetGitHubOwner(), Repository.GetGitHubName());
+            ReleaseNote.AppendLine(repository.Description);
+            ReleaseNote.Append(PullRequestNote);
+            ReleaseNote.Append(IssuesNote);
+            ReleaseNote.Append(CommitsNote);
+            ReleaseNote.Append(Contributors.ToStringBuilder());
+
+            File.WriteAllText(@"D:\Desktop\test.md", ReleaseNote.ToString());
+        });
+
+    private readonly StringBuilder CommitsNote = new();
+
+    Target GetCommitNote => d => d
+        .DependsOn(GetGitmoji, GetCommits)
+        .Executes(() =>
+        {
+            var regx = GitmojiRegex();
+
+            Dictionary<string, StringBuilder> commitsBuilders = new();
+
+            foreach (var commit in Commits)
+            {
+                var message = commit.Commit.Message;
+
+                var match = regx.Match(message);
+                if (!match.Success) continue;
+
+                var type = match.Groups[0].Value;
+                ref var builder = ref CollectionsMarshal.GetValueRefOrAddDefault(commitsBuilders, type, out var exist);
+                if (!exist) builder = new StringBuilder();
+                var content = regx.Replace(message, string.Empty).Split('\n')[0].Trim();
+                if (Contributors.Add(commit))
+                {
+                    builder.AppendLine($"1. {content} by @{commit.Author.Login} in {commit.Sha}");
+                }
+                else
+                {
+                    builder.AppendLine($"1. {content} in {commit.Sha}");
+                }
+            }
+
+            if (commitsBuilders.Count == 0) return;
+            CommitsNote.AppendLine("## Commits");
+            foreach (var pair in commitsBuilders)
+            {
+                if (!Gitmojis.TryGetValue(pair.Key, out var gitmoji)) continue;
+                CommitsNote.AppendLine($"### {pair.Key} {gitmoji}");
+                CommitsNote.Append(pair.Value);
+            }
+        });
+
+    private readonly StringBuilder PullRequestNote = new();
+
+    Target GetPullRequestNote => d => d
+        .Executes(async () =>
+        {
+            var client = new GitHubClient(new ProductHeaderValue("NUKE-PullRequests"))
+            {
+                Credentials = new Credentials(GithubToken)
+            };
+            var pullRequests =
+                await client.PullRequest.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(), new PullRequestRequest()
+                {
+                    State = ItemStateFilter.Closed
+                });
+            var mergedPRs = pullRequests.Where(pr => LastTagCreatedTime is null || pr.MergedAt > LastTagCreatedTime)
+                .ToList();
+
+            if (mergedPRs.Count == 0) return;
+            PullRequestNote.AppendLine("## Pull Requests");
+
+            foreach (var pr in mergedPRs)
+            {
+                if (Contributors.Add(pr))
+                {
+                    PullRequestNote.AppendLine($"1. {pr.Title} by @{pr.User.Login} in #{pr.Number}");
+                }
+                else
+                {
+                    PullRequestNote.AppendLine($"1. {pr.Title} #{pr.Number}");
+                }
+            }
+        });
+
+    private readonly StringBuilder IssuesNote = new();
+
+    Target GetIssuesNote => d => d
+        .Executes(async () =>
+        {
+            var client = new GitHubClient(new ProductHeaderValue("NUKE-Issues"))
+            {
+                Credentials = new Credentials(GithubToken)
+            };
+
+            var issues =
+                await client.Issue.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(), new RepositoryIssueRequest()
+                {
+                    Since = LastTagCreatedTime,
+                    State = ItemStateFilter.Closed,
+                });
+
+            var closedIssues = issues.Where(i => i.PullRequest is null).ToArray();
+            if (closedIssues.Length == 0) return;
+
+            IssuesNote.AppendLine("## Issues");
+            foreach (var issue in closedIssues)
+            {
+                var icon = issue.StateReason?.Value is ItemStateReason.Completed ? "✅" : "🚫";
+                IssuesNote.AppendLine($"1. {icon}{issue.Title} #{issue.Number}");
+            }
+        });
+
+    private readonly Dictionary<string, string> Gitmojis = [];
+
+    [GeneratedRegex("^:(.*):")]
+    private static partial Regex GitmojiRegex();
+
+    Target GetGitmoji => d => d
+        .Executes(async () =>
+        {
+            using var httpClient = new HttpClient();
+            var json = await httpClient.GetStringAsync("https://gitmoji.dev/api/gitmojis");
+            if (JsonConvert.DeserializeObject(json) is not JObject jObject) return;
+            if (jObject["gitmojis"] is not JArray emojis) return;
+            foreach (var emoji in emojis)
+            {
+                var key = emoji["code"]?.ToString();
+                var description = emoji["description"]?.ToString();
+
+                if (key is null || description is null) continue;
+                Gitmojis[key] = description;
+            }
+        });
+
+    private IReadOnlyList<GitHubCommit> Commits = [];
+
+    Target GetCommits => d => d
+        .DependsOn(GetLastTag)
+        .OnlyWhenStatic(() => !string.IsNullOrEmpty(GithubToken))
+        .Executes(async () =>
+        {
+            var client = new GitHubClient(new ProductHeaderValue("NUKE-Commits"))
+            {
+                Credentials = new Credentials(GithubToken)
+            };
+
+            Commits = await client.Repository.Commit.GetAll(Repository.GetGitHubOwner(), Repository.GetGitHubName(),
+                new CommitRequest
+                {
+                    Since = LastTagCreatedTime
+                });
+        });
+
+    private DateTimeOffset? LastTagCreatedTime;
+    private string TagName;
+
+    Target GetLastTag => d => d
+        .OnlyWhenStatic(() => !string.IsNullOrEmpty(GithubToken))
+        .Executes(async () =>
+        {
+            var client = new GitHubClient(new ProductHeaderValue("NUKE-LastTag"))
+            {
+                Credentials = new Credentials(GithubToken)
+            };
+
+            try
+            {
+                var release =
+                    await client.Repository.Release.GetLatest(Repository.GetGitHubOwner(), Repository.GetGitHubName());
+                TagName = release.TagName;
+                LastTagCreatedTime = release.CreatedAt;
+            }
+            catch
+            {
+                //Ignore
+            }
+        });
+
+    #endregion
 }
