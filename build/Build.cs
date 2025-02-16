@@ -247,7 +247,7 @@ partial class Build : NukeBuild
 
             foreach (var package in OutputDirectory.GlobFiles("*.nupkg"))
             {
-                using var packageStream = File.OpenRead(package);
+                await using var packageStream = File.OpenRead(package);
                 var upload = new ReleaseAssetUpload
                 {
                     FileName = Path.GetFileName(package),

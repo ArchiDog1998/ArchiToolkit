@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Octokit;
@@ -14,7 +15,8 @@ internal class ContributorInformation
     {
         var prs = string.Join(", ", PullRequests);
         var commits = string.Join(", ", Commits);
-        return string.Join(", ", prs, commits);
+        string[] items = [prs, commits];
+        return string.Join(", ", items.Where(s => !string.IsNullOrEmpty(s)));
     }
 }
 
