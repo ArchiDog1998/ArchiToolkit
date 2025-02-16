@@ -83,7 +83,16 @@ partial class Build : NukeBuild
 
     Target PushMain => d => d
         .DependsOn(PushNugetPackages, CreateGitHubRelease, UploadGitHubReleasePackages)
-        .OnlyWhenStatic(() => !Repository.Tags.Contains(GetVersionTag()))
+        .OnlyWhenStatic(() =>
+        {
+            var client = new GitHubClient(new ProductHeaderValue("NUKE-Tag"))
+            {
+                Credentials = new Credentials(GithubToken)
+            };
+            var tags = client.Repository.GetAllTags(Repository.GetGitHubOwner(), Repository.GetGitHubName()).Result
+                .Select(t => t.Name);
+            return !tags.Contains(GetVersionTag());
+        })
         .Executes(() =>
         {
         });
@@ -115,6 +124,7 @@ partial class Build : NukeBuild
         });
 
     private readonly List<string> PushedPackages = [];
+
     Target PushNugetPackages => d => d
         .DependsOn(CopyNuGetPackages)
         .OnlyWhenStatic(() => !string.IsNullOrEmpty(NuGetApiKey))
@@ -122,7 +132,8 @@ partial class Build : NukeBuild
         {
             foreach (var package in OutputDirectory.GlobFiles("*.nupkg"))
             {
-                var existVersions = GetPackageVersions(package, out var packageName, out var packageId, out var version);
+                var existVersions =
+                    GetPackageVersions(package, out var packageName, out var packageId, out var version);
                 foreach (var deletingVersion in VersionsShouldDelete(existVersions))
                     DeletePackage(packageId, deletingVersion);
                 if (existVersions.Contains(version)) continue;
@@ -175,7 +186,8 @@ partial class Build : NukeBuild
         }
     }
 
-    private Version[] GetPackageVersions(AbsolutePath packagePath, out string packageName, out string packageId, out Version version)
+    private Version[] GetPackageVersions(AbsolutePath packagePath, out string packageName, out string packageId,
+        out Version version)
     {
         var packageNameVersion = packagePath.NameWithoutExtension;
         var parts = packageNameVersion.Split('.');
@@ -187,7 +199,7 @@ partial class Build : NukeBuild
         }
 
         packageName = string.Join(".", parts.TakeWhile(p => !uint.TryParse(p, out _)));
-        packageId =packageName.ToLower();
+        packageId = packageName.ToLower();
         if (!Version.TryParse(string.Join(".", parts.SkipWhile(p => !uint.TryParse(p, out _))), out version)) return [];
 
         var nugetCheckUrl = $"https://api.nuget.org/v3-flatcontainer/{packageId}/index.json";
@@ -281,6 +293,7 @@ partial class Build : NukeBuild
             {
                 ReleaseNote.AppendLine($"Nuget Packages: {string.Join(", ", PushedPackages)}");
             }
+
             ReleaseNote.Append(PullRequestNote);
             ReleaseNote.Append(IssuesNote);
             ReleaseNote.Append(CommitsNote);
@@ -338,10 +351,11 @@ partial class Build : NukeBuild
                 Credentials = new Credentials(GithubToken)
             };
             var pullRequests =
-                await client.PullRequest.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(), new PullRequestRequest()
-                {
-                    State = ItemStateFilter.Closed
-                });
+                await client.PullRequest.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(),
+                    new PullRequestRequest()
+                    {
+                        State = ItemStateFilter.Closed
+                    });
             var mergedPRs = pullRequests.Where(pr => LastTagCreatedTime is null || pr.MergedAt > LastTagCreatedTime)
                 .ToList();
 
@@ -372,11 +386,12 @@ partial class Build : NukeBuild
             };
 
             var issues =
-                await client.Issue.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(), new RepositoryIssueRequest()
-                {
-                    Since = LastTagCreatedTime,
-                    State = ItemStateFilter.Closed,
-                });
+                await client.Issue.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(),
+                    new RepositoryIssueRequest()
+                    {
+                        Since = LastTagCreatedTime,
+                        State = ItemStateFilter.Closed,
+                    });
 
             var closedIssues = issues.Where(i => i.PullRequest is null).ToArray();
             if (closedIssues.Length == 0) return;
