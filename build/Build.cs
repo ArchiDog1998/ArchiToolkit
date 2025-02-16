@@ -114,6 +114,7 @@ partial class Build : NukeBuild
             }
         });
 
+    private readonly List<string> PushedPackages = [];
     Target PushNugetPackages => d => d
         .DependsOn(CopyNuGetPackages)
         .OnlyWhenStatic(() => !string.IsNullOrEmpty(NuGetApiKey))
@@ -121,12 +122,12 @@ partial class Build : NukeBuild
         {
             foreach (var package in OutputDirectory.GlobFiles("*.nupkg"))
             {
-                var existVersions = GetPackageVersions(package, out var packageId, out var version);
+                var existVersions = GetPackageVersions(package, out var packageName, out var packageId, out var version);
                 foreach (var deletingVersion in VersionsShouldDelete(existVersions))
                     DeletePackage(packageId, deletingVersion);
-
                 if (existVersions.Contains(version)) continue;
-                PushPackage(package);
+                if (!PushPackage(package)) continue;
+                PushedPackages.Add($"[{packageName}](https://www.nuget.org/packages/{packageId}/{version})");
             }
         });
 
@@ -156,7 +157,7 @@ partial class Build : NukeBuild
         }
     }
 
-    private void PushPackage(AbsolutePath package)
+    private bool PushPackage(AbsolutePath package)
     {
         try
         {
@@ -165,28 +166,31 @@ partial class Build : NukeBuild
                 .SetSource(NuGetSource)
                 .SetApiKey(NuGetApiKey)
             );
+            return true;
         }
         catch
         {
             Log.Warning($"Failed to push the nuget package {package}");
+            return false;
         }
     }
 
-    private Version[] GetPackageVersions(AbsolutePath packagePath, out string packageName, out Version version)
+    private Version[] GetPackageVersions(AbsolutePath packagePath, out string packageName, out string packageId, out Version version)
     {
         var packageNameVersion = packagePath.NameWithoutExtension;
         var parts = packageNameVersion.Split('.');
         if (parts.Length < 2)
         {
-            packageName = string.Empty;
+            packageName = packageId = string.Empty;
             version = null!;
             return [];
         }
 
-        packageName = string.Join(".", parts.TakeWhile(p => !uint.TryParse(p, out _))).ToLower();
+        packageName = string.Join(".", parts.TakeWhile(p => !uint.TryParse(p, out _)));
+        packageId =packageName.ToLower();
         if (!Version.TryParse(string.Join(".", parts.SkipWhile(p => !uint.TryParse(p, out _))), out version)) return [];
 
-        var nugetCheckUrl = $"https://api.nuget.org/v3-flatcontainer/{packageName}/index.json";
+        var nugetCheckUrl = $"https://api.nuget.org/v3-flatcontainer/{packageId}/index.json";
 
         try
         {
@@ -198,7 +202,7 @@ partial class Build : NukeBuild
         }
         catch
         {
-            Log.Warning($"Failed to check NuGet for {packageName} {version}. Assuming it doesn't exist.");
+            Log.Warning($"Failed to check NuGet for {packageId} {version}. Assuming it doesn't exist.");
             return [];
         }
     }
@@ -259,7 +263,7 @@ partial class Build : NukeBuild
     private readonly ContributorManager Contributors = new();
 
     Target CreateReleaseNote => d => d
-        .DependsOn(GetCommitNote, GetLastTag, GetPullRequestNote, GetIssuesNote)
+        .DependsOn(GetCommitNote, GetLastTag, GetPullRequestNote, GetIssuesNote, PushNugetPackages)
         .Executes(async () =>
         {
             var version = GetVersionTag();
@@ -273,6 +277,10 @@ partial class Build : NukeBuild
             };
             var repository = await client.Repository.Get(Repository.GetGitHubOwner(), Repository.GetGitHubName());
             ReleaseNote.AppendLine(repository.Description);
+            if (PushedPackages.Count > 0)
+            {
+                ReleaseNote.AppendLine($"Nuget Packages: {string.Join(", ", PushedPackages)}");
+            }
             ReleaseNote.Append(PullRequestNote);
             ReleaseNote.Append(IssuesNote);
             ReleaseNote.Append(CommitsNote);
