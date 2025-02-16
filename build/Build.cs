@@ -377,7 +377,15 @@ partial class Build : NukeBuild
             foreach (var issue in closedIssues)
             {
                 var icon = issue.StateReason?.Value is ItemStateReason.Completed ? "✅" : "🚫";
-                IssuesNote.AppendLine($"1. {icon}{issue.Title} #{issue.Number}");
+
+                if (issue.User is { } user)
+                {
+                    IssuesNote.AppendLine($"1. {icon}{issue.Title} by @{user.Login} in #{issue.Number}");
+                }
+                else
+                {
+                    IssuesNote.AppendLine($"1. {icon}{issue.Title} #{issue.Number}");
+                }
             }
         });
 
