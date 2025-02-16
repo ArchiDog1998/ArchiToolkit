@@ -83,19 +83,21 @@ partial class Build : NukeBuild
 
     Target PushMain => d => d
         .DependsOn(PushNugetPackages, CreateGitHubRelease, UploadGitHubReleasePackages)
-        .OnlyWhenStatic(() =>
-        {
-            var client = new GitHubClient(new ProductHeaderValue("NUKE-Tag"))
-            {
-                Credentials = new Credentials(GithubToken)
-            };
-            var tags = client.Repository.GetAllTags(Repository.GetGitHubOwner(), Repository.GetGitHubName()).Result
-                .Select(t => t.Name);
-            return !tags.Contains(GetVersionTag());
-        })
+        .OnlyWhenStatic(HasNotRelease)
         .Executes(() =>
         {
         });
+
+    private bool HasNotRelease()
+    {
+        var client = new GitHubClient(new ProductHeaderValue("NUKE-Tag"))
+        {
+            Credentials = new Credentials(GithubToken)
+        };
+        var tags = client.Repository.GetAllTags(Repository.GetGitHubOwner(), Repository.GetGitHubName()).Result
+            .Select(t => t.Name);
+        return !tags.Contains(GetVersionTag());
+    }
 
     private string GetVersionTag()
     {
@@ -227,6 +229,7 @@ partial class Build : NukeBuild
 
     Target CreateGitHubRelease => d => d
         .DependsOn(Test, CreateReleaseNote)
+        .OnlyWhenStatic(HasNotRelease)
         .OnlyWhenStatic(() => !string.IsNullOrEmpty(GithubToken))
         .Executes(async () =>
         {
