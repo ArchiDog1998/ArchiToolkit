@@ -38,6 +38,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.InterpolatedPa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.RoslynHelper", "src\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj", "{F053AFA6-8B7B-4813-8719-93209A62B872}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.InterpolatedParser.Tests", "tests\ArchiToolkit.InterpolatedParser.Tests\ArchiToolkit.InterpolatedParser.Tests.csproj", "{8B09ACD7-A374-4D33-B4E2-7FECD7E47DC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.InterpolatedParser.SourceGenerator", "src\analyzers\ArchiToolkit.InterpolatedParser.SourceGenerator\ArchiToolkit.InterpolatedParser.SourceGenerator.csproj", "{0271376B-659F-4175-9B1B-D271697A0365}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.InterpolatedParser.Sources", "src\libraries\ArchiToolkit.InterpolatedParser.Sources\ArchiToolkit.InterpolatedParser.Sources.csproj", "{586FA317-8412-46E0-B768-3BD190AB2B79}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +92,17 @@ Global
 		{F053AFA6-8B7B-4813-8719-93209A62B872}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F053AFA6-8B7B-4813-8719-93209A62B872}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F053AFA6-8B7B-4813-8719-93209A62B872}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B09ACD7-A374-4D33-B4E2-7FECD7E47DC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B09ACD7-A374-4D33-B4E2-7FECD7E47DC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B09ACD7-A374-4D33-B4E2-7FECD7E47DC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B09ACD7-A374-4D33-B4E2-7FECD7E47DC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0271376B-659F-4175-9B1B-D271697A0365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0271376B-659F-4175-9B1B-D271697A0365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0271376B-659F-4175-9B1B-D271697A0365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0271376B-659F-4175-9B1B-D271697A0365}.Release|Any CPU.Build.0 = Release|Any CPU
+		{586FA317-8412-46E0-B768-3BD190AB2B79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{586FA317-8412-46E0-B768-3BD190AB2B79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{586FA317-8412-46E0-B768-3BD190AB2B79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,5 +119,8 @@ Global
 		{C1023E10-C928-43B3-8051-5EC91898CF8B} = {42762D80-B827-4395-8973-3B5D19960DD0}
 		{007E82FD-1972-4DF4-A7BF-E75BE39E15B4} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 		{F053AFA6-8B7B-4813-8719-93209A62B872} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
+		{8B09ACD7-A374-4D33-B4E2-7FECD7E47DC0} = {42762D80-B827-4395-8973-3B5D19960DD0}
+		{0271376B-659F-4175-9B1B-D271697A0365} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
+		{586FA317-8412-46E0-B768-3BD190AB2B79} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 	EndGlobalSection
 EndGlobal

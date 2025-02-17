@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="..\..\libraries\ArchiToolkit.InterpolatedParser.Sources\*.cs"/>
+        <ProjectReference Include="..\..\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj" />
+    </ItemGroup>
+</Project>
