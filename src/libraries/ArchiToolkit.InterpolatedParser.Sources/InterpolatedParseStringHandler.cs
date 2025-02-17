@@ -10,6 +10,7 @@ namespace ArchiToolkit.InterpolatedParser;
 ///     Just the handler
 /// </summary>
 [InterpolatedStringHandler]
+// ReSharper disable once PartialTypeWithSinglePart
 internal readonly partial struct InterpolatedParseStringHandler
 {
     private readonly Queue<Regex> _replacements;
@@ -18,7 +19,6 @@ internal readonly partial struct InterpolatedParseStringHandler
     private readonly string[] _inputs = [];
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="literalLength"></param>
     /// <param name="formattedCount"></param>
@@ -31,7 +31,6 @@ internal readonly partial struct InterpolatedParseStringHandler
     }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="literalLength"></param>
     /// <param name="formattedCount"></param>
@@ -42,24 +41,68 @@ internal readonly partial struct InterpolatedParseStringHandler
         _inputs = inputs;
     }
 
-    public void AppendLiteral([StringSyntax(StringSyntaxAttribute.Regex)] string s)
+    public void AppendLiteral([StringSyntax(StringSyntaxAttribute.Regex)] string regex)
     {
-        _replacements.Enqueue(new Regex(s));
+        AppendRegex(_replacements.Count == 0 ? "^" + regex : regex);
     }
 
+    private void AppendRegex([StringSyntax(StringSyntaxAttribute.Regex)] string regex)
+    {
+        _replacements.Enqueue(new Regex(regex));
+    }
+
+    private bool IsInput<T>(T t, string? format, string callerName)
+    {
+        if (!_inputs.Contains(callerName)) return false;
+        if (t is IFormattable formattable)
+            AppendRegex("^" + formattable.ToString(format, null));
+        else
+            AppendRegex("^" + (t?.ToString() ?? string.Empty));
+
+        return true;
+    }
+
+    #region Format
+
 #if NET7_0_OR_GREATER
+    // ReSharper disable once MethodOverloadWithOptionalParameter
     public void AppendFormatted<T>(in T t, string format, [CallerArgumentExpression(nameof(t))] string callerName = "")
         where T : ISpanParsable<T>
     {
+        if (IsInput(t, format, callerName)) return;
         _items.Enqueue(new SpanParseItem<T>(in t, _replacements.Count));
     }
 
     public void AppendFormatted<T>(in T t, [CallerArgumentExpression(nameof(t))] string callerName = "")
         where T : ISpanParsable<T>
     {
+        if (IsInput(t, null, callerName)) return;
         _items.Enqueue(new SpanParseItem<T>(in t, _replacements.Count));
     }
 #endif
+
+    [OverloadResolutionPriority(-1)]
+    // ReSharper disable once MethodOverloadWithOptionalParameter
+    public void AppendFormatted(object t, string format, [CallerArgumentExpression(nameof(t))] string callerName = "")
+    {
+        if (IsInput(t, format, callerName)) return;
+        throw new NotImplementedException(
+            "The method or operation is not implemented. Please check the source generator.");
+    }
+
+    [OverloadResolutionPriority(-1)]
+    public void AppendFormatted(object t, [CallerArgumentExpression(nameof(t))] string callerName = "")
+    {
+        if (IsInput(t, null, callerName)) return;
+        throw new NotImplementedException(
+            "The method or operation is not implemented. Please check the source generator.");
+    }
+
+    #endregion
+
+
+    #region Parse
+
     internal bool[] TryParse(string input)
     {
         List<bool> result = new(_formattedCount);
@@ -138,6 +181,8 @@ internal readonly partial struct InterpolatedParseStringHandler
             if (!parsed) action(item, input, stringStart, null);
         }
     }
+
+    #endregion
 }
 
 #if NETCOREAPP

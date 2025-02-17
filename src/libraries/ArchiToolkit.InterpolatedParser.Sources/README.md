@@ -1,5 +1,3 @@
-# ArchiToolkit.InterpolatedParser
+# ArchiToolkit.InterpolatedParser.Sources
 
-Heavily Inspired by the repo [InterpolatedParser](https://github.com/AntonBergaker/InterpolatedParser) by [AntonBergaker](https://github.com/AntonBergaker).
-
-I just make it can be used with Regex and more extensibility.
+This is the repo for saving the sources code that the SourceGenerator will get.

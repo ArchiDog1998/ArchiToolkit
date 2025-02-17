@@ -3,12 +3,12 @@
 namespace ArchiToolkit.RoslynHelper;
 
 /// <summary>
-/// For the string extensions.
+///     For the string extensions.
 /// </summary>
 public static class StringExtensions
 {
     /// <summary>
-    /// Make a string to pascal case.
+    ///     Make a string to pascal case.
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
@@ -37,7 +37,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Add leading string.
+    ///     Add leading string.
     /// </summary>
     /// <param name="input"></param>
     /// <param name="leading"></param>

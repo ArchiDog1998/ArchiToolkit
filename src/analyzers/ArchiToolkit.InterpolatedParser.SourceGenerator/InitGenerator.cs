@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ArchiToolkit.InterpolatedParser.SourceGenerator;
@@ -11,8 +12,8 @@ public class InitGenerator : IIncrementalGenerator
     {
         var methodDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: static (node, _) => node is MethodDeclarationSyntax,
-                transform: static (context, _) => (MethodDeclarationSyntax)context.Node)
+                static (node, _) => node is MethodDeclarationSyntax,
+                static (context, _) => (MethodDeclarationSyntax)context.Node)
             .Collect();
 
         context.RegisterSourceOutput(methodDeclarations, Generate);
@@ -27,7 +28,10 @@ public class InitGenerator : IIncrementalGenerator
             if (stream == null) continue;
 
             using var reader = new StreamReader(stream);
-            context.AddSource($"{name}.g.cs", reader.ReadToEnd());
+
+            var root = CSharpSyntaxTree.ParseText(reader.ReadToEnd()).GetRoot();
+            var updateRoot = new GeneratedRewriter(typeof(InitGenerator)).Visit(root);
+            context.AddSource($"{name}.g.cs", updateRoot.NodeToString());
         }
     }
 }

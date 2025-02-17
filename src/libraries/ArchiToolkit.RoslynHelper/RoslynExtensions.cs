@@ -4,12 +4,12 @@ using Microsoft.CodeAnalysis;
 namespace ArchiToolkit.RoslynHelper;
 
 /// <summary>
-/// The default Roslyn Extensions.
+///     The default Roslyn Extensions.
 /// </summary>
 public static class RoslynExtensions
 {
     /// <summary>
-    /// Get the base types and this type.
+    ///     Get the base types and this type.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
@@ -24,13 +24,14 @@ public static class RoslynExtensions
     }
 
     /// <summary>
-    /// All the Children in this type.
+    ///     All the Children in this type.
     /// </summary>
     /// <typeparam name="T">The node type</typeparam>
     /// <param name="node"></param>
     /// <param name="removedNodes">the nodes need to removed.</param>
     /// <returns></returns>
-    public static IEnumerable<T> GetChildren<T>(this SyntaxNode node, params SyntaxNode[] removedNodes) where T : SyntaxNode
+    public static IEnumerable<T> GetChildren<T>(this SyntaxNode node, params SyntaxNode[] removedNodes)
+        where T : SyntaxNode
     {
         if (removedNodes.Contains(node)) return [];
         if (node is T result) return [result];
@@ -38,11 +39,12 @@ public static class RoslynExtensions
     }
 
     /// <summary>
-    /// Get the first parent with the specific <typeparamref name="T"/>.
+    ///     Get the first parent with the specific <typeparamref name="T" />.
     /// </summary>
     /// <typeparam name="T">The node type</typeparam>
     /// <param name="node"></param>
     /// <returns></returns>
+    [Obsolete("Try AncestorsAndSelf() or Ancestors()")]
     public static T? GetParent<T>(this SyntaxNode? node) where T : SyntaxNode
     {
         if (node == null) return null;
@@ -51,26 +53,17 @@ public static class RoslynExtensions
     }
 
     /// <summary>
-    /// Get the full symbol name.
+    ///     Get the full symbol name.
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
     public static string GetFullMetadataName(this ISymbol? s)
     {
-        if (s is null or INamespaceSymbol)
-        {
-            return string.Empty;
-        }
+        if (s is null or INamespaceSymbol) return string.Empty;
 
-        while (s != null && s is not ITypeSymbol)
-        {
-            s = s.ContainingSymbol;
-        }
+        while (s != null && s is not ITypeSymbol) s = s.ContainingSymbol;
 
-        if (s == null)
-        {
-            return string.Empty;
-        }
+        if (s == null) return string.Empty;
 
         var sb = new StringBuilder(s.GetTypeSymbolName());
 
@@ -100,9 +93,7 @@ public static class RoslynExtensions
     private static string GetTypeSymbolName(this ISymbol symbol)
     {
         if (symbol is IArrayTypeSymbol arrayTypeSymbol) //Array
-        {
             return arrayTypeSymbol.ElementType.GetFullMetadataName() + "[]";
-        }
 
         var str = symbol.MetadataName;
         if (symbol is not INamedTypeSymbol symbolType) return str; //Generic
@@ -116,7 +107,7 @@ public static class RoslynExtensions
     }
 
     /// <summary>
-    /// Print a node to string.
+    ///     Print a node to string.
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>

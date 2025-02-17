@@ -35,6 +35,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{0859616C
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.InterpolatedParser", "src\libraries\ArchiToolkit.InterpolatedParser\ArchiToolkit.InterpolatedParser.csproj", "{007E82FD-1972-4DF4-A7BF-E75BE39E15B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0271376B-659F-4175-9B1B-D271697A0365} = {0271376B-659F-4175-9B1B-D271697A0365}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.RoslynHelper", "src\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj", "{F053AFA6-8B7B-4813-8719-93209A62B872}"
 EndProject
