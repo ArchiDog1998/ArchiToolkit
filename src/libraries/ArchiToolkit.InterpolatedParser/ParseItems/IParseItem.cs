@@ -1,4 +1,4 @@
-﻿namespace ArchiToolkit.InterpolatedParser.Parsers;
+﻿namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
 public interface IParseItem
 {

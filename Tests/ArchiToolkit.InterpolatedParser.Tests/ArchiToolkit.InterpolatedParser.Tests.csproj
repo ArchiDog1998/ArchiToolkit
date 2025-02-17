@@ -3,8 +3,8 @@
         <PackageReference Include="TUnit" Version="0.10.26"/>
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.InterpolatedParser.SourceGenerator\ArchiToolkit.InterpolatedParser.SourceGenerator.csproj" />
+      <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.InterpolatedParser.SourceGenerator\ArchiToolkit.InterpolatedParser.SourceGenerator.csproj"  OutputItemType="analyzer" />
       <ProjectReference Include="..\..\src\libraries\ArchiToolkit.InterpolatedParser\ArchiToolkit.InterpolatedParser.csproj" />
-      <ProjectReference Include="..\..\src\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj" />
+      <ProjectReference Include="..\..\src\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj"  OutputItemType="analyzer" />
     </ItemGroup>
 </Project>

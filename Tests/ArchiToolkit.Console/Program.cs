@@ -30,8 +30,9 @@ using Microsoft.Extensions.Logging;
 //         Tag = new EventId(15, "Fucking event"),
 //     }).And.ContainSingle(3).Which.Could.Be(2);
 // }
+
 var x = 0;
 var name = "";
-"x is 69! And My name is ArchiTed".Parse(["abc"], $"x is {x:1232sa}! And M[y] name is {name}");
+"x is 69! And My name is ArchiTed".Parse($"x is {x}! And M[y] name is {name}");
 Console.WriteLine(x);
 Console.WriteLine(name);

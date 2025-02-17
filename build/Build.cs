@@ -68,6 +68,7 @@ partial class Build : NukeBuild
         {
             TestProject(Solution.tests.ArchiToolkit_Assertions_Tests);
             TestProject(Solution.tests.ArchiToolkit_PureConst_Tests);
+            TestProject(Solution.tests.ArchiToolkit_InterpolatedParser_Tests);
             return;
 
             static void TestProject(Project project)
@@ -107,7 +108,7 @@ partial class Build : NukeBuild
         return $"v{versionElement?.Value ?? throw new Exception("Version not found in Directory.Build.props")}";
     }
 
-    public static int Main() => Execute<Build>(x => x.PushMain);
+    public static int Main() => Execute<Build>(x => x.CopyNuGetPackages);
 
     #region Nuget Package
 

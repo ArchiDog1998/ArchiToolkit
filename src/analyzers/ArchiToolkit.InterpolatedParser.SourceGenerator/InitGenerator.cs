@@ -29,7 +29,9 @@ public class InitGenerator : IIncrementalGenerator
 
             using var reader = new StreamReader(stream);
 
-            var root = CSharpSyntaxTree.ParseText(reader.ReadToEnd()).GetRoot();
+            var root = CSharpSyntaxTree.ParseText(reader.ReadToEnd(),
+                    new CSharpParseOptions(preprocessorSymbols: ["NET7_0_OR_GREATER", "NETCOREAPP", "NETFRAMEWORK"]))
+                .GetRoot();
             var updateRoot = new GeneratedRewriter(typeof(InitGenerator)).Visit(root);
             context.AddSource($"{name}.g.cs", updateRoot.NodeToString());
         }

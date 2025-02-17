@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using ArchiToolkit.InterpolatedParser.Options;
 
 namespace ArchiToolkit.InterpolatedParser;
 
@@ -13,48 +14,55 @@ internal static class InterpolatedParserExtensions
     /// </summary>
     /// <param name="input"></param>
     /// <param name="template"></param>
+    /// <param name="provider"></param>
     public static void Parse(this string input,
         [StringSyntax(StringSyntaxAttribute.Regex)]
-        InterpolatedParseStringHandler template)
+        InterpolatedParseStringHandler template,
+        IFormatProvider? provider = null)
     {
-        template.Parse(input);
+        template.Parse(input, provider);
     }
 
     /// <summary>
     /// </summary>
     /// <param name="input"></param>
-    /// <param name="inputs"></param>
+    /// <param name="options"></param>
     /// <param name="template"></param>
-    public static void Parse(this string input, string[] inputs,
-        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(inputs))]
-        InterpolatedParseStringHandler template)
+    /// <param name="provider"></param>
+    public static void Parse(this string input, ParseOptions options,
+        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(options))]
+        InterpolatedParseStringHandler template,
+        IFormatProvider? provider = null)
     {
-        template.Parse(input);
+        template.Parse(input, provider);
     }
-
 
     /// <summary>
     /// </summary>
     /// <param name="input"></param>
     /// <param name="template"></param>
+    /// <param name="provider"></param>
     /// <returns></returns>
     public static bool[] TryParse(this string input,
         [StringSyntax(StringSyntaxAttribute.Regex)]
-        InterpolatedParseStringHandler template)
+        InterpolatedParseStringHandler template,
+        IFormatProvider? provider = null)
     {
-        return template.TryParse(input);
+        return template.TryParse(input, provider);
     }
 
     /// <summary>
     /// </summary>
     /// <param name="input"></param>
-    /// <param name="inputs"></param>
+    /// <param name="options"></param>
     /// <param name="template"></param>
+    /// <param name="provider"></param>
     /// <returns></returns>
-    public static bool[] TryParse(this string input, string[] inputs,
-        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(inputs))]
-        InterpolatedParseStringHandler template)
+    public static bool[] TryParse(this string input, ParseOptions options,
+        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(options))]
+        InterpolatedParseStringHandler template,
+        IFormatProvider? provider = null)
     {
-        return template.TryParse(input);
+        return template.TryParse(input, provider);
     }
 }
