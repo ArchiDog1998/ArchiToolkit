@@ -6,6 +6,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Assertions.Logging\ArchiToolkit.Assertions.Logging.csproj" />
+        <ProjectReference Include="..\..\src\libraries\ArchiToolkit.InterpolatedParser\ArchiToolkit.InterpolatedParser.csproj" />
     </ItemGroup>
 
     <ItemGroup>

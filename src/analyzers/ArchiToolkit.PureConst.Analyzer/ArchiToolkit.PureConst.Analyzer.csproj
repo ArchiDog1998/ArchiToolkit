@@ -13,4 +13,8 @@
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj" />
+    </ItemGroup>
 </Project>

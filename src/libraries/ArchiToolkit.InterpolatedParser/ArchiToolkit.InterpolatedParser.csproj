@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Title>Interpolated Parser</Title>
+        <Description>Check the method for pure and the const thing</Description>
+        <TargetFrameworks>net7.0;net8.0;net9.0</TargetFrameworks>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+</Project>
