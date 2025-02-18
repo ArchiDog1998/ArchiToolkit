@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -54,19 +55,6 @@ internal readonly partial struct InterpolatedParseStringHandler
         _replacements.Enqueue(new Regex(regex));
     }
 
-    private bool IsInput<T>(T t, in ParseItemOptions option, string? format)
-    {
-        if (option.Type is not ParseType.In) return false;
-        if (option.CustomToString is { } toString)
-            AppendRegex("^" + toString(t, format));
-        if (t is IFormattable formattable)
-            AppendRegex("^" + formattable.ToString(format, null));
-        else
-            AppendRegex("^" + (t?.ToString() ?? string.Empty));
-
-        return true;
-    }
-
     #region Format
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -92,85 +80,94 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     #region Append
 
-    public void AppendStringObject<T>(in T t, string? format, string callerName, IStringParser<T> parser)
-    {
-        var option = _options[callerName];
-        if (IsInput(t, in option, format)) return;
-        if (option.Parser is IStringParser<T> customParser)
-        {
-            parser = customParser;
-        }
-
-        _items.Enqueue(new StringParseItem<T>(in t, _replacements.Count, parser));
-    }
-
-    public void AppendStringCollection<TCollection, TValue>(in TCollection t, string? format, string callerName,
-        IStringParser<TValue> parser)
+    public void AppendCollection<TCollection, TValue>(in TCollection t, string? format, string callerName,
+        IParser? parser)
         where TCollection : ICollection<TValue>, new()
     {
         var option = _options[callerName];
-        if (IsInput(t, in option, format)) return;
-        if (string.IsNullOrEmpty(format)) throw new ArgumentException("Format cannot be empty.");
-        if (option.Parser is IStringParser<TValue> customParser)
+        var realParser = GetParser(in t, format, parser, option);
+        if (option.DataType is not DataType.List)
         {
-            parser = customParser;
+            AppendObjectRaw(in t, realParser);
         }
-
-        _items.Enqueue(new CollectionStringParseItem<TCollection, TValue>(in t, _replacements.Count, parser, format));
+        else
+        {
+            AppendCollectionRaw<TCollection, TValue>(in t, realParser, option.Separator);
+        }
     }
+
+    public void AppendObject<T>(in T t, string? format, string callerName, IParser? parser)
+    {
+        var option = _options[callerName];
+        var realParser = GetParser(in t, format, parser, option);
+        AppendObjectRaw(in t, realParser);
+    }
+
+    private void AppendCollectionRaw<TCollection, TValue>(in TCollection t, IParser? parser, string separator)
+        where TCollection : ICollection<TValue>, new()
+    {
+        switch (parser)
+        {
 #if NETCOREAPP
-    public void AppendSpanObject<T>(in T t, string? format, string callerName, ISpanParser<T> parser)
-    {
-        var option = _options[callerName];
-        if (IsInput(t, in option, format)) return;
-        if (option.Parser is ISpanParser<T> customParser)
-        {
-            parser = customParser;
+            case ISpanParser<TValue> spanParser:
+                _items.Enqueue(
+                    new CollectionSpanParseItem<TCollection, TValue>(in t, _replacements.Count, spanParser, separator));
+                break;
+#endif
+            case IStringParser<TValue> stringParser:
+                _items.Enqueue(new CollectionStringParseItem<TCollection, TValue>(in t, _replacements.Count,
+                    stringParser, separator));
+                break;
+            case not null:
+                throw new InvalidDataException($"Invalid parser type, which is {parser.GetType()}.");
         }
-
-        _items.Enqueue(new SpanParseItem<T>(in t, _replacements.Count, parser));
     }
 
-
-    public void AppendSpanCollection<TCollection, TValue>(in TCollection t, string? format, string callerName,
-        ISpanParser<TValue> parser)
-        where TCollection : ICollection<TValue>, new()
+    private void AppendObjectRaw<T>(in T t, IParser? parser)
     {
-        var option = _options[callerName];
-        if (IsInput(t, in option, format)) return;
-        if (string.IsNullOrEmpty(format)) throw new ArgumentException("Format cannot be empty.");
-        if (option.Parser is ISpanParser<TValue> customParser)
+        switch (parser)
         {
-            parser = customParser;
+#if NETCOREAPP
+            case ISpanParser<T> spanParser:
+                _items.Enqueue(new SpanParseItem<T>(in t, _replacements.Count, spanParser));
+                break;
+#endif
+            case IStringParser<T> stringParser:
+                _items.Enqueue(new StringParseItem<T>(in t, _replacements.Count, stringParser));
+                break;
+            case not null:
+                throw new InvalidDataException($"Invalid parser type, which is {parser.GetType()}.");
+        }
+    }
+
+    private IParser? GetParser<T>(in T t, string? format, IParser? parser, ParseItemOptions option)
+    {
+        if (IsInput(in t, in option, format)) return null;
+        var realParser = option.Parser ?? parser;
+        if (realParser is null) throw new NullReferenceException("Parser is null!");
+        return realParser;
+    }
+
+    private bool IsInput<T>(in T t, in ParseItemOptions option, string? format)
+    {
+        if (option.ParseType is not ParseType.In) return false;
+        if (option.DataType is DataType.List && t is IEnumerable list)
+        {
+            List<string> stringItems = [];
+            foreach (var item in list)
+            {
+                stringItems.Add(option.FormatToString(item, format));
+            }
+
+            AppendRegex("^" + string.Join(option.Separator, stringItems));
+        }
+        else
+        {
+            AppendRegex("^" + option.FormatToString(t, format));
         }
 
-        _items.Enqueue(new CollectionSpanParseItem<TCollection, TValue>(in t, _replacements.Count, parser, format));
+        return true;
     }
-#endif
-
-#if NET7_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendStringParsableObject<T>(in T t, string? format, string callerName)
-        where T : IParsable<T>
-        => AppendStringObject(in t, format, callerName, new StringParsableParser<T>());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendSpanParsableObject<T>(in T t, string? format, string callerName)
-        where T : ISpanParsable<T>
-        => AppendSpanObject(in t, format, callerName, new SpanParseableParser<T>());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendStringParsableCollection<TCollection, TValue>(in TCollection t, string? format, string callerName)
-        where TCollection : ICollection<TValue>, new()
-        where TValue : IParsable<TValue>
-        => AppendStringCollection(in t, format, callerName, new StringParsableParser<TValue>());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendSpanParsableCollection<TCollection, TValue>(in TCollection t, string? format, string callerName)
-        where TCollection : ICollection<TValue>, new()
-        where TValue : ISpanParsable<TValue>
-        => AppendSpanCollection(in t, format, callerName, new SpanParseableParser<TValue>());
-#endif
 
     #endregion
 
@@ -260,34 +257,22 @@ internal readonly partial struct InterpolatedParseStringHandler
     #region Test
 
 #if NET9_0_OR_GREATER // Waiting for generating!
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in int t, string format, [CallerArgumentExpression(nameof(t))] string callerName = "")
-        => AppendInt(in t, format, callerName);
+        => AppendObject(in t, format, callerName, new SpanParseableParser<int>());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in int t, [CallerArgumentExpression(nameof(t))] string callerName = "")
-        => AppendInt(in t, null, callerName);
-
-    private void AppendInt(in int i, string? format, string callerName)
-    {
-        AppendSpanParsableObject(in i, format, callerName);
-    }
-
+        =>  AppendObject(in t, null, callerName, new SpanParseableParser<int>());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in string t, string format,
         [CallerArgumentExpression(nameof(t))] string callerName = "")
-        => AppendString(in t, format, callerName);
+        =>AppendObject(in t, format, callerName, new SpanParseableParser<string>());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in string t, [CallerArgumentExpression(nameof(t))] string callerName = "")
-        => AppendString(in t, null, callerName);
-
-    private void AppendString(in string i, string? format, string callerName)
-    {
-        AppendSpanParsableObject(in i, format, callerName);
-    }
-
+        =>AppendObject(in t, null, callerName, new SpanParseableParser<string>());
 #endif
 
     #endregion

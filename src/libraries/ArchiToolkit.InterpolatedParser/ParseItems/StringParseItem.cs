@@ -2,7 +2,8 @@
 
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
-public class StringParseItem<T>(in T value, int index, IStringParser<T> parser) : ParseItem<T>(in value, index),IStringParseItem
+public class StringParseItem<T>(in T value, int index, IStringParser<T> parser)
+    : ParseItem<T>(in value, index), IStringParseItem
 {
     public void Parse(string s, IFormatProvider? provider)
     {

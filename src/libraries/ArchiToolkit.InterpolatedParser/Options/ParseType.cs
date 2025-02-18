@@ -2,8 +2,10 @@
 
 public enum ParseType : byte
 {
-    List,
-    Item,
+    /// <summary>
+    ///
+    /// </summary>
+    Out,
     /// <summary>
     /// As input string,
     /// </summary>
