@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿#if NETCOREAPP
+using System.Diagnostics.CodeAnalysis;
 
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
@@ -13,3 +14,4 @@ public abstract class SpanParser<T>: Parser, ISpanParser<T>
     /// <inheritdoc />
     public abstract bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out T result);
 }
+#endif

@@ -16,7 +16,7 @@ namespace ArchiToolkit.InterpolatedParser;
 // ReSharper disable once PartialTypeWithSinglePart
 internal readonly partial struct InterpolatedParseStringHandler
 {
-    private readonly Queue<Regex> _replacements;
+    private readonly Queue<Func<IFormatProvider?, string>> _replacements;
     private readonly Queue<IParseItem> _items;
     private readonly int _formattedCount;
     private readonly ParseOptions _options = new();
@@ -28,7 +28,7 @@ internal readonly partial struct InterpolatedParseStringHandler
     // ReSharper disable once UnusedParameter.Local
     public InterpolatedParseStringHandler(int literalLength, int formattedCount)
     {
-        _replacements = new Queue<Regex>(2 * formattedCount + 1);
+        _replacements = new Queue<Func<IFormatProvider?, string>>(2 * formattedCount + 1);
         _items = new Queue<IParseItem>(formattedCount);
         _formattedCount = formattedCount;
     }
@@ -46,12 +46,14 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     public void AppendLiteral([StringSyntax(StringSyntaxAttribute.Regex)] string regex)
     {
-        AppendRegex(_replacements.Count == 0 && !regex.StartsWith("^") ? "^" + regex : regex);
+        AppendRegex(_replacements.Count == 0 && !regex.StartsWith("^")
+            ? _ => "^" + regex
+            : _ => regex);
     }
 
-    private void AppendRegex([StringSyntax(StringSyntaxAttribute.Regex)] string regex)
+    private void AppendRegex(Func<IFormatProvider?, string> regexCreator)
     {
-        _replacements.Enqueue(new Regex(regex));
+        _replacements.Enqueue(regexCreator);
     }
 
     #region Format
@@ -70,7 +72,7 @@ internal readonly partial struct InterpolatedParseStringHandler
     private void AppendObject(object t, string? format, string callerName)
     {
         var option = _options[callerName];
-        if (IsInput(t, in option, format)) return;
+        if (IsInput(t, option, format)) return;
         throw new NotImplementedException(
             "The method or operation is not implemented. Please check the source generator.");
     }
@@ -165,28 +167,23 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     private IParser? GetParser<T>(in T t, string? format, IParser? parser, ParseItemOptions option)
     {
-        if (IsInput(in t, in option, format)) return null;
+        if (IsInput(t, option, format)) return null;
         var realParser = option.Parser ?? parser;
         if (realParser is null) throw new NullReferenceException("Parser is null!");
         return realParser;
     }
 
-    private bool IsInput<T>(in T t, in ParseItemOptions option, string? format)
+    private bool IsInput<T>(T t, ParseItemOptions option, string? format)
     {
         if (option.ParseType is not ParseType.In) return false;
         if (option.DataType is DataType.List && t is IEnumerable list)
         {
-            List<string> stringItems = [];
-            foreach (var item in list)
-            {
-                stringItems.Add(option.FormatToString(item, format));
-            }
-
-            AppendRegex("^" + string.Join(option.Separator, stringItems));
+            AppendRegex(p => "^" + string.Join(option.Separator,
+                from object? item in list select option.FormatToString(item, format, p)));
         }
         else
         {
-            AppendRegex("^" + option.FormatToString(t, format));
+            AppendRegex(p => "^" + option.FormatToString(t, format, p));
         }
 
         return true;
@@ -216,7 +213,7 @@ internal readonly partial struct InterpolatedParseStringHandler
                 default:
                     throw new StrongTypingException("Unexpected IParseItem");
             }
-        });
+        }, provider);
         return result.ToArray();
     }
 
@@ -239,12 +236,12 @@ internal readonly partial struct InterpolatedParseStringHandler
                 default:
                     throw new StrongTypingException("Unexpected IParseItem");
             }
-        });
+        }, provider);
     }
 
     private delegate void ParseDelegate(IParseItem item, string text, int start, int? length);
 
-    private void Solve(string input, ParseDelegate action)
+    private void Solve(string input, ParseDelegate action, IFormatProvider? provider)
     {
         var index = 0;
         var stringStart = 0;
@@ -252,8 +249,9 @@ internal readonly partial struct InterpolatedParseStringHandler
         while (_items.TryDequeue(out var item))
         {
             var parsed = false;
-            while (_replacements.TryDequeue(out var regex))
+            while (_replacements.TryDequeue(out var regexCreator))
             {
+                var regex = new Regex(regexCreator(provider));
                 var match = regex.Match(input, stringStart);
                 if (!match.Success) throw new FormatException("Invalid format to get the parsed string.");
                 try

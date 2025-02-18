@@ -52,13 +52,14 @@ public readonly record struct ParseItemOptions([CallerMemberName]string Paramete
     /// </summary>
     /// <param name="value">the target</param>
     /// <param name="format">format</param>
+    /// <param name="provider"></param>
     /// <returns></returns>
-    public string FormatToString(object? value, string? format)
+    public string FormatToString(object? value, string? format, IFormatProvider? provider)
     {
         if (CustomToString is { } toString)
             return toString(value, format);
         if (value is IFormattable formattable)
-            return formattable.ToString(format, null); //TODO: Shall we send a format provider?
+            return formattable.ToString(format, provider);
         return value?.ToString() ?? "<null>";
     }
 }
