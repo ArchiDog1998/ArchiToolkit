@@ -43,7 +43,7 @@ internal static class InterpolatedParserExtensions
     /// <param name="template"></param>
     /// <param name="provider"></param>
     /// <returns></returns>
-    public static bool[] TryParse(this string input,
+    public static ParseResult[] TryParse(this string input,
         [StringSyntax(StringSyntaxAttribute.Regex)]
         InterpolatedParseStringHandler template,
         IFormatProvider? provider = null)
@@ -58,7 +58,7 @@ internal static class InterpolatedParserExtensions
     /// <param name="template"></param>
     /// <param name="provider"></param>
     /// <returns></returns>
-    public static bool[] TryParse(this string input, ParseOptions options,
+    public static ParseResult[] TryParse(this string input, ParseOptions options,
         [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(options))]
         InterpolatedParseStringHandler template,
         IFormatProvider? provider = null)

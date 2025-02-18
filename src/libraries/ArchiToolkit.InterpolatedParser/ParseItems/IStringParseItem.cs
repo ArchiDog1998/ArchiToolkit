@@ -18,5 +18,5 @@ public interface IStringParseItem : IParseItem
     /// <param name="s"></param>
     /// <param name="provider"></param>
     /// <returns></returns>
-    bool TryParse(string s, IFormatProvider? provider);
+    ParseResult TryParse(string s, IFormatProvider? provider);
 }

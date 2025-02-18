@@ -22,7 +22,7 @@ public sealed class SpanParseItem<T>(in T value, int index, ISpanParser<T> parse
     }
 
     /// <inheritdoc />
-    public bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider)
+    public ParseResult TryParse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
         if (!parser.TryParse(s, provider, out var result)) return false;
         SetValue(result);

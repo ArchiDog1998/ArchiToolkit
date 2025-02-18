@@ -6,6 +6,7 @@ using ArchiToolkit.Assertions.Assertions.Extensions;
 using ArchiToolkit.Assertions.Logging;
 using ArchiToolkit.Console;
 using ArchiToolkit.InterpolatedParser;
+using ArchiToolkit.InterpolatedParser.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -32,8 +33,11 @@ using Microsoft.Extensions.Logging;
 //     }).And.ContainSingle(3).Which.Could.Be(2);
 // }
 
-var x = new List<int>();
+var x = new List<int>(){69, 12};
 var name = "";
-"Xasdfgagbab, x is 69,12! And My name is ArchiTed".Parse($"x is {x:x}! And M[y] name is {name}");
+"Xasdfgagbab, x is 69,12! And My name is ArchiTed".Parse(new ParseOptions()
+    {
+        ParameterOptions = [nameof(x)],
+    },$"x is {x}! And M[y] name is {name}");
 Console.WriteLine(string.Join(" + ", x));
 Console.WriteLine(name);

@@ -17,10 +17,8 @@ public readonly record struct ParseItemOptions([CallerMemberName]string Paramete
     /// <summary>
     /// The default value.
     /// </summary>
-    public static readonly ParseItemOptions Default = new()
-    {
-        Separator = ","
-    };
+    // ReSharper disable once ExplicitCallerInfoArgument
+    public static readonly ParseItemOptions Default = new("");
 
     /// <summary>
     /// In or Out?
@@ -68,8 +66,15 @@ public readonly record struct ParseItemOptions([CallerMemberName]string Paramete
     {
         if (CustomToString is { } toString)
             return toString(value, format);
-        if (value is IFormattable formattable)
+        if (value is IFormattable formattable && format is not null)
             return formattable.ToString(format, provider);
         return value?.ToString() ?? "<null>";
     }
+
+#pragma warning disable CS1066 // The default value specified will have no effect because it applies to a member that is used in contexts that do not allow optional arguments
+    public static implicit operator ParseItemOptions([CallerMemberName] string parameterName = "") => new(parameterName)
+    {
+        ParseType = ParseType.In,
+    };
+#pragma warning restore CS1066 // The default value specified will have no effect because it applies to a member that is used in contexts that do not allow optional arguments
 }

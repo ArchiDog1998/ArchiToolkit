@@ -45,33 +45,42 @@ public sealed class CollectionStringParseItem<TCollection, TValue>(
 
     /// <inheritdoc />
 
-    public bool TryParse(string s, IFormatProvider? provider)
+    public ParseResult TryParse(string s, IFormatProvider? provider)
     {
         var item = new TCollection();
-        var result = true;
+        List<bool> result = [];
         while (true)
         {
             var index = s.IndexOf(separator, StringComparison.CurrentCulture);
             if (index < 0)
             {
                 if (parser.TryParse(s, provider, out var resultValue))
+                {
+                    result.Add(true);
                     item.Add(resultValue);
+                }
                 else
-                    result = false;
-                break;
+                {
+                    result.Add(false);
+                }
             }
             else
             {
                 if (parser.TryParse(s[..index], provider, out var resultValue))
+                {
+                    result.Add(true);
                     item.Add(resultValue);
+                }
                 else
-                    result = false;
+                {
+                    result.Add(false);
+                }
             }
 
             s = s[(index + separator.Length)..];
         }
 
         SetValue(item);
-        return result;
+        return new ParseResult(result);
     }
 }

@@ -45,35 +45,45 @@ public sealed class CollectionSpanParseItem<TCollection, TValue>(
     }
 
     /// <inheritdoc />
-    public bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider)
+    public ParseResult TryParse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
         var item = new TCollection();
         var separatorSpan = separator.AsSpan();
-        var result = true;
+        List<bool> result = [];
         while (true)
         {
             var index = s.IndexOf(separatorSpan);
             if (index < 0)
             {
                 if (parser.TryParse(s, provider, out var resultValue))
+                {
+                    result.Add(true);
                     item.Add(resultValue);
+                }
                 else
-                    result = false;
+                {
+                    result.Add(false);
+                }
                 break;
             }
             else
             {
                 if (parser.TryParse(s[..index], provider, out var resultValue))
+                {
+                    result.Add(true);
                     item.Add(resultValue);
+                }
                 else
-                    result = false;
+                {
+                    result.Add(false);
+                }
             }
 
             s = s[(index + separatorSpan.Length)..];
         }
 
         SetValue(item);
-        return result;
+        return new ParseResult(result);
     }
 }
 #endif

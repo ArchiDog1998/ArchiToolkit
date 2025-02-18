@@ -204,9 +204,9 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     #region Parse
 
-    internal bool[] TryParse(string input, IFormatProvider? provider)
+    internal ParseResult[] TryParse(string input, IFormatProvider? provider)
     {
-        List<bool> result = new(_formattedCount);
+        List<ParseResult> result = new(_formattedCount);
         Solve(input, (i, t, s, l) =>
         {
             switch (i)

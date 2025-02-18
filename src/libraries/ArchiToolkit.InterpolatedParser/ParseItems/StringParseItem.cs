@@ -21,7 +21,7 @@ public sealed class StringParseItem<T>(in T value, int index, IStringParser<T> p
     }
 
     /// <inheritdoc />
-    public bool TryParse(string s, IFormatProvider? provider)
+    public ParseResult TryParse(string s, IFormatProvider? provider)
     {
         if (!parser.TryParse(s, provider, out var result)) return false;
         SetValue(result);

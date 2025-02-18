@@ -20,6 +20,6 @@ public interface ISpanParseItem : IParseItem
     /// <param name="s"></param>
     /// <param name="provider"></param>
     /// <returns></returns>
-    bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider);
+    ParseResult TryParse(ReadOnlySpan<char> s, IFormatProvider? provider);
 }
 #endif
