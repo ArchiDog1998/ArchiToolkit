@@ -6,6 +6,11 @@
 public enum TrimType : byte
 {
     /// <summary>
+    ///     Nothing
+    /// </summary>
+    None,
+
+    /// <summary>
     ///     Trim
     /// </summary>
     Trim,
@@ -19,9 +24,4 @@ public enum TrimType : byte
     ///     Trim at end
     /// </summary>
     TrimEnd,
-
-    /// <summary>
-    ///     Nothing
-    /// </summary>
-    None
 }

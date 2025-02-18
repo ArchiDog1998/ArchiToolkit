@@ -12,12 +12,7 @@ partial class FormatGenerator
             .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)))
             .WithParameterList(ParameterList());
         creation = ObjectCreationExpression(IdentifierName(className))
-            .WithInitializer(InitializerExpression(SyntaxKind.ObjectInitializerExpression,
-                [
-                    AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, IdentifierName("Format"),
-                        IdentifierName("format")),
-                ]
-            ));
+            .WithArgumentList(ArgumentList());
 
         //TODO: number parsing.
 

@@ -83,6 +83,13 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     #endregion
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void SetFormat(ref IParser? parser, string? format)
+    {
+        if (parser is null) return;
+        parser.Format = format;
+    }
+
     #region Append
 
     public void AppendCollection<TCollection, TValue>(in TCollection t, string? format, string callerName,
@@ -94,11 +101,13 @@ internal readonly partial struct InterpolatedParseStringHandler
         if (option.DataType is not DataType.List)
         {
             var realParser = GetParser(in t, format, collectionParser, option) ?? FindParser<TValue>();
+            SetFormat(ref realParser, format);
             AppendObjectRaw(in t, realParser, type);
         }
         else
         {
             var realParser = GetParser(in t, format, itemParser, option) ?? FindParser<TCollection>();
+            SetFormat(ref realParser, format);
             AppendCollectionRaw<TCollection, TValue>(in t, realParser, option.Separator, type);
         }
     }
@@ -108,6 +117,7 @@ internal readonly partial struct InterpolatedParseStringHandler
         var option = _options[callerName];
         var type = option.TrimType ?? _options.TrimType;
         var realParser = GetParser(in t, format, parser, option) ?? FindParser<T>();
+        SetFormat(ref realParser, format);
         AppendObjectRaw(in t, realParser, type);
     }
 
