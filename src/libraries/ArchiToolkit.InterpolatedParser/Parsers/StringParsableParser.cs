@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
-public abstract class StringParsableParser<T> : IStringParser<T> where T : IParsable<T>
+public abstract class StringParsableParser<T> : Parser, IStringParser<T> where T : IParsable<T>
 {
     public T Parse(string s, IFormatProvider? provider)
     {

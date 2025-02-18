@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
-public abstract class SpanParseableParser<T> : ISpanParser<T> where T : ISpanParsable<T>
+public abstract class SpanParseableParser<T> : Parser, ISpanParser<T> where T : ISpanParsable<T>
 {
     public T Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {

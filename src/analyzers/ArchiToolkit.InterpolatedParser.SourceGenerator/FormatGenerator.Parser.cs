@@ -9,15 +9,21 @@ partial class FormatGenerator
 
         //Parameter(Identifier("format")).WithType(NullableType(PredefinedType(Token(SyntaxKind.StringKeyword))))
         var basicClass = ClassDeclaration(className)
-            .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)));
-        var basicCreation = ObjectCreationExpression(IdentifierName(className));
+            .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)))
+            .WithParameterList(ParameterList());
+        creation = ObjectCreationExpression(IdentifierName(className))
+            .WithInitializer(InitializerExpression(SyntaxKind.ObjectInitializerExpression,
+                [
+                    AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, IdentifierName("Format"),
+                        IdentifierName("format")),
+                ]
+            ));
 
         //TODO: number parsing.
 
         if (HasInterface(type, "System.ISpanParsable<TSelf>"))
         {
-            creation = basicCreation.WithArgumentList(ArgumentList());
-            return basicClass.WithParameterList(ParameterList()).WithBaseList(BaseList(
+            return basicClass.WithBaseList(BaseList(
             [
                 SimpleBaseType(
                     GenericName(Identifier("global::ArchiToolkit.InterpolatedParser.Parsers.SpanParseableParser"))
@@ -27,8 +33,7 @@ partial class FormatGenerator
 
         if (HasInterface(type, "System.IParsable<TSelf>"))
         {
-            creation = basicCreation.WithArgumentList(ArgumentList());
-            return basicClass.WithParameterList(ParameterList()).WithBaseList(BaseList(
+            return basicClass.WithBaseList(BaseList(
             [
                 SimpleBaseType(
                     GenericName(Identifier("global::ArchiToolkit.InterpolatedParser.Parsers.StringParseableParser"))
@@ -38,7 +43,6 @@ partial class FormatGenerator
 
         //TODO: reflection parsing.
 
-        creation = basicCreation.WithArgumentList(ArgumentList());
         return null;
     }
 }
