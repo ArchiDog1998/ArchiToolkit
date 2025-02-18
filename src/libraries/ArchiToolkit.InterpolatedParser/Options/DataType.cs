@@ -1,17 +1,17 @@
 ﻿namespace ArchiToolkit.InterpolatedParser.Options;
 
 /// <summary>
-/// The data type to parse it.
+///     The data type to parse it.
 /// </summary>
 public enum DataType : byte
 {
     /// <summary>
-    /// Make it parse as list as possible.
+    ///     Make it parse as list as possible.
     /// </summary>
     List,
 
     /// <summary>
-    /// Just an object.
+    ///     Just an object.
     /// </summary>
-    Item,
+    Item
 }

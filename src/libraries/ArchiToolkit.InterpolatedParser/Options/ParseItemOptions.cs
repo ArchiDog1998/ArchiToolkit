@@ -1,23 +1,58 @@
-﻿using ArchiToolkit.InterpolatedParser.Parsers;
+﻿using System.Runtime.CompilerServices;
+using ArchiToolkit.InterpolatedParser.Parsers;
 
 namespace ArchiToolkit.InterpolatedParser.Options;
 
-public readonly record struct ParseItemOptions(string ParameterName)
+/// <summary>
+/// The option to one specific parameter
+/// </summary>
+/// <param name="ParameterName">Please use <see langword="nameof"/></param> to get the symbol word
+public readonly record struct ParseItemOptions([CallerMemberName]string ParameterName = "")
 {
-    public static readonly ParseItemOptions Default = new()
-    {
-        Separator = ",",
-    };
-
+    /// <summary>
+    /// The delegate about what you want to get the string.
+    /// </summary>
     public delegate string ToStringDelegate(object? value, string? format);
 
+    /// <summary>
+    /// The default value.
+    /// </summary>
+    public static readonly ParseItemOptions Default = new()
+    {
+        Separator = ","
+    };
+
+    /// <summary>
+    /// In or Out?
+    /// </summary>
     public ParseType ParseType { get; init; }
+
+    /// <summary>
+    /// List or Item?
+    /// </summary>
     public DataType DataType { get; init; }
+
+    /// <summary>
+    /// Your custom parser?
+    /// </summary>
     public IParser? Parser { get; init; }
+
+    /// <summary>
+    /// Your separator for the case you set <see cref="DataType"/> to <see cref="DataType.List"/>.
+    /// </summary>
     public string Separator { get; init; } = ",";
 
+    /// <summary>
+    /// Your custom way to make it as string.
+    /// </summary>
     public ToStringDelegate? CustomToString { get; init; }
 
+    /// <summary>
+    /// To string the custom way
+    /// </summary>
+    /// <param name="value">the target</param>
+    /// <param name="format">format</param>
+    /// <returns></returns>
     public string FormatToString(object? value, string? format)
     {
         if (CustomToString is { } toString)

@@ -6,16 +6,16 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
-        <None Include="..\..\analyzers\ArchiToolkit.PureConst.Analyzer\bin\$(Configuration)\netstandard2.0\ArchiToolkit.PureConst.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-        <None Include="..\..\analyzers\ArchiToolkit.PureConst.Analyzer\bin\$(Configuration)\netstandard2.0\ArchiToolkit.RoslynHelper.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="..\..\analyzers\ArchiToolkit.PureConst.Analyzer\bin\$(Configuration)\netstandard2.0\ArchiToolkit.PureConst.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+        <None Include="..\..\analyzers\ArchiToolkit.PureConst.Analyzer\bin\$(Configuration)\netstandard2.0\ArchiToolkit.RoslynHelper.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
-        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0"/>
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0"/>
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0"/>
     </ItemGroup>
 </Project>

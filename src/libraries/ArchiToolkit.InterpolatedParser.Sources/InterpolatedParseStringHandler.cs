@@ -86,12 +86,12 @@ internal readonly partial struct InterpolatedParseStringHandler
         var option = _options[callerName];
         if (option.DataType is not DataType.List)
         {
-            var realParser = GetParser(in t, format, collectionParser, option);
+            var realParser = GetParser(in t, format, collectionParser, option) ?? FindParser<TValue>();
             AppendObjectRaw(in t, realParser);
         }
         else
         {
-            var realParser = GetParser(in t, format, itemParser, option);
+            var realParser = GetParser(in t, format, itemParser, option) ?? FindParser<TCollection>();
             AppendCollectionRaw<TCollection, TValue>(in t, realParser, option.Separator);
         }
     }
@@ -99,8 +99,29 @@ internal readonly partial struct InterpolatedParseStringHandler
     public void AppendObject<T>(in T t, string? format, string callerName, IParser? parser)
     {
         var option = _options[callerName];
-        var realParser = GetParser(in t, format, parser, option);
+        var realParser = GetParser(in t, format, parser, option) ?? FindParser<T>();
         AppendObjectRaw(in t, realParser);
+    }
+
+    private IParser? FindParser<T>()
+    {
+        foreach (var parser in _options.Parsers)
+        {
+            if (parser.TargetType == typeof(T))
+            {
+                return parser;
+            }
+        }
+
+        foreach (var parser in _options.Parsers)
+        {
+            if (parser.TargetType.IsAssignableFrom(typeof(T)))
+            {
+                return parser;
+            }
+        }
+
+        return null;
     }
 
     private void AppendCollectionRaw<TCollection, TValue>(in TCollection t, IParser? parser, string separator)
@@ -275,4 +296,3 @@ file static class QueueExtensions
     }
 }
 #endif
-
