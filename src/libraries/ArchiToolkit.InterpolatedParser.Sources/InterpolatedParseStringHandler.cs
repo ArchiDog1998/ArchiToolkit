@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Data;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -81,17 +80,18 @@ internal readonly partial struct InterpolatedParseStringHandler
     #region Append
 
     public void AppendCollection<TCollection, TValue>(in TCollection t, string? format, string callerName,
-        IParser? parser)
+        IParser? collectionParser, IParser? itemParser)
         where TCollection : ICollection<TValue>, new()
     {
         var option = _options[callerName];
-        var realParser = GetParser(in t, format, parser, option);
         if (option.DataType is not DataType.List)
         {
+            var realParser = GetParser(in t, format, collectionParser, option);
             AppendObjectRaw(in t, realParser);
         }
         else
         {
+            var realParser = GetParser(in t, format, itemParser, option);
             AppendCollectionRaw<TCollection, TValue>(in t, realParser, option.Separator);
         }
     }
@@ -106,6 +106,8 @@ internal readonly partial struct InterpolatedParseStringHandler
     private void AppendCollectionRaw<TCollection, TValue>(in TCollection t, IParser? parser, string separator)
         where TCollection : ICollection<TValue>, new()
     {
+        if (string.IsNullOrEmpty(separator))
+            throw new ArgumentNullException(nameof(separator), "Separator cannot be empty.");
         switch (parser)
         {
 #if NETCOREAPP
@@ -253,29 +255,6 @@ internal readonly partial struct InterpolatedParseStringHandler
     }
 
     #endregion
-
-    #region Test
-
-#if NET9_0_OR_GREATER // Waiting for generating!
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(in int t, string format, [CallerArgumentExpression(nameof(t))] string callerName = "")
-        => AppendObject(in t, format, callerName, new SpanParseableParser<int>());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(in int t, [CallerArgumentExpression(nameof(t))] string callerName = "")
-        =>  AppendObject(in t, null, callerName, new SpanParseableParser<int>());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(in string t, string format,
-        [CallerArgumentExpression(nameof(t))] string callerName = "")
-        =>AppendObject(in t, format, callerName, new SpanParseableParser<string>());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(in string t, [CallerArgumentExpression(nameof(t))] string callerName = "")
-        =>AppendObject(in t, null, callerName, new SpanParseableParser<string>());
-#endif
-
-    #endregion
 }
 
 #if NETFRAMEWORK || NETSTANDARD
@@ -296,3 +275,4 @@ file static class QueueExtensions
     }
 }
 #endif
+

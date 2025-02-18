@@ -4,12 +4,15 @@ namespace ArchiToolkit.InterpolatedParser.Options;
 
 public readonly record struct ParseItemOptions(string ParameterName)
 {
-    public static readonly ParseItemOptions Default = new();
+    public static readonly ParseItemOptions Default = new()
+    {
+        Separator = ",",
+    };
 
     public delegate string ToStringDelegate(object? value, string? format);
 
-    public ParseType ParseType { get; init; } = ParseType.Out;
-    public DataType DataType { get; init; } = DataType.List;
+    public ParseType ParseType { get; init; }
+    public DataType DataType { get; init; }
     public IParser? Parser { get; init; }
     public string Separator { get; init; } = ",";
 

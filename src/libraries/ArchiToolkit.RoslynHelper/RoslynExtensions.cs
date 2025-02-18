@@ -53,11 +53,21 @@ public static class RoslynExtensions
     }
 
     /// <summary>
+    /// Get the metadata name of the symbol
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="hashCount"></param>
+    /// <returns></returns>
+    public static MetadataName GetMetadataName(this ISymbol symbol, int hashCount = 16) =>
+        new(symbol, hashCount);
+
+    /// <summary>
     ///     Get the full symbol name.
     /// </summary>
     /// <param name="s"></param>
+    /// <param name="hasGlobal"></param>
     /// <returns></returns>
-    public static string GetFullMetadataName(this ISymbol? s)
+    public static string GetFullMetadataName(this ISymbol? s, bool hasGlobal = false)
     {
         if (s is null or INamespaceSymbol) return string.Empty;
 
@@ -82,7 +92,7 @@ public static class RoslynExtensions
             s = s.ContainingSymbol;
         }
 
-        return sb.ToString();
+        return hasGlobal ? "global::" + sb : sb.ToString();
 
         static bool IsRootNamespace(ISymbol symbol)
         {

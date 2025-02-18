@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;using ArchiToolkit.Assertions;
 using ArchiToolkit.Assertions.Assertions;
 using ArchiToolkit.Assertions.Assertions.Extensions;
 using ArchiToolkit.Assertions.Logging;
+using ArchiToolkit.Console;
 using ArchiToolkit.InterpolatedParser;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,8 +32,9 @@ using Microsoft.Extensions.Logging;
 //     }).And.ContainSingle(3).Which.Could.Be(2);
 // }
 
-var x = 0;
+var x = new List<int>();
 var name = "";
-"x is 69! And My name is ArchiTed".Parse($"x is {x}! And M[y] name is {name}");
-Console.WriteLine(x);
+var item = new MyTestClass();
+"x is 69,12! And My name is ArchiTed".Parse($"x is {x}! And M[y] name is {name}");
+Console.WriteLine(string.Join(", ", x));
 Console.WriteLine(name);

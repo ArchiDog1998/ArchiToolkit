@@ -17,7 +17,7 @@ public readonly record struct ParseOptions()
     public IParser[] Parsers { get; init; } = [];
 
     public ParseItemOptions this[string optionName]
-        => _options.TryGetValue(optionName, out var options) ? options :ParseItemOptions.Default;
+        => _options.TryGetValue(optionName, out var options) ? options : ParseItemOptions.Default;
 
     public static implicit operator ParseOptions(ParseItemOptions[] options) => new()
     {

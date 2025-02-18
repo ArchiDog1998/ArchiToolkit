@@ -1,25 +1,14 @@
-﻿using System.Collections.Immutable;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace ArchiToolkit.InterpolatedParser.SourceGenerator;
+﻿namespace ArchiToolkit.InterpolatedParser.SourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
 public class InitGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var methodDeclarations = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                static (node, _) => node is MethodDeclarationSyntax,
-                static (context, _) => (MethodDeclarationSyntax)context.Node)
-            .Collect();
-
-        context.RegisterSourceOutput(methodDeclarations, Generate);
+        context.RegisterPostInitializationOutput(InitializationOutput);
     }
 
-    private static void Generate(SourceProductionContext context, ImmutableArray<MethodDeclarationSyntax> methods)
+    private static void InitializationOutput(IncrementalGeneratorPostInitializationContext context)
     {
         var assembly = typeof(InitGenerator).Assembly;
         foreach (var name in assembly.GetManifestResourceNames())
