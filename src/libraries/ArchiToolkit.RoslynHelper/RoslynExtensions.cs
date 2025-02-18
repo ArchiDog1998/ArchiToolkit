@@ -58,7 +58,7 @@ public static class RoslynExtensions
     /// <param name="symbol"></param>
     /// <param name="hashCount"></param>
     /// <returns></returns>
-    public static MetadataName GetMetadataName(this ISymbol symbol, int hashCount = 16) =>
+    public static MetadataName GetMetadataName(this ISymbol symbol, int hashCount = 32) =>
         new(symbol, hashCount);
 
     /// <summary>

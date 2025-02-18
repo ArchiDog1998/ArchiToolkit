@@ -3,27 +3,32 @@
 partial class FormatGenerator
 {
     private static ClassDeclarationSyntax? GetParserType(ITypeSymbol type, MetadataName metadataName,
-        out string className)
+        out ObjectCreationExpressionSyntax creation)
     {
-        className = "Parser_" + metadataName.HashName;
+        var className = "Parser_" + metadataName.HashName;
 
+        //Parameter(Identifier("format")).WithType(NullableType(PredefinedType(Token(SyntaxKind.StringKeyword))))
         var basicClass = ClassDeclaration(className)
             .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)));
+        var basicCreation = ObjectCreationExpression(IdentifierName(className));
 
         //TODO: number parsing.
 
         if (HasInterface(type, "System.ISpanParsable<TSelf>"))
         {
-            return basicClass.WithBaseList(BaseList(
+            creation = basicCreation.WithArgumentList(ArgumentList());
+            return basicClass.WithParameterList(ParameterList()).WithBaseList(BaseList(
             [
                 SimpleBaseType(
                     GenericName(Identifier("global::ArchiToolkit.InterpolatedParser.Parsers.SpanParseableParser"))
                         .WithTypeArgumentList(TypeArgumentList([IdentifierName(type.GetFullMetadataName(true))])))
             ]));
         }
+
         if (HasInterface(type, "System.IParsable<TSelf>"))
         {
-            return basicClass.WithBaseList(BaseList(
+            creation = basicCreation.WithArgumentList(ArgumentList());
+            return basicClass.WithParameterList(ParameterList()).WithBaseList(BaseList(
             [
                 SimpleBaseType(
                     GenericName(Identifier("global::ArchiToolkit.InterpolatedParser.Parsers.StringParseableParser"))
@@ -33,6 +38,7 @@ partial class FormatGenerator
 
         //TODO: reflection parsing.
 
+        creation = basicCreation.WithArgumentList(ArgumentList());
         return null;
     }
 }

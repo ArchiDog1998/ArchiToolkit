@@ -26,7 +26,7 @@ public readonly struct MetadataName
     /// </summary>
     public string HashName => _hashName.Value;
 
-    internal MetadataName(ISymbol symbol, int hashCount = 16)
+    internal MetadataName(ISymbol symbol, int hashCount)
     {
         _typeName = new Lazy<string>(() => symbol.GetFullMetadataName(true));
         _safeName = new Lazy<string>(() => symbol.GetFullMetadataName()

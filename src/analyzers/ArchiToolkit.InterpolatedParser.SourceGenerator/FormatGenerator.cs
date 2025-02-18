@@ -72,7 +72,7 @@ public partial class FormatGenerator : IIncrementalGenerator
                 return (result, t, className);
             })
             .Where(t => t is { result: true, t: not null })
-            .ToImmutableDictionary<(bool, ITypeSymbol, string), ITypeSymbol, string>(
+            .ToImmutableDictionary<(bool, ITypeSymbol, ObjectCreationExpressionSyntax), ITypeSymbol, ObjectCreationExpressionSyntax>(
                 i => i.Item2,
                 i => i.Item3,
                 SymbolEqualityComparer.Default);
@@ -88,13 +88,13 @@ public partial class FormatGenerator : IIncrementalGenerator
         }
     }
 
-    private static bool Generate(SourceProductionContext context, ITypeSymbol type, out string className)
+    private static bool Generate(SourceProductionContext context, ITypeSymbol type, out ObjectCreationExpressionSyntax creation)
     {
         var name = type.GetMetadataName();
 
         //context.AddSource($"Test.{name.SafeName}.g.cs",     string.Join("\n", type.AllInterfaces.Select(i => i.OriginalDefinition)));
 
-        var classDeclaration = GetParserType(type, name, out className);
+        var classDeclaration = GetParserType(type, name, out creation);
         if (classDeclaration == null) return false;
 
         var root = NamespaceDeclaration("ArchiToolkit.InterpolatedParser",
@@ -112,7 +112,7 @@ public partial class FormatGenerator : IIncrementalGenerator
     }
 
     private static StructDeclarationSyntax BasicStruct(string typeName, string methodName, ParseItem item,
-        IImmutableDictionary<ITypeSymbol, string> classNames)
+        IImmutableDictionary<ITypeSymbol, ObjectCreationExpressionSyntax> creations)
     {
         var method1 = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("AppendFormatted"))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
@@ -159,7 +159,7 @@ public partial class FormatGenerator : IIncrementalGenerator
                     Parameter(Identifier("format"))
                         .WithType(NullableType(PredefinedType(Token(SyntaxKind.StringKeyword)))),
                     Parameter(Identifier("callerName")).WithType(PredefinedType(Token(SyntaxKind.StringKeyword)))
-                ])), item, classNames);
+                ])), item, creations);
 
         return StructDeclaration("InterpolatedParseStringHandler")
             .WithModifiers(
@@ -168,7 +168,7 @@ public partial class FormatGenerator : IIncrementalGenerator
     }
 
     private static MethodDeclarationSyntax ModifyMethod(MethodDeclarationSyntax method, ParseItem item,
-        IImmutableDictionary<ITypeSymbol, string> classNames)
+        IImmutableDictionary<ITypeSymbol, ObjectCreationExpressionSyntax> creations)
     {
         if (item.SubType is null)
             return method.WithExpressionBody(ArrowExpressionClause(
@@ -205,10 +205,7 @@ public partial class FormatGenerator : IIncrementalGenerator
 
         ExpressionSyntax GetArgument(ITypeSymbol type)
         {
-            if (classNames.TryGetValue(type, out var name))
-                return ObjectCreationExpression(IdentifierName(name))
-                    .WithArgumentList(ArgumentList());
-
+            if (creations.TryGetValue(type, out var name)) return name;
             return LiteralExpression(SyntaxKind.NullLiteralExpression);
         }
     }
