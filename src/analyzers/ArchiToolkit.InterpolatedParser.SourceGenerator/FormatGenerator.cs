@@ -65,7 +65,9 @@ public partial class FormatGenerator : IIncrementalGenerator
     private static void Generate(SourceProductionContext context, ParseItem[] items)
     {
         var validTypes = items
-            .SelectMany(i => (ITypeSymbol?[]) [i.Type, i.SubType]).OfType<ITypeSymbol>()
+            .SelectMany(i => (ITypeSymbol?[]) [i.Type, i.SubType])
+            .ToImmutableHashSet(SymbolEqualityComparer.Default)
+            .OfType<ITypeSymbol>()
             .Select(t =>
             {
                 var result = Generate(context, t, out var className);
