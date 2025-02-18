@@ -34,6 +34,6 @@ using Microsoft.Extensions.Logging;
 
 var x = new List<int>();
 var name = "";
-"Xasdfgagbab, x is 69,12! And My name is ArchiTed".Parse($"x is {x}! And M[y] name is {name}");
+"Xasdfgagbab, x is 69,12! And My name is ArchiTed".Parse($"x is {x:x}! And M[y] name is {name}");
 Console.WriteLine(string.Join(" + ", x));
 Console.WriteLine(name);

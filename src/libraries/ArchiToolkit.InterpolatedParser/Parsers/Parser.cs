@@ -5,9 +5,6 @@ namespace ArchiToolkit.InterpolatedParser.Parsers;
 /// <inheritdoc />
 public abstract class Parser : IParser
 {
-    /// <inheritdoc />
-    public abstract Type TargetType { get; }
-
     private static readonly Dictionary<char, NumberStyles> ShorthandMappings = new()
     {
         { 'C', NumberStyles.Currency },
@@ -23,21 +20,42 @@ public abstract class Parser : IParser
         { 'A', NumberStyles.Any }
     };
 
-    /// <inheritdoc />
-    public string? Format { get; set; }
+    private Lazy<NumberStyles> _getNumberStyle;
 
-    /// <summary>
-    /// Get the number style by the format string.
-    /// </summary>
-    /// <param name="format"></param>
-    /// <returns></returns>
-    protected static NumberStyles GetStyle(string format)
+    protected Parser()
+    {
+        _getNumberStyle = new Lazy<NumberStyles>(GetStyle);
+    }
+
+    public NumberStyles NumberStyle => _getNumberStyle.Value;
+
+    /// <inheritdoc />
+    public abstract Type TargetType { get; }
+
+    /// <inheritdoc />
+    public string? Format
+    {
+        get;
+        set
+        {
+            if (value == field) return;
+            field = value;
+            _getNumberStyle = new Lazy<NumberStyles>(GetStyle);
+        }
+    }
+
+    private NumberStyles GetStyle()
+    {
+        return Format is null ? NumberStyles.None : GetStyle(Format);
+    }
+
+    private static NumberStyles GetStyle(string format)
     {
         if (Enum.TryParse(format, true, out NumberStyles parsedStyle)) return parsedStyle;
 
         NumberStyles result = 0;
 
-        foreach (var ch in format)
+        foreach (var ch in format.ToUpper())
             if (ShorthandMappings.TryGetValue(ch, out var style))
                 result |= style;
 

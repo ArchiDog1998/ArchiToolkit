@@ -250,30 +250,6 @@ internal readonly partial struct InterpolatedParseStringHandler
         }, provider);
     }
 
-    private static string TrimString(string s, TrimType type)
-    {
-        return type switch
-        {
-            TrimType.Trim => s.Trim(),
-            TrimType.TrimStart => s.TrimStart(),
-            TrimType.TrimEnd => s.TrimEnd(),
-            _ => s
-        };
-    }
-#if NETCOREAPP
-
-    private static ReadOnlySpan<char> TrimString(ReadOnlySpan<char> s, TrimType type)
-    {
-        return type switch
-        {
-            TrimType.Trim => s.Trim(),
-            TrimType.TrimStart => s.TrimStart(),
-            TrimType.TrimEnd => s.TrimEnd(),
-            _ => s
-        };
-    }
-#endif
-
     private delegate void ParseDelegate(IParseItem item, string text, int start, int? length);
 
     private void Solve(string input, ParseDelegate action, IFormatProvider? provider)
