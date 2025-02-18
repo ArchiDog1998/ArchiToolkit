@@ -1,4 +1,5 @@
-﻿using ArchiToolkit.InterpolatedParser.Parsers;
+﻿using ArchiToolkit.InterpolatedParser.Options;
+using ArchiToolkit.InterpolatedParser.Parsers;
 
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
@@ -6,8 +7,9 @@ public class CollectionStringParseItem<TCollection, TValue>(
     in TCollection value,
     int index,
     IStringParser<TValue> parser,
-    string separator)
-    : ParseItem<TCollection>(in value, index), IStringParseItem
+    string separator,
+    TrimType type)
+    : ParseItem<TCollection>(in value, index, type), IStringParseItem
     where TCollection : ICollection<TValue>, new()
 {
     public void Parse(string s, IFormatProvider? provider)

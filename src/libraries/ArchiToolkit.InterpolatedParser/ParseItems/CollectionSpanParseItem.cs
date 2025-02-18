@@ -1,4 +1,5 @@
 ﻿#if NETCOREAPP
+using ArchiToolkit.InterpolatedParser.Options;
 using ArchiToolkit.InterpolatedParser.Parsers;
 
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
@@ -7,8 +8,9 @@ public class CollectionSpanParseItem<TCollection, TValue>(
     in TCollection value,
     int index,
     ISpanParser<TValue> parser,
-    string separator)
-    : ParseItem<TCollection>(in value, index), ISpanParseItem
+    string separator,
+    TrimType type)
+    : ParseItem<TCollection>(in value, index, type), ISpanParseItem
     where TCollection : ICollection<TValue>, new()
 {
     public void Parse(ReadOnlySpan<char> s, IFormatProvider? provider)

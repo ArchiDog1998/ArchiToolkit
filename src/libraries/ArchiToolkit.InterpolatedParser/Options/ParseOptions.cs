@@ -10,6 +10,11 @@ public readonly record struct ParseOptions()
     private readonly Dictionary<string, ParseItemOptions> _options = [];
 
     /// <summary>
+    ///
+    /// </summary>
+    public TrimType TrimType { get; init; } = TrimType.Trim;
+
+    /// <summary>
     /// Your parameters options.
     /// </summary>
     public ParseItemOptions[] ParameterOptions

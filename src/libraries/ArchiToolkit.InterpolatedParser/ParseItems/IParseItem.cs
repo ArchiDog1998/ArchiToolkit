@@ -1,6 +1,9 @@
-﻿namespace ArchiToolkit.InterpolatedParser.ParseItems;
+﻿using ArchiToolkit.InterpolatedParser.Options;
+
+namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
 public interface IParseItem
 {
     public int RegexIndex { get; }
+    public TrimType TrimType { get; }
 }

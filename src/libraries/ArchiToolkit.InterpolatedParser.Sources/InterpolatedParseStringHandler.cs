@@ -62,12 +62,16 @@ internal readonly partial struct InterpolatedParseStringHandler
     [OverloadResolutionPriority(-1)]
     // ReSharper disable once MethodOverloadWithOptionalParameter
     public void AppendFormatted(object t, string format, [CallerArgumentExpression(nameof(t))] string callerName = "")
-        => AppendObject(t, format, callerName);
+    {
+        AppendObject(t, format, callerName);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [OverloadResolutionPriority(-1)]
     public void AppendFormatted(object t, [CallerArgumentExpression(nameof(t))] string callerName = "")
-        => AppendObject(t, null, callerName);
+    {
+        AppendObject(t, null, callerName);
+    }
 
     private void AppendObject(object t, string? format, string callerName)
     {
@@ -86,47 +90,42 @@ internal readonly partial struct InterpolatedParseStringHandler
         where TCollection : ICollection<TValue>, new()
     {
         var option = _options[callerName];
+        var type = option.TrimType ?? _options.TrimType;
         if (option.DataType is not DataType.List)
         {
             var realParser = GetParser(in t, format, collectionParser, option) ?? FindParser<TValue>();
-            AppendObjectRaw(in t, realParser);
+            AppendObjectRaw(in t, realParser, type);
         }
         else
         {
             var realParser = GetParser(in t, format, itemParser, option) ?? FindParser<TCollection>();
-            AppendCollectionRaw<TCollection, TValue>(in t, realParser, option.Separator);
+            AppendCollectionRaw<TCollection, TValue>(in t, realParser, option.Separator, type);
         }
     }
 
     public void AppendObject<T>(in T t, string? format, string callerName, IParser? parser)
     {
         var option = _options[callerName];
+        var type = option.TrimType ?? _options.TrimType;
         var realParser = GetParser(in t, format, parser, option) ?? FindParser<T>();
-        AppendObjectRaw(in t, realParser);
+        AppendObjectRaw(in t, realParser, type);
     }
 
     private IParser? FindParser<T>()
     {
         foreach (var parser in _options.Parsers)
-        {
             if (parser.TargetType == typeof(T))
-            {
                 return parser;
-            }
-        }
 
         foreach (var parser in _options.Parsers)
-        {
             if (parser.TargetType.IsAssignableFrom(typeof(T)))
-            {
                 return parser;
-            }
-        }
 
         return null;
     }
 
-    private void AppendCollectionRaw<TCollection, TValue>(in TCollection t, IParser? parser, string separator)
+    private void AppendCollectionRaw<TCollection, TValue>(in TCollection t, IParser? parser, string separator,
+        TrimType type)
         where TCollection : ICollection<TValue>, new()
     {
         if (string.IsNullOrEmpty(separator))
@@ -136,29 +135,30 @@ internal readonly partial struct InterpolatedParseStringHandler
 #if NETCOREAPP
             case ISpanParser<TValue> spanParser:
                 _items.Enqueue(
-                    new CollectionSpanParseItem<TCollection, TValue>(in t, _replacements.Count, spanParser, separator));
+                    new CollectionSpanParseItem<TCollection, TValue>(in t, _replacements.Count, spanParser, separator,
+                        type));
                 break;
 #endif
             case IStringParser<TValue> stringParser:
                 _items.Enqueue(new CollectionStringParseItem<TCollection, TValue>(in t, _replacements.Count,
-                    stringParser, separator));
+                    stringParser, separator, type));
                 break;
             case not null:
                 throw new InvalidDataException($"Invalid parser type, which is {parser.GetType()}.");
         }
     }
 
-    private void AppendObjectRaw<T>(in T t, IParser? parser)
+    private void AppendObjectRaw<T>(in T t, IParser? parser, TrimType type)
     {
         switch (parser)
         {
 #if NETCOREAPP
             case ISpanParser<T> spanParser:
-                _items.Enqueue(new SpanParseItem<T>(in t, _replacements.Count, spanParser));
+                _items.Enqueue(new SpanParseItem<T>(in t, _replacements.Count, spanParser, type));
                 break;
 #endif
             case IStringParser<T> stringParser:
-                _items.Enqueue(new StringParseItem<T>(in t, _replacements.Count, stringParser));
+                _items.Enqueue(new StringParseItem<T>(in t, _replacements.Count, stringParser, type));
                 break;
             case not null:
                 throw new InvalidDataException($"Invalid parser type, which is {parser.GetType()}.");
@@ -177,14 +177,10 @@ internal readonly partial struct InterpolatedParseStringHandler
     {
         if (option.ParseType is not ParseType.In) return false;
         if (option.DataType is DataType.List && t is IEnumerable list)
-        {
             AppendRegex(p => "^" + string.Join(option.Separator,
                 from object? item in list select option.FormatToString(item, format, p)));
-        }
         else
-        {
             AppendRegex(p => "^" + option.FormatToString(t, format, p));
-        }
 
         return true;
     }
@@ -202,12 +198,12 @@ internal readonly partial struct InterpolatedParseStringHandler
             {
                 case IStringParseItem si:
                     var subString = l.HasValue ? t.Substring(s, l.Value) : t[s..];
-                    result.Add(si.TryParse(subString, provider));
+                    result.Add(si.TryParse(TrimString(subString, i.TrimType), provider));
                     break;
 #if NETCOREAPP
                 case ISpanParseItem si:
                     var subSpan = l.HasValue ? t.AsSpan(s, l.Value) : t.AsSpan(s);
-                    result.Add(si.TryParse(subSpan, provider));
+                    result.Add(si.TryParse(TrimString(subSpan, i.TrimType), provider));
                     break;
 #endif
                 default:
@@ -225,12 +221,12 @@ internal readonly partial struct InterpolatedParseStringHandler
             {
                 case IStringParseItem si:
                     var subString = l.HasValue ? t.Substring(s, l.Value) : t[s..];
-                    si.Parse(subString, provider);
+                    si.Parse(TrimString(subString, i.TrimType), provider);
                     break;
 #if NETCOREAPP
                 case ISpanParseItem si:
                     var subSpan = l.HasValue ? t.AsSpan(s, l.Value) : t.AsSpan(s);
-                    si.Parse(subSpan, provider);
+                    si.Parse(TrimString(subSpan, i.TrimType), provider);
                     break;
 #endif
                 default:
@@ -238,6 +234,30 @@ internal readonly partial struct InterpolatedParseStringHandler
             }
         }, provider);
     }
+
+    private static string TrimString(string s, TrimType type)
+    {
+        return type switch
+        {
+            TrimType.Trim => s.Trim(),
+            TrimType.TrimStart => s.TrimStart(),
+            TrimType.TrimEnd => s.TrimEnd(),
+            _ => s
+        };
+    }
+#if NETCOREAPP
+
+    private static ReadOnlySpan<char> TrimString(ReadOnlySpan<char> s, TrimType type)
+    {
+        return type switch
+        {
+            TrimType.Trim => s.Trim(),
+            TrimType.TrimStart => s.TrimStart(),
+            TrimType.TrimEnd => s.TrimEnd(),
+            _ => s
+        };
+    }
+#endif
 
     private delegate void ParseDelegate(IParseItem item, string text, int start, int? length);
 

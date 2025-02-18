@@ -1,9 +1,10 @@
-﻿using ArchiToolkit.InterpolatedParser.Parsers;
+﻿using ArchiToolkit.InterpolatedParser.Options;
+using ArchiToolkit.InterpolatedParser.Parsers;
 
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
-public class StringParseItem<T>(in T value, int index, IStringParser<T> parser)
-    : ParseItem<T>(in value, index), IStringParseItem
+public class StringParseItem<T>(in T value, int index, IStringParser<T> parser, TrimType type)
+    : ParseItem<T>(in value, index, type), IStringParseItem
 {
     public void Parse(string s, IFormatProvider? provider)
     {

@@ -33,6 +33,11 @@ public readonly record struct ParseItemOptions([CallerMemberName]string Paramete
     public DataType DataType { get; init; }
 
     /// <summary>
+    ///
+    /// </summary>
+    public TrimType? TrimType { get; init; }
+
+    /// <summary>
     /// Your custom parser?
     /// </summary>
     public IParser? Parser { get; init; }
