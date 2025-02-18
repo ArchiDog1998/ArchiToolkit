@@ -339,7 +339,6 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     /// <param name="message"></param>
     /// <param name="assertionParams"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public AndConstraint<TValue> AssertCheck(bool succeed, AssertionItemType assertionItemType,
         AssertMessage message, AssertionParams? assertionParams)
     {
@@ -357,7 +356,6 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     /// <param name="assertionParams"></param>
     /// <typeparam name="TMatchedElement"></typeparam>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public AndWhichConstraint<TValue, TMatchedElement> AssertCheck<TMatchedElement>(
         Func<TMatchedElement> resultGetter, string suffix, bool succeed, AssertionItemType assertionItemType,
         AssertMessage message, AssertionParams? assertionParams)

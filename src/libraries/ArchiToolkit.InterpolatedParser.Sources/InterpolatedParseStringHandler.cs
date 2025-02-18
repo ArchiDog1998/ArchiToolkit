@@ -58,7 +58,6 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     #region Format
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [OverloadResolutionPriority(-1)]
     // ReSharper disable once MethodOverloadWithOptionalParameter
     public void AppendFormatted(object t, string format, [CallerArgumentExpression(nameof(t))] string callerName = "")
@@ -66,7 +65,6 @@ internal readonly partial struct InterpolatedParseStringHandler
         AppendObject(t, format, callerName);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [OverloadResolutionPriority(-1)]
     public void AppendFormatted(object t, [CallerArgumentExpression(nameof(t))] string callerName = "")
     {
@@ -83,7 +81,6 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     #endregion
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void SetFormat(ref IParser? parser, string? format)
     {
         if (parser is null) return;

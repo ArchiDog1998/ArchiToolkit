@@ -103,9 +103,7 @@ partial class FormatGenerator
     {
         return MethodDeclaration(IdentifierName(typeName), Identifier("Parse"))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-            .WithAttributeLists([
-                GeneratedCodeAttribute(typeof(FormatGenerator)).AddAttributes(NonUserCodeAttribute())
-            ])
+            .WithAttributeLists([MethodAttribute()])
             .WithParameterList(
                 ParameterList([
                     Parameter(Identifier("s")).WithType(IdentifierName(inputName)),
@@ -116,11 +114,10 @@ partial class FormatGenerator
 
     private static MethodDeclarationSyntax TryParseMethod(string typeName, string inputName)
     {
+
         return MethodDeclaration(PredefinedType(Token(SyntaxKind.BoolKeyword)), Identifier("TryParse"))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-            .WithAttributeLists([
-                GeneratedCodeAttribute(typeof(FormatGenerator)).AddAttributes(NonUserCodeAttribute())
-            ])
+            .WithAttributeLists([MethodAttribute()])
             .WithParameterList(ParameterList(
             [
                 Parameter(Identifier("s")).WithType(IdentifierName(inputName)),

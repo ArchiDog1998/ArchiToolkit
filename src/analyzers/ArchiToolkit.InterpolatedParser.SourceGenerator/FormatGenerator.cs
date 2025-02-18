@@ -93,9 +93,6 @@ public partial class FormatGenerator : IIncrementalGenerator
     private static bool Generate(SourceProductionContext context, ITypeSymbol type, out ObjectCreationExpressionSyntax creation)
     {
         var name = type.GetMetadataName();
-
-        //context.AddSource($"Test.{name.SafeName}.g.cs",     string.Join("\n", type.AllInterfaces.Select(i => i.OriginalDefinition)));
-
         var classDeclaration = GetParserType(type, name, out creation);
         if (classDeclaration == null) return false;
 
@@ -113,129 +110,9 @@ public partial class FormatGenerator : IIncrementalGenerator
         return true;
     }
 
-    private static StructDeclarationSyntax BasicStruct(string typeName, string methodName, ParseItem item,
-        IImmutableDictionary<ITypeSymbol, ObjectCreationExpressionSyntax> creations)
-    {
-        var method1 = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("AppendFormatted"))
-            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
-            .WithAttributeLists([MethodAttribute()])
-            .WithParameterList(ParameterList([
-                Parameter(Identifier("t")).WithModifiers(TokenList(Token(SyntaxKind.InKeyword)))
-                    .WithType(IdentifierName(typeName)),
-                Parameter(Identifier("format")).WithType(PredefinedType(Token(SyntaxKind.StringKeyword))),
-                CallerNameParameter()
-            ]))
-            .WithExpressionBody(ArrowExpressionClause(InvocationExpression(IdentifierName(methodName))
-                .WithArgumentList(ArgumentList(
-                [
-                    Argument(IdentifierName("t")).WithRefOrOutKeyword(Token(SyntaxKind.InKeyword)),
-                    Argument(IdentifierName("format")),
-                    Argument(IdentifierName("callerName"))
-                ]))))
-            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
-
-        var method2 = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("AppendFormatted"))
-            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
-            .WithAttributeLists([MethodAttribute()])
-            .WithParameterList(ParameterList([
-                Parameter(Identifier("t")).WithModifiers(TokenList(Token(SyntaxKind.InKeyword)))
-                    .WithType(IdentifierName(typeName)),
-                CallerNameParameter()
-            ]))
-            .WithExpressionBody(ArrowExpressionClause(InvocationExpression(IdentifierName(methodName))
-                .WithArgumentList(ArgumentList(
-                [
-                    Argument(IdentifierName("t")).WithRefOrOutKeyword(Token(SyntaxKind.InKeyword)),
-                    Argument(LiteralExpression(SyntaxKind.NullLiteralExpression)),
-                    Argument(IdentifierName("callerName"))
-                ]))))
-            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
-
-        var method3 = ModifyMethod(
-            MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier(methodName))
-                .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)))
-                .WithAttributeLists([MethodAttribute()])
-                .WithParameterList(ParameterList([
-                    Parameter(Identifier("t")).WithModifiers(TokenList(Token(SyntaxKind.InKeyword)))
-                        .WithType(IdentifierName(typeName)),
-                    Parameter(Identifier("format"))
-                        .WithType(NullableType(PredefinedType(Token(SyntaxKind.StringKeyword)))),
-                    Parameter(Identifier("callerName")).WithType(PredefinedType(Token(SyntaxKind.StringKeyword)))
-                ])), item, creations);
-
-        return StructDeclaration("InterpolatedParseStringHandler")
-            .WithModifiers(
-                TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.PartialKeyword)))
-            .WithMembers([method1, method2, method3]);
-    }
-
-    private static MethodDeclarationSyntax ModifyMethod(MethodDeclarationSyntax method, ParseItem item,
-        IImmutableDictionary<ITypeSymbol, ObjectCreationExpressionSyntax> creations)
-    {
-        if (item.SubType is null)
-            return method.WithExpressionBody(ArrowExpressionClause(
-                    InvocationExpression(IdentifierName("AppendObject"))
-                        .WithArgumentList(ArgumentList(
-                            [
-                                Argument(IdentifierName("t")).WithRefOrOutKeyword(Token(SyntaxKind.InKeyword)),
-                                Argument(IdentifierName("format")),
-                                Argument(IdentifierName("callerName")),
-                                Argument(GetArgument(item.Type))
-                            ]
-                        ))))
-                .WithSemicolonToken(
-                    Token(SyntaxKind.SemicolonToken));
-
-        return method.WithExpressionBody(ArrowExpressionClause(
-                InvocationExpression(GenericName(Identifier("AppendCollection"))
-                        .WithTypeArgumentList(TypeArgumentList(
-                        [
-                            IdentifierName(item.Type.GetFullMetadataName(true)),
-                            IdentifierName(item.SubType.GetFullMetadataName(true))
-                        ])))
-                    .WithArgumentList(ArgumentList(
-                        [
-                            Argument(IdentifierName("t")).WithRefOrOutKeyword(Token(SyntaxKind.InKeyword)),
-                            Argument(IdentifierName("format")),
-                            Argument(IdentifierName("callerName")),
-                            Argument(GetArgument(item.Type)),
-                            Argument(GetArgument(item.SubType))
-                        ]
-                    ))))
-            .WithSemicolonToken(
-                Token(SyntaxKind.SemicolonToken));
-
-        ExpressionSyntax GetArgument(ITypeSymbol type)
-        {
-            if (creations.TryGetValue(type, out var name)) return name;
-            return LiteralExpression(SyntaxKind.NullLiteralExpression);
-        }
-    }
-
-
-    private static ParameterSyntax CallerNameParameter()
-    {
-        return Parameter(Identifier("callerName"))
-            .WithAttributeLists([
-                AttributeList(SingletonSeparatedList(
-                    Attribute(IdentifierName("global::System.Runtime.CompilerServices.CallerArgumentExpression"))
-                        .WithArgumentList(AttributeArgumentList(
-                            [AttributeArgument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal("t")))]))))
-            ])
-            .WithType(PredefinedType(Token(SyntaxKind.StringKeyword)))
-            .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(""))));
-    }
-
     private static AttributeListSyntax MethodAttribute()
     {
-        return GeneratedCodeAttribute(typeof(FormatGenerator)).AddAttributes(NonUserCodeAttribute(),
-            Attribute(IdentifierName("global::System.Runtime.CompilerServices.MethodImpl"))
-                .WithArgumentList(AttributeArgumentList(
-                [
-                    AttributeArgument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                        IdentifierName("global::System.Runtime.CompilerServices.MethodImplOptions"),
-                        IdentifierName("AggressiveInlining")))
-                ])));
+        return GeneratedCodeAttribute(typeof(FormatGenerator)).AddAttributes(NonUserCodeAttribute());
     }
 
     private readonly struct ParseItem(ITypeSymbol type, ITypeSymbol? subType)

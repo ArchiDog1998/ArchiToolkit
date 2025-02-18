@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using ArchiToolkit.InterpolatedParser.Options;
 
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
