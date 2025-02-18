@@ -12,7 +12,7 @@ public readonly record struct ParseOptions()
     /// <summary>
     ///
     /// </summary>
-    public TrimType TrimType { get; init; } = TrimType.Trim;
+    public PreModifyOptions TrimType { get; init; } = new();
 
     /// <summary>
     /// Your parameters options.

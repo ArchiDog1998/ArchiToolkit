@@ -2,6 +2,7 @@
 
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
+/// <inheritdoc cref="IStringParser{T}"/>
 public abstract class StringParser<T> : Parser, IStringParser<T>
 {
     /// <inheritdoc />

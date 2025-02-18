@@ -97,28 +97,28 @@ internal readonly partial struct InterpolatedParseStringHandler
         where TCollection : ICollection<TValue>, new()
     {
         var option = _options[callerName];
-        var type = option.TrimType ?? _options.TrimType;
+        var preModify = option.TrimType ?? _options.TrimType;
         if (option.DataType is not DataType.List)
         {
             var realParser = GetParser(in t, format, collectionParser, option) ?? FindParser<TValue>();
             SetFormat(ref realParser, format);
-            AppendObjectRaw(in t, realParser, type);
+            AppendObjectRaw(in t, realParser, preModify);
         }
         else
         {
             var realParser = GetParser(in t, format, itemParser, option) ?? FindParser<TCollection>();
             SetFormat(ref realParser, format);
-            AppendCollectionRaw<TCollection, TValue>(in t, realParser, option.Separator, type);
+            AppendCollectionRaw<TCollection, TValue>(in t, realParser, option.Separator, preModify);
         }
     }
 
     public void AppendObject<T>(in T t, string? format, string callerName, IParser? parser)
     {
         var option = _options[callerName];
-        var type = option.TrimType ?? _options.TrimType;
+        var preModify = option.TrimType ?? _options.TrimType;
         var realParser = GetParser(in t, format, parser, option) ?? FindParser<T>();
         SetFormat(ref realParser, format);
-        AppendObjectRaw(in t, realParser, type);
+        AppendObjectRaw(in t, realParser, preModify);
     }
 
     private IParser? FindParser<T>()
@@ -135,7 +135,7 @@ internal readonly partial struct InterpolatedParseStringHandler
     }
 
     private void AppendCollectionRaw<TCollection, TValue>(in TCollection t, IParser? parser, string separator,
-        TrimType type)
+        PreModifyOptions preModify)
         where TCollection : ICollection<TValue>, new()
     {
         if (string.IsNullOrEmpty(separator))
@@ -146,19 +146,19 @@ internal readonly partial struct InterpolatedParseStringHandler
             case ISpanParser<TValue> spanParser:
                 _items.Enqueue(
                     new CollectionSpanParseItem<TCollection, TValue>(in t, _replacements.Count, spanParser, separator,
-                        type));
+                        preModify));
                 break;
 #endif
             case IStringParser<TValue> stringParser:
                 _items.Enqueue(new CollectionStringParseItem<TCollection, TValue>(in t, _replacements.Count,
-                    stringParser, separator, type));
+                    stringParser, separator, preModify));
                 break;
             case not null:
                 throw new InvalidDataException($"Invalid parser type, which is {parser.GetType()}.");
         }
     }
 
-    private void AppendObjectRaw<T>(in T t, IParser? parser, TrimType type)
+    private void AppendObjectRaw<T>(in T t, IParser? parser, PreModifyOptions type)
     {
         switch (parser)
         {
@@ -208,12 +208,12 @@ internal readonly partial struct InterpolatedParseStringHandler
             {
                 case IStringParseItem si:
                     var subString = l.HasValue ? t.Substring(s, l.Value) : t[s..];
-                    result.Add(si.TryParse(TrimString(subString, i.TrimType), provider));
+                    result.Add(si.TryParse( i.PreModification.ModifyString(subString), provider));
                     break;
 #if NETCOREAPP
                 case ISpanParseItem si:
                     var subSpan = l.HasValue ? t.AsSpan(s, l.Value) : t.AsSpan(s);
-                    result.Add(si.TryParse(TrimString(subSpan, i.TrimType), provider));
+                    result.Add(si.TryParse(i.PreModification.ModifyString(subSpan), provider));
                     break;
 #endif
                 default:
@@ -231,12 +231,12 @@ internal readonly partial struct InterpolatedParseStringHandler
             {
                 case IStringParseItem si:
                     var subString = l.HasValue ? t.Substring(s, l.Value) : t[s..];
-                    si.Parse(TrimString(subString, i.TrimType), provider);
+                    si.Parse(i.PreModification.ModifyString(subString), provider);
                     break;
 #if NETCOREAPP
                 case ISpanParseItem si:
                     var subSpan = l.HasValue ? t.AsSpan(s, l.Value) : t.AsSpan(s);
-                    si.Parse(TrimString(subSpan, i.TrimType), provider);
+                    si.Parse(i.PreModification.ModifyString(subSpan), provider);
                     break;
 #endif
                 default:

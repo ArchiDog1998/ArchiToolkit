@@ -3,15 +3,27 @@ using ArchiToolkit.InterpolatedParser.Parsers;
 
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
-public class CollectionStringParseItem<TCollection, TValue>(
+/// <summary>
+/// The collection parser.
+/// </summary>
+/// <param name="value"></param>
+/// <param name="index"></param>
+/// <param name="parser"></param>
+/// <param name="separator"></param>
+/// <param name="preModify"></param>
+/// <typeparam name="TCollection"></typeparam>
+/// <typeparam name="TValue"></typeparam>
+public sealed class CollectionStringParseItem<TCollection, TValue>(
     in TCollection value,
     int index,
     IStringParser<TValue> parser,
     string separator,
-    TrimType type)
-    : ParseItem<TCollection>(in value, index, type), IStringParseItem
+    PreModifyOptions preModify)
+    : ParseItem<TCollection>(in value, index, preModify), IStringParseItem
     where TCollection : ICollection<TValue>, new()
 {
+    /// <inheritdoc />
+
     public void Parse(string s, IFormatProvider? provider)
     {
         var item = new TCollection();
@@ -30,6 +42,8 @@ public class CollectionStringParseItem<TCollection, TValue>(
 
         SetValue(item);
     }
+
+    /// <inheritdoc />
 
     public bool TryParse(string s, IFormatProvider? provider)
     {

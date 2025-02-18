@@ -3,23 +3,26 @@ using ArchiToolkit.InterpolatedParser.Options;
 
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
+/// <inheritdoc />
 public abstract unsafe class ParseItem<T> : IParseItem
 {
     private readonly void* _ptr;
 
-    protected ParseItem(in T value, int index, TrimType trimType)
+    private protected ParseItem(in T value, int index, PreModifyOptions preModify)
     {
         ref var t = ref Unsafe.AsRef(in value);
         _ptr = Unsafe.AsPointer(ref t);
         RegexIndex = index;
-        TrimType = trimType;
+        PreModification = preModify;
     }
 
+    /// <inheritdoc />
     public int RegexIndex { get; }
 
-    public TrimType TrimType { get; }
+    /// <inheritdoc />
+    public PreModifyOptions PreModification { get; }
 
-    protected void SetValue(in T value)
+    private protected void SetValue(in T value)
     {
         Unsafe.AsRef<T>(_ptr) = value;
     }

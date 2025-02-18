@@ -3,6 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
+/// <summary>
+/// For the span parsable items.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public abstract class SpanParseableParser<T> : SpanParser<T> where T : ISpanParsable<T>
 {
     /// <inheritdoc />

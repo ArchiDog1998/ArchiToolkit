@@ -4,15 +4,26 @@ using ArchiToolkit.InterpolatedParser.Parsers;
 
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
-public class CollectionSpanParseItem<TCollection, TValue>(
+/// <summary>
+/// The parse item for collections.
+/// </summary>
+/// <param name="value"></param>
+/// <param name="index"></param>
+/// <param name="parser"></param>
+/// <param name="separator"></param>
+/// <param name="preModify"></param>
+/// <typeparam name="TCollection"></typeparam>
+/// <typeparam name="TValue"></typeparam>
+public sealed class CollectionSpanParseItem<TCollection, TValue>(
     in TCollection value,
     int index,
     ISpanParser<TValue> parser,
     string separator,
-    TrimType type)
-    : ParseItem<TCollection>(in value, index, type), ISpanParseItem
+    PreModifyOptions preModify)
+    : ParseItem<TCollection>(in value, index, preModify), ISpanParseItem
     where TCollection : ICollection<TValue>, new()
 {
+    /// <inheritdoc />
     public void Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
         var item = new TCollection();
@@ -33,6 +44,7 @@ public class CollectionSpanParseItem<TCollection, TValue>(
         SetValue(item);
     }
 
+    /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
         var item = new TCollection();

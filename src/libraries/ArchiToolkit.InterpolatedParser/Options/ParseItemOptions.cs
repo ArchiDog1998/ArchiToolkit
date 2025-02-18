@@ -35,7 +35,7 @@ public readonly record struct ParseItemOptions([CallerMemberName]string Paramete
     /// <summary>
     ///
     /// </summary>
-    public TrimType? TrimType { get; init; }
+    public PreModifyOptions? TrimType { get; init; }
 
     /// <summary>
     /// Your custom parser?

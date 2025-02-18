@@ -24,4 +24,9 @@ public enum TrimType : byte
     ///     Trim at end
     /// </summary>
     TrimEnd,
+
+    /// <summary>
+    /// Your custom way to modify it
+    /// </summary>
+    Custom,
 }

@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
+/// <inheritdoc cref="ISpanParser{T}"/>
 public abstract class SpanParser<T>: Parser, ISpanParser<T>
 {
     /// <inheritdoc />

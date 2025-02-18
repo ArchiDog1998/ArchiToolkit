@@ -2,6 +2,7 @@
 
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
+/// <inheritdoc />
 public abstract class Parser : IParser
 {
     /// <inheritdoc />
@@ -25,7 +26,11 @@ public abstract class Parser : IParser
     /// <inheritdoc />
     public string? Format { get; set; }
 
-
+    /// <summary>
+    /// Get the number style by the format string.
+    /// </summary>
+    /// <param name="format"></param>
+    /// <returns></returns>
     protected static NumberStyles GetStyle(string format)
     {
         if (Enum.TryParse(format, true, out NumberStyles parsedStyle)) return parsedStyle;
