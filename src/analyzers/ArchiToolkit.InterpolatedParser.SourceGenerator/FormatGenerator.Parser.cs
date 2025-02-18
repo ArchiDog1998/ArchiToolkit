@@ -7,7 +7,7 @@ partial class FormatGenerator
     {
         var className = "Parser_" + metadataName.HashName;
 
-        //Parameter(Identifier("format")).WithType(NullableType(PredefinedType(Token(SyntaxKind.StringKeyword))))
+        var typeName = type.GetFullMetadataName(true);
         var basicClass = ClassDeclaration(className)
             .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)))
             .WithParameterList(ParameterList());
@@ -16,13 +16,21 @@ partial class FormatGenerator
 
         //TODO: number parsing.
 
+        if (HasStaticMethod(type, "Parse", "System.ReadOnlySpan<System.Char>", "System.IFormatProvider")
+            && HasStaticMethod(type, "Parse", "System.ReadOnlySpan<System.Char>", "System.Globalization.NumberStyles", "System.IFormatProvider")
+            && HasStaticMethod(type, "TryParse", "System.ReadOnlySpan<System.Char>", "System.IFormatProvider")
+            && HasStaticMethod(type, "TryParse", "System.ReadOnlySpan<System.Char>", "System.Globalization.NumberStyles", "System.IFormatProvider"))
+        {
+            //return basicClass;
+        }
+
         if (HasInterface(type, "System.ISpanParsable<TSelf>"))
         {
             return basicClass.WithBaseList(BaseList(
             [
                 SimpleBaseType(
                     GenericName(Identifier("global::ArchiToolkit.InterpolatedParser.Parsers.SpanParseableParser"))
-                        .WithTypeArgumentList(TypeArgumentList([IdentifierName(type.GetFullMetadataName(true))])))
+                        .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName)])))
             ]));
         }
 
@@ -32,12 +40,25 @@ partial class FormatGenerator
             [
                 SimpleBaseType(
                     GenericName(Identifier("global::ArchiToolkit.InterpolatedParser.Parsers.StringParseableParser"))
-                        .WithTypeArgumentList(TypeArgumentList([IdentifierName(type.GetFullMetadataName(true))])))
+                        .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName)])))
             ]));
         }
 
         //TODO: reflection parsing.
 
         return null;
+    }
+
+    private static bool HasStaticMethod(ITypeSymbol typeSymbol, string methodName, params string[] argumentsName)
+    {
+        return typeSymbol
+            .GetMembers(methodName)
+            .OfType<IMethodSymbol>()
+            .Any(method =>
+            {
+                if (!method.IsStatic) return false;
+                return !argumentsName
+                    .Where((t, i) => method.Parameters[i].Type.GetFullMetadataName() != t).Any();
+            });
     }
 }

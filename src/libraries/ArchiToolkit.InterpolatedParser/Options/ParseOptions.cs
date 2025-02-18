@@ -10,9 +10,14 @@ public readonly record struct ParseOptions()
     private readonly Dictionary<string, ParseItemOptions> _options = [];
 
     /// <summary>
+    /// Patch at the beginning
+    /// </summary>
+    public bool Beginning { get; init; }
+
+    /// <summary>
     ///
     /// </summary>
-    public PreModifyOptions TrimType { get; init; } = new();
+    public PreModifyOptions ProModification { get; init; } = new();
 
     /// <summary>
     /// Your parameters options.

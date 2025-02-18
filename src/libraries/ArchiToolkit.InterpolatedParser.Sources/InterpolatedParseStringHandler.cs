@@ -46,7 +46,7 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     public void AppendLiteral([StringSyntax(StringSyntaxAttribute.Regex)] string regex)
     {
-        AppendRegex(_replacements.Count == 0 && !regex.StartsWith("^")
+        AppendRegex(_replacements.Count == 0 && _options.Beginning && !regex.StartsWith("^")
             ? _ => "^" + regex
             : _ => regex);
     }
@@ -97,7 +97,7 @@ internal readonly partial struct InterpolatedParseStringHandler
         where TCollection : ICollection<TValue>, new()
     {
         var option = _options[callerName];
-        var preModify = option.TrimType ?? _options.TrimType;
+        var preModify = option.PreModification ?? _options.ProModification;
         if (option.DataType is not DataType.List)
         {
             var realParser = GetParser(in t, format, collectionParser, option) ?? FindParser<TValue>();
@@ -115,7 +115,7 @@ internal readonly partial struct InterpolatedParseStringHandler
     public void AppendObject<T>(in T t, string? format, string callerName, IParser? parser)
     {
         var option = _options[callerName];
-        var preModify = option.TrimType ?? _options.TrimType;
+        var preModify = option.PreModification ?? _options.ProModification;
         var realParser = GetParser(in t, format, parser, option) ?? FindParser<T>();
         SetFormat(ref realParser, format);
         AppendObjectRaw(in t, realParser, preModify);
@@ -187,12 +187,17 @@ internal readonly partial struct InterpolatedParseStringHandler
     {
         if (option.ParseType is not ParseType.In) return false;
         if (option.DataType is DataType.List && t is IEnumerable list)
-            AppendRegex(p => "^" + string.Join(option.Separator,
-                from object? item in list select option.FormatToString(item, format, p)));
+            AppendRegex(p => AddBeginning(string.Join(option.Separator,
+                from object? item in list select option.FormatToString(item, format, p))));
         else
-            AppendRegex(p => "^" + option.FormatToString(t, format, p));
+            AppendRegex(p => AddBeginning(option.FormatToString(t, format, p)));
 
         return true;
+
+        string AddBeginning(string s)
+        {
+            return option.Beginning ? "^" + s : s;
+        }
     }
 
     #endregion
