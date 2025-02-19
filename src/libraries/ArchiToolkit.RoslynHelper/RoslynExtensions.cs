@@ -65,17 +65,23 @@ public static class RoslynExtensions
     ///     Get the full symbol name.
     /// </summary>
     /// <param name="s"></param>
+    /// <param name="hasTypeParameter"></param>
     /// <param name="hasGlobal"></param>
     /// <returns></returns>
-    public static string GetFullMetadataName(this ISymbol? s, bool hasGlobal = false)
+    public static string GetFullMetadataName(this ISymbol? s, out bool hasTypeParameter, bool hasGlobal = false)
     {
+        hasTypeParameter = false;
         if (s is null or INamespaceSymbol) return string.Empty;
 
         while (s != null && s is not ITypeSymbol) s = s.ContainingSymbol;
-
         if (s == null) return string.Empty;
+        if (s is ITypeSymbol { TypeKind: TypeKind.TypeParameter })
+        {
+            hasTypeParameter = true;
+            return s.Name;
+        }
 
-        var sb = new StringBuilder(s.GetTypeSymbolName());
+        var sb = new StringBuilder(s.GetTypeSymbolName(out hasTypeParameter, hasGlobal));
 
         s = s.ContainingSymbol;
         while (!IsRootNamespace(s))
@@ -100,10 +106,11 @@ public static class RoslynExtensions
         }
     }
 
-    private static string GetTypeSymbolName(this ISymbol symbol)
+    private static string GetTypeSymbolName(this ISymbol symbol, out bool hasTypeParameter, bool hasGlobal)
     {
+        hasTypeParameter = false;
         if (symbol is IArrayTypeSymbol arrayTypeSymbol) //Array
-            return arrayTypeSymbol.ElementType.GetFullMetadataName() + "[]";
+            return arrayTypeSymbol.ElementType.GetFullMetadataName(out hasTypeParameter, hasGlobal) + "[]";
 
         var str = symbol.MetadataName;
         if (symbol is not INamedTypeSymbol symbolType) return str; //Generic
@@ -112,7 +119,14 @@ public static class RoslynExtensions
         if (strs.Length < 2) return str;
         str = strs[0];
 
-        str += "<" + string.Join(", ", symbolType.TypeArguments.Select(p => p.GetFullMetadataName())) + ">";
+        var hasTypeParam = false;
+        str += "<" + string.Join(", ", symbolType.TypeArguments.Select(p =>
+        {
+            var result = p.GetFullMetadataName(out var relay, hasGlobal);
+            hasTypeParam |= relay;
+            return result;
+        })) + ">";
+        hasTypeParameter = hasTypeParam;
         return str;
     }
 

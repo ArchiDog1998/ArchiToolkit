@@ -22,7 +22,7 @@ public partial class FormatGenerator : IIncrementalGenerator
         var model = context.SemanticModel;
         if (context.Node is not InvocationExpressionSyntax invocation) yield break;
         if (model.GetSymbolInfo(invocation).Symbol is not IMethodSymbol symbol) yield break;
-        if (symbol.ContainingType.GetFullMetadataName() is not
+        if (symbol.ContainingType.GetFullMetadataName(out _) is not
             "ArchiToolkit.InterpolatedParser.InterpolatedParserExtensions") yield break;
 
         foreach (var arg in invocation.ArgumentList.Arguments)
@@ -74,7 +74,8 @@ public partial class FormatGenerator : IIncrementalGenerator
                 return (result, t, className);
             })
             .Where(t => t is { result: true, t: not null })
-            .ToImmutableDictionary<(bool, ITypeSymbol, ObjectCreationExpressionSyntax), ITypeSymbol, ObjectCreationExpressionSyntax>(
+            .ToImmutableDictionary<(bool, ITypeSymbol, ObjectCreationExpressionSyntax), ITypeSymbol,
+                ObjectCreationExpressionSyntax>(
                 i => i.Item2,
                 i => i.Item3,
                 SymbolEqualityComparer.Default);
@@ -82,6 +83,7 @@ public partial class FormatGenerator : IIncrementalGenerator
         foreach (var item in items)
         {
             var metadataName = item.Type.GetMetadataName();
+            if (metadataName.HasTypeParameter) continue;
             var methodName = "Add_" + metadataName.HashName;
             var root = NamespaceDeclaration("ArchiToolkit.InterpolatedParser",
                     $"For adding the formatted type of {metadataName.TypeName}")
@@ -90,9 +92,16 @@ public partial class FormatGenerator : IIncrementalGenerator
         }
     }
 
-    private static bool Generate(SourceProductionContext context, ITypeSymbol type, out ObjectCreationExpressionSyntax creation)
+    private static bool Generate(SourceProductionContext context, ITypeSymbol type,
+        out ObjectCreationExpressionSyntax creation)
     {
         var name = type.GetMetadataName();
+        if (name.HasTypeParameter)
+        {
+            creation = null!;
+            return false;
+        }
+
         var classDeclaration = GetParserType(type, name, out creation);
         if (classDeclaration == null) return false;
 

@@ -210,7 +210,7 @@ internal readonly partial struct InterpolatedParseStringHandler
             {
                 case IStringParseItem si:
                     var subString = l.HasValue ? t.Substring(s, l.Value) : t[s..];
-                    result.Add(si.TryParse( i.PreModification.ModifyString(subString), provider));
+                    result.Add(si.TryParse(i.PreModification.ModifyString(subString), provider));
                     break;
 #if NETCOREAPP
                 case ISpanParseItem si:

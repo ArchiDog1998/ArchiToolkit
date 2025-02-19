@@ -2,6 +2,28 @@
 
 partial class FormatGenerator
 {
+    private static readonly Dictionary<string, string> TypeToStringSyntax = new()
+    {
+        { "System.DateOnly", "DateOnlyFormat" },
+        { typeof(DateTime).FullName!, "DateTimeFormat" },
+        { typeof(Guid).FullName!, "GuidFormat" },
+        { "System.TimeOnly", "TimeOnlyFormat" },
+        { typeof(TimeSpan).FullName!, "TimeSpanFormat" },
+
+        // Numeric types
+        { typeof(byte).FullName!, "NumericFormat" },
+        { typeof(sbyte).FullName!, "NumericFormat" },
+        { typeof(short).FullName!, "NumericFormat" },
+        { typeof(ushort).FullName!, "NumericFormat" },
+        { typeof(int).FullName!, "NumericFormat" },
+        { typeof(uint).FullName!, "NumericFormat" },
+        { typeof(long).FullName!, "NumericFormat" },
+        { typeof(ulong).FullName!, "NumericFormat" },
+        { typeof(float).FullName!, "NumericFormat" },
+        { typeof(double).FullName!, "NumericFormat" },
+        { typeof(decimal).FullName!, "NumericFormat" }
+    };
+
     private static StructDeclarationSyntax BasicStruct(string typeName, string methodName, ParseItem item,
         IImmutableDictionary<ITypeSymbol, ObjectCreationExpressionSyntax> creations)
     {
@@ -80,8 +102,8 @@ partial class FormatGenerator
                 InvocationExpression(GenericName(Identifier("AppendCollection"))
                         .WithTypeArgumentList(TypeArgumentList(
                         [
-                            IdentifierName(item.Type.GetFullMetadataName(true)),
-                            IdentifierName(item.SubType.GetFullMetadataName(true))
+                            IdentifierName(item.Type.GetFullMetadataName(out _, true)),
+                            IdentifierName(item.SubType.GetFullMetadataName(out _, true))
                         ])))
                     .WithArgumentList(ArgumentList(
                         [
@@ -141,28 +163,6 @@ partial class FormatGenerator
 
     private static string GetStringSyntax(ITypeSymbol type)
     {
-        return TypeToStringSyntax.TryGetValue(type.GetFullMetadataName(), out var name) ? name : string.Empty;
+        return TypeToStringSyntax.TryGetValue(type.GetFullMetadataName(out _), out var name) ? name : string.Empty;
     }
-
-    private static readonly Dictionary<string, string> TypeToStringSyntax = new()
-    {
-        { "System.DateOnly", "DateOnlyFormat" },
-        { typeof(DateTime).FullName!, "DateTimeFormat" },
-        { typeof(Guid).FullName!, "GuidFormat" },
-        { "System.TimeOnly", "TimeOnlyFormat" },
-        { typeof(TimeSpan).FullName!, "TimeSpanFormat" },
-
-        // Numeric types
-        { typeof(byte).FullName!, "NumericFormat" },
-        { typeof(sbyte).FullName!, "NumericFormat" },
-        { typeof(short).FullName!, "NumericFormat" },
-        { typeof(ushort).FullName!, "NumericFormat" },
-        { typeof(int).FullName!, "NumericFormat" },
-        { typeof(uint).FullName!, "NumericFormat" },
-        { typeof(long).FullName!, "NumericFormat" },
-        { typeof(ulong).FullName!, "NumericFormat" },
-        { typeof(float).FullName!, "NumericFormat" },
-        { typeof(double).FullName!, "NumericFormat" },
-        { typeof(decimal).FullName!, "NumericFormat" }
-    };
 }

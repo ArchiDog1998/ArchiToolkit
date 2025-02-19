@@ -7,8 +7,8 @@ partial class FormatGenerator
     {
         var className = "Parser_" + metadataName.HashName;
 
-        var typeName = type.GetFullMetadataName(true);
-        var typeNameSimple = type.GetFullMetadataName();
+        var typeName = type.GetFullMetadataName(out _, true);
+        var typeNameSimple = type.GetFullMetadataName(out _);
         var basicClass = ClassDeclaration(className)
             .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)))
             .WithParameterList(ParameterList());
@@ -24,11 +24,9 @@ partial class FormatGenerator
                 typeNameSimple)
             && HasStaticMethod(type, "TryParse", "System.ReadOnlySpan<System.Char>",
                 "System.Globalization.NumberStyles", "System.IFormatProvider", typeNameSimple))
-        {
             return NumberChange(
                 BaseTypeChange(basicClass, "global::ArchiToolkit.InterpolatedParser.Parsers.SpanParser", typeName),
                 typeName, "System.ReadOnlySpan<System.Char>");
-        }
 
         if (HasStaticMethod(type, "Parse", "System.String", "System.IFormatProvider")
             && HasStaticMethod(type, "Parse", "System.String", "System.Globalization.NumberStyles",
@@ -37,41 +35,31 @@ partial class FormatGenerator
                 typeNameSimple)
             && HasStaticMethod(type, "TryParse", "System.String",
                 "System.Globalization.NumberStyles", "System.IFormatProvider", typeNameSimple))
-        {
             return NumberChange(
                 BaseTypeChange(basicClass, "global::ArchiToolkit.InterpolatedParser.Parsers.SpanParser", typeName),
                 typeName, "System.String");
-        }
 
         if (HasInterface(type, "System.ISpanParsable<TSelf>"))
-        {
             return BaseTypeChange(basicClass, "global::ArchiToolkit.InterpolatedParser.Parsers.SpanParseableParser",
                 typeName);
-        }
 
         if (HasStaticMethod(type, "Parse", "System.ReadOnlySpan<System.Char>", "System.IFormatProvider")
             && HasStaticMethod(type, "TryParse", "System.ReadOnlySpan<System.Char>", "System.IFormatProvider",
                 typeNameSimple))
-        {
             return GeneralChange(
                 BaseTypeChange(basicClass, "global::ArchiToolkit.InterpolatedParser.Parsers.SpanParser", typeName),
                 typeName, "System.ReadOnlySpan<System.Char>");
-        }
 
         if (HasInterface(type, "System.IParsable<TSelf>"))
-        {
             return BaseTypeChange(basicClass, "global::ArchiToolkit.InterpolatedParser.Parsers.StringParseableParser",
                 typeName);
-        }
 
         if (HasStaticMethod(type, "Parse", "System.String", "System.IFormatProvider")
             && HasStaticMethod(type, "TryParse", "System.String", "System.IFormatProvider",
                 typeNameSimple))
-        {
             return GeneralChange(
                 BaseTypeChange(basicClass, "global::ArchiToolkit.InterpolatedParser.Parsers.SpanParser", typeName),
                 typeName, "System.String");
-        }
         return null;
     }
 
@@ -85,7 +73,7 @@ partial class FormatGenerator
                 if (!method.IsStatic) return false;
                 if (method.Parameters.Length != argumentsName.Length) return false;
                 return !argumentsName
-                    .Where((t, i) => method.Parameters[i].Type.GetFullMetadataName() != t).Any();
+                    .Where((t, i) => method.Parameters[i].Type.GetFullMetadataName(out _) != t).Any();
             });
     }
 
@@ -114,7 +102,6 @@ partial class FormatGenerator
 
     private static MethodDeclarationSyntax TryParseMethod(string typeName, string inputName)
     {
-
         return MethodDeclaration(PredefinedType(Token(SyntaxKind.BoolKeyword)), Identifier("TryParse"))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
             .WithAttributeLists([MethodAttribute()])
