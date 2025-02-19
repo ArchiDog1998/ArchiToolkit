@@ -54,6 +54,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PureConst", "PureConst", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fluent", "Fluent", "{C40CB50D-D8A5-4267-A0DB-E24911B80E5F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Fluent", "src\libraries\ArchiToolkit.Fluent\ArchiToolkit.Fluent.csproj", "{3D4A7F69-466B-40FA-AC81-D4488CC007AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -112,6 +114,10 @@ Global
 		{0271376B-659F-4175-9B1B-D271697A0365}.Release|Any CPU.Build.0 = Release|Any CPU
 		{586FA317-8412-46E0-B768-3BD190AB2B79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{586FA317-8412-46E0-B768-3BD190AB2B79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D4A7F69-466B-40FA-AC81-D4488CC007AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D4A7F69-466B-40FA-AC81-D4488CC007AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D4A7F69-466B-40FA-AC81-D4488CC007AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D4A7F69-466B-40FA-AC81-D4488CC007AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -134,5 +140,6 @@ Global
 		{BBABB8BD-18B1-4203-BAAD-774EAB747942} = {3C4FBC59-6A99-4AF8-B24B-3C57256F1251}
 		{305AF198-B752-414A-8BF3-2E698EF01FED} = {3C4FBC59-6A99-4AF8-B24B-3C57256F1251}
 		{C40CB50D-D8A5-4267-A0DB-E24911B80E5F} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
+		{3D4A7F69-466B-40FA-AC81-D4488CC007AD} = {C40CB50D-D8A5-4267-A0DB-E24911B80E5F}
 	EndGlobalSection
 EndGlobal
