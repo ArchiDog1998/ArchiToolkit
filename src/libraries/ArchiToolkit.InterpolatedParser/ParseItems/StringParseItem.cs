@@ -12,7 +12,7 @@ namespace ArchiToolkit.InterpolatedParser.ParseItems;
 /// <param name="preModify"></param>
 /// <typeparam name="T"></typeparam>
 public sealed class StringParseItem<T>(in T value, int index, IStringParser<T> parser, PreModifyOptions preModify)
-    : ParseItem<T>(in value, index, preModify), IStringParseItem
+    : ParseItem<T>(value, index, preModify), IStringParseItem
 {
     /// <inheritdoc />
     public void Parse(string s, IFormatProvider? provider)

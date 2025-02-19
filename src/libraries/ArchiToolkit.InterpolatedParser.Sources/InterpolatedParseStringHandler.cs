@@ -97,15 +97,15 @@ internal readonly partial struct InterpolatedParseStringHandler
         var preModify = option.PreModification ?? _options.ProModification;
         if (option.DataType is not DataType.List)
         {
-            var realParser = GetParser(in t, format, collectionParser, option) ?? FindParser<TValue>();
+            var realParser = GetParser(t, format, collectionParser, option) ?? FindParser<TValue>();
             SetFormat(ref realParser, format);
-            AppendObjectRaw(in t, realParser, preModify);
+            AppendObjectRaw(t, realParser, preModify);
         }
         else
         {
-            var realParser = GetParser(in t, format, itemParser, option) ?? FindParser<TCollection>();
+            var realParser = GetParser(t, format, itemParser, option) ?? FindParser<TCollection>();
             SetFormat(ref realParser, format);
-            AppendCollectionRaw<TCollection, TValue>(in t, realParser, option.Separator, preModify);
+            AppendCollectionRaw<TCollection, TValue>(t, realParser, option.Separator, preModify);
         }
     }
 
@@ -113,9 +113,9 @@ internal readonly partial struct InterpolatedParseStringHandler
     {
         var option = _options[callerName];
         var preModify = option.PreModification ?? _options.ProModification;
-        var realParser = GetParser(in t, format, parser, option) ?? FindParser<T>();
+        var realParser = GetParser(t, format, parser, option) ?? FindParser<T>();
         SetFormat(ref realParser, format);
-        AppendObjectRaw(in t, realParser, preModify);
+        AppendObjectRaw(t, realParser, preModify);
     }
 
     private IParser? FindParser<T>()
@@ -142,12 +142,12 @@ internal readonly partial struct InterpolatedParseStringHandler
 #if NETCOREAPP
             case ISpanParser<TValue> spanParser:
                 _items.Enqueue(
-                    new CollectionSpanParseItem<TCollection, TValue>(in t, _replacements.Count, spanParser, separator,
+                    new CollectionSpanParseItem<TCollection, TValue>(t, _replacements.Count, spanParser, separator,
                         preModify));
                 break;
 #endif
             case IStringParser<TValue> stringParser:
-                _items.Enqueue(new CollectionStringParseItem<TCollection, TValue>(in t, _replacements.Count,
+                _items.Enqueue(new CollectionStringParseItem<TCollection, TValue>(t, _replacements.Count,
                     stringParser, separator, preModify));
                 break;
             case not null:
@@ -161,11 +161,11 @@ internal readonly partial struct InterpolatedParseStringHandler
         {
 #if NETCOREAPP
             case ISpanParser<T> spanParser:
-                _items.Enqueue(new SpanParseItem<T>(in t, _replacements.Count, spanParser, type));
+                _items.Enqueue(new SpanParseItem<T>(t, _replacements.Count, spanParser, type));
                 break;
 #endif
             case IStringParser<T> stringParser:
-                _items.Enqueue(new StringParseItem<T>(in t, _replacements.Count, stringParser, type));
+                _items.Enqueue(new StringParseItem<T>(t, _replacements.Count, stringParser, type));
                 break;
             case not null:
                 throw new InvalidDataException($"Invalid parser type, which is {parser.GetType()}.");

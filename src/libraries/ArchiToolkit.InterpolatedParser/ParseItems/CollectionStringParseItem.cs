@@ -19,7 +19,7 @@ public sealed class CollectionStringParseItem<TCollection, TValue>(
     IStringParser<TValue> parser,
     string separator,
     PreModifyOptions preModify)
-    : ParseItem<TCollection>(in value, index, preModify), IStringParseItem
+    : ParseItem<TCollection>(value, index, preModify), IStringParseItem
     where TCollection : ICollection<TValue>, new()
 {
     /// <inheritdoc />

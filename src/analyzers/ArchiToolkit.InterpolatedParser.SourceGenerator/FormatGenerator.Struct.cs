@@ -18,7 +18,7 @@ partial class FormatGenerator
             .WithExpressionBody(ArrowExpressionClause(InvocationExpression(IdentifierName(methodName))
                 .WithArgumentList(ArgumentList(
                 [
-                    Argument(IdentifierName("t")).WithRefOrOutKeyword(Token(SyntaxKind.InKeyword)),
+                    Argument(IdentifierName("t")),
                     Argument(IdentifierName("format")),
                     Argument(IdentifierName("callerName"))
                 ]))))
@@ -35,7 +35,7 @@ partial class FormatGenerator
             .WithExpressionBody(ArrowExpressionClause(InvocationExpression(IdentifierName(methodName))
                 .WithArgumentList(ArgumentList(
                 [
-                    Argument(IdentifierName("t")).WithRefOrOutKeyword(Token(SyntaxKind.InKeyword)),
+                    Argument(IdentifierName("t")),
                     Argument(LiteralExpression(SyntaxKind.NullLiteralExpression)),
                     Argument(IdentifierName("callerName"))
                 ]))))
@@ -67,7 +67,7 @@ partial class FormatGenerator
                     InvocationExpression(IdentifierName("AppendObject"))
                         .WithArgumentList(ArgumentList(
                             [
-                                Argument(IdentifierName("t")).WithRefOrOutKeyword(Token(SyntaxKind.InKeyword)),
+                                Argument(IdentifierName("t")),
                                 Argument(IdentifierName("format")),
                                 Argument(IdentifierName("callerName")),
                                 Argument(GetArgument(item.Type))
@@ -85,7 +85,7 @@ partial class FormatGenerator
                         ])))
                     .WithArgumentList(ArgumentList(
                         [
-                            Argument(IdentifierName("t")).WithRefOrOutKeyword(Token(SyntaxKind.InKeyword)),
+                            Argument(IdentifierName("t")),
                             Argument(IdentifierName("format")),
                             Argument(IdentifierName("callerName")),
                             Argument(GetArgument(item.Type)),

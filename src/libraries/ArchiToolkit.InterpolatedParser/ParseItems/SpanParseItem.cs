@@ -13,7 +13,7 @@ namespace ArchiToolkit.InterpolatedParser.ParseItems;
 /// <param name="preModify"></param>
 /// <typeparam name="T"></typeparam>
 public sealed class SpanParseItem<T>(in T value, int index, ISpanParser<T> parser, PreModifyOptions preModify)
-    : ParseItem<T>(in value, index, preModify), ISpanParseItem
+    : ParseItem<T>(value, index, preModify), ISpanParseItem
 {
     /// <inheritdoc />
     public void Parse(ReadOnlySpan<char> s, IFormatProvider? provider)

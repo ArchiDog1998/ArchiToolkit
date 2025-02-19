@@ -20,7 +20,7 @@ public sealed class CollectionSpanParseItem<TCollection, TValue>(
     ISpanParser<TValue> parser,
     string separator,
     PreModifyOptions preModify)
-    : ParseItem<TCollection>(in value, index, preModify), ISpanParseItem
+    : ParseItem<TCollection>(value, index, preModify), ISpanParseItem
     where TCollection : ICollection<TValue>, new()
 {
     /// <inheritdoc />
