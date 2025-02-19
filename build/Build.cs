@@ -66,9 +66,11 @@ partial class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            TestProject(Solution.tests.ArchiToolkit_Assertions_Tests);
-            TestProject(Solution.tests.ArchiToolkit_PureConst_Tests);
-            TestProject(Solution.tests.ArchiToolkit_InterpolatedParser_Tests);
+            foreach (var project in Solution.AllProjects.Where(p => p.Name.EndsWith(".Tests")))
+            {
+                TestProject(project);
+            }
+
             return;
 
             static void TestProject(Project project)
