@@ -43,7 +43,7 @@ public class BasicTests
         var value = 0;
         var text = "";
         $"value is {inputValue}, and the text is {inputText}."
-            .Parse( $"value is {value}, and the text is {text}.");
+            .Parse( $"value is {value}, and the text is {text}\\.");
         await Assert.That(value).IsEqualTo(inputValue);
         await Assert.That(text).IsEqualTo(inputText);
     }
