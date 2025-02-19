@@ -1,14 +1,19 @@
 ﻿namespace ArchiToolkit.Fluent;
 
-public static partial class FluentExtensions
+/// <summary>
+/// Make the one as fluent.
+/// </summary>
+public static class FluentExtensions
 {
-    public static Fluent<T> AsFluentImmediate<T>(this T value)
+    /// <summary>
+    /// Make this value as a fluent one.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="type"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static Fluent<T> AsFluent<T>(this T value, FluentType type = FluentType.Lazy)
     {
-        return new (value, FluentType.Immediate);
-    }
-
-    public static Fluent<T> AsFluentLazy<T>(this T value)
-    {
-        return new (value, FluentType.Lazy);
+        return new Fluent<T>(value, type);
     }
 }

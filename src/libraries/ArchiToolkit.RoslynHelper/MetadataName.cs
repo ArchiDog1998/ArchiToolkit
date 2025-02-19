@@ -7,6 +7,7 @@ namespace ArchiToolkit.RoslynHelper;
 /// <summary>
 /// The metadataName for the symbol
 /// </summary>
+[Obsolete]
 public readonly struct MetadataName
 {
     private readonly Lazy<string> _typeName, _safeName, _hashName;

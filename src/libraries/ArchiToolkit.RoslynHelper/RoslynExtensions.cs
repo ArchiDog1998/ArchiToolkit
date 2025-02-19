@@ -53,11 +53,21 @@ public static class RoslynExtensions
     }
 
     /// <summary>
+    /// Get the type name.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="hashCount"></param>
+    /// <returns></returns>
+    public static TypeName GetTypeName(this ITypeSymbol symbol, int hashCount = 32) =>
+        new(symbol, hashCount);
+
+    /// <summary>
     /// Get the metadata name of the symbol
     /// </summary>
     /// <param name="symbol"></param>
     /// <param name="hashCount"></param>
     /// <returns></returns>
+    [Obsolete]
     public static MetadataName GetMetadataName(this ISymbol symbol, int hashCount = 32) =>
         new(symbol, hashCount);
 
@@ -68,6 +78,7 @@ public static class RoslynExtensions
     /// <param name="hasTypeParameter"></param>
     /// <param name="hasGlobal"></param>
     /// <returns></returns>
+    [Obsolete]
     public static string GetFullMetadataName(this ISymbol? s, out bool hasTypeParameter, bool hasGlobal = false)
     {
         hasTypeParameter = false;
@@ -106,6 +117,7 @@ public static class RoslynExtensions
         }
     }
 
+    [Obsolete]
     private static string GetTypeSymbolName(this ISymbol symbol, out bool hasTypeParameter, bool hasGlobal)
     {
         hasTypeParameter = false;

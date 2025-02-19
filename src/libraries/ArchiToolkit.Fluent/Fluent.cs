@@ -1,34 +1,22 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace ArchiToolkit.Fluent;
+﻿namespace ArchiToolkit.Fluent;
 
 /// <summary>
 ///     The basic fluent item
 /// </summary>
 /// <typeparam name="TTarget"></typeparam>
-public unsafe class Fluent<TTarget> : IDisposable
+public class Fluent<TTarget> : IDisposable
 {
     private readonly Queue<Action> _actions = new();
-    private readonly void* _ptr;
     private readonly FluentType _type;
-    private bool _executed;
+    private bool _canContinue = true;
+    private TTarget _target;
+    internal bool Executed;
 
-    /// <summary>
-    /// Create one.
-    /// </summary>
-    /// <param name="target"></param>
-    /// <param name="type"></param>
-    public Fluent(in TTarget target, FluentType type)
+    internal Fluent(in TTarget target, FluentType type)
     {
-        ref var t = ref Unsafe.AsRef(in target);
-        _ptr = Unsafe.AsPointer(ref t);
+        _target = target;
         _type = type;
     }
-
-    /// <summary>
-    ///     The target to modify
-    /// </summary>
-    protected ref TTarget Target => ref Unsafe.AsRef<TTarget>(_ptr);
 
     /// <summary>
     ///     Get the result of it, actually it is not necessary, because it already modified the original one for you.
@@ -38,7 +26,7 @@ public unsafe class Fluent<TTarget> : IDisposable
         get
         {
             Execute();
-            return Target;
+            return _target;
         }
     }
 
@@ -49,33 +37,43 @@ public unsafe class Fluent<TTarget> : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>
-    /// Can continue
-    /// </summary>
-    public bool CanContinue { get; set; } = true;
-
-
-    internal void Execute()
+    private void Execute()
     {
-        if (_executed) return;
-        _executed = true;
-        while (CanContinue && _actions.Count > 0) _actions.Dequeue().Invoke();
+        if (Executed) return;
+        Executed = true;
+        while (_canContinue && _actions.Count > 0) _actions.Dequeue().Invoke();
     }
 
-    /// <summary>
-    ///     Add an action to it.
-    /// </summary>
-    /// <param name="action"></param>
-    protected internal void AddAction(Action action)
+    internal Fluent<TTarget> AddCondition(Func<bool> condition)
     {
-        if (_executed)
+        return AddAction(() => _canContinue = condition());
+    }
+
+    public Fluent<TTarget> AddProperty(PropertyDelegate<TTarget> property)
+    {
+        return AddAction(() => property(ref _target));
+    }
+
+    public DoResult<TTarget, TResult> InvokeMethod<TResult>(MethodDelegate<TTarget, TResult> method)
+    {
+        var actions = _actions.ToArray();
+        _actions.Clear();
+        var lazy = new Lazy<TResult>(() =>
         {
-            throw new NotSupportedException("You cannot add more actions after executing.");
-        }
+            foreach (var action in actions) action();
+            return method(ref _target);
+        });
+        return new DoResult<TTarget, TResult>(AddAction(() => { _ = lazy.Value; }), lazy);
+    }
+
+    private Fluent<TTarget> AddAction(Action action)
+    {
+        if (Executed) throw new NotSupportedException("You cannot add more actions after executing.");
+
         switch (_type)
         {
             case FluentType.Immediate:
-                if (CanContinue) action.Invoke();
+                if (_canContinue) action.Invoke();
                 break;
             case FluentType.Lazy:
                 _actions.Enqueue(action);
@@ -83,5 +81,7 @@ public unsafe class Fluent<TTarget> : IDisposable
             default:
                 throw new NotSupportedException($"Unsupported fluent type {_type}");
         }
+
+        return this;
     }
 }

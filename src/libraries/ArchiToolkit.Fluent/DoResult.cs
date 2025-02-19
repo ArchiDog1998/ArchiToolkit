@@ -1,59 +1,49 @@
 ﻿namespace ArchiToolkit.Fluent;
 
 /// <summary>
-///
 /// </summary>
 /// <param name="fluent"></param>
-/// <typeparam name="TFluent"></typeparam>
 /// <typeparam name="TResult"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public class DoResult<TFluent, TValue, TResult>(TFluent fluent, Func<TResult> getResult)
-    where TFluent : Fluent<TValue>
+public class DoResult<TValue, TResult>(Fluent<TValue> fluent, Lazy<TResult> lazy)
 {
-    private readonly Lazy<TResult> _result = new(getResult);
-
     /// <summary>
-    /// The return value
+    ///     The return value
     /// </summary>
     public TResult ReturnValue
     {
         get
         {
-            fluent.Execute();
-            return _result.Value;
+            fluent.Executed = true;
+            return lazy.Value;
         }
     }
 
-    /// <inheritdoc cref="Fluent{TTarget}.Result"/>
+    /// <inheritdoc cref="Fluent{TTarget}.Result" />
     public TValue Result => Continue.Result;
 
     /// <summary>
-    /// Continue to do sth.
+    ///     Continue to do sth.
     /// </summary>
-    public TFluent Continue
-    {
-        get
-        {
-            fluent.AddAction(() => getResult());
-            return fluent;
-        }
-    }
+    public Fluent<TValue> Continue => fluent;
 
     /// <summary>
-    /// Continue when can continue.
+    ///     Continue when can continue.
     /// </summary>
     /// <param name="canContinue"></param>
     /// <returns></returns>
-    public TFluent ContinueWhen(Predicate<TResult> canContinue)
+    public Fluent<TValue> ContinueWhen(Predicate<TResult> canContinue)
     {
-        fluent.AddAction(() => fluent.CanContinue = canContinue(_result.Value));
-        return fluent;
+        return fluent.AddCondition(() => canContinue(lazy.Value));
     }
 
     /// <summary>
-    /// Convert to the result.
+    ///     Convert to the result.
     /// </summary>
     /// <param name="doResult"></param>
     /// <returns></returns>
-    public static implicit operator TResult(DoResult<TFluent, TValue, TResult> doResult) => doResult.ReturnValue;
+    public static implicit operator TResult(DoResult<TValue, TResult> doResult)
+    {
+        return doResult.ReturnValue;
+    }
 }

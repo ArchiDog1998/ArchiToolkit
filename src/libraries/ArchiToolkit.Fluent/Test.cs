@@ -3,7 +3,7 @@
 public struct Test
 {
     /// <summary>
-    /// This looks good
+    ///     This looks good
     /// </summary>
     public int Data
     {
@@ -16,7 +16,7 @@ public struct Test
     }
 
     /// <summary>
-    /// Check the things.
+    ///     Check the things.
     /// </summary>
     /// <param name="abc">looks good</param>
     /// <returns>OK</returns>
@@ -27,52 +27,56 @@ public struct Test
     }
 }
 
-public static partial class FluentExtensions
-{
-    public static FluentTest AsFluentImmediate(this in Test value)
-    {
-        return new (value, FluentType.Immediate);
-    }
-
-    public static FluentTest AsFluentLazy(this in Test value)
-    {
-        return new(value, FluentType.Lazy);
-    }
-}
-
-public class FluentTest(in Test test, FluentType type) : Fluent<Test>(test, type)
+public static class FluentObjectsExtensions
 {
     /// <summary>
-    /// Set the value <see cref="Test.Data"/> in <see cref="Test"/>
-    /// <para><inheritdoc cref="Test.Data"/></para>
+    ///     Set the value <see cref="Test.Data" /> in <see cref="Test" />
+    ///     <para>
+    ///         <inheritdoc cref="Test.Data" />
+    ///     </para>
     /// </summary>
+    /// <param name="fluent">Self</param>
     /// <param name="value">The value to input</param>
     /// <returns>Self</returns>
-    public FluentTest WithData(int value)
+    public static Fluent<Test> WithData(this Fluent<Test> fluent, int value)
     {
-        AddAction(() => Target.Data = value);
-        return this;
+        return fluent.AddProperty(Modify);
+
+        void Modify(ref Test data)
+        {
+            data.Data = value;
+        }
     }
 
     /// <summary>
-    /// <inheritdoc cref="WithData(System.Int32)"/>
+    ///     <inheritdoc cref="WithData(ArchiToolkit.Fluent.Fluent{ArchiToolkit.Fluent.Test},int)" />
     /// </summary>
+    /// <param name="fluent">Self</param>
     /// <param name="modifyValue">The method to modify it</param>
     /// <returns>Self</returns>
-    public FluentTest WithData(ModifyDelegate<int> modifyValue)
+    public static Fluent<Test> WithData(this Fluent<Test> fluent, ModifyDelegate<int> modifyValue)
     {
-        AddAction(() => Target.Data = modifyValue(Target.Data));
-        return this;
+        return fluent.AddProperty(Modify);
+
+        void Modify(ref Test data)
+        {
+            data.Data = modifyValue(data.Data);
+        }
     }
 
     /// <summary>
     /// Invoke the method <see cref="Test.Check"/> in <see cref="Test"/>
     /// <para><inheritdoc cref="Test.Check"/></para>
     /// </summary>
+    /// <param name="fluent">Self</param>
     /// <param name="abc"><inheritdoc cref="Test.Check"/></param>
-    /// <returns><inheritdoc cref="Test.Check"/></returns>
-    public DoResult<FluentTest, Test, int> DoCheck(int abc)
+    /// <returns>Self</returns>
+    public static DoResult<Test, int> DoCheck(this Fluent<Test> fluent, int abc)
     {
-        return new(this, () => Target.Check(abc));
+        return fluent.InvokeMethod(Invoke);
+        int Invoke(ref Test data)
+        {
+            return data.Check(abc);
+        }
     }
 }
