@@ -17,13 +17,13 @@ public partial class FormatGenerator : IIncrementalGenerator
         return invocation.ArgumentList.Arguments.Count > 0;
     }
 
-    private IEnumerable<TypeInfo> TransForm(GeneratorSyntaxContext context, CancellationToken token)
+    private static IEnumerable<TypeInfo> TransForm(GeneratorSyntaxContext context, CancellationToken token)
     {
         var model = context.SemanticModel;
         if (context.Node is not InvocationExpressionSyntax invocation) yield break;
         if (model.GetSymbolInfo(invocation).Symbol is not IMethodSymbol symbol) yield break;
-        if (symbol.ContainingType.GetFullMetadataName(out _) is not
-            "ArchiToolkit.InterpolatedParser.InterpolatedParserExtensions") yield break;
+        if (symbol.ContainingType.GetTypeName().FullName is not
+            "global::ArchiToolkit.InterpolatedParser.InterpolatedParserExtensions") yield break;
 
         foreach (var arg in invocation.ArgumentList.Arguments)
         {

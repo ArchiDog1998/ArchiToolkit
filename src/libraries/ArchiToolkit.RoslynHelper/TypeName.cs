@@ -7,11 +7,11 @@ namespace ArchiToolkit.RoslynHelper;
 
 public readonly struct TypeName
 {
-    private readonly Lazy<string> _lazyFullName, _lazySaveName, _lazyHashName;
+    private readonly Lazy<string> _lazyFullName, _lazySafeName, _lazyHashName;
     private readonly Lazy<ITypeParameterSymbol[]> _lazyTypeParameters;
     public string FullName => _lazyFullName.Value;
 
-    public string SafeName => _lazySaveName.Value;
+    public string SafeName => _lazySafeName.Value;
 
     public string HashName => _lazyHashName.Value;
 
@@ -23,7 +23,12 @@ public readonly struct TypeName
     {
         var lazy = _lazyFullName =
             new Lazy<string>(() => typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
-        _lazySaveName = new Lazy<string>(() => Regex.Replace(lazy.Value, @"[.\[\]<>,\s]", "_"));
+        _lazySafeName = new Lazy<string>(() =>
+        {
+            var name = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat
+                .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
+            return Regex.Replace(name, @"[.\[\]<>,\s:]", "_");
+        });
         _lazyHashName = new Lazy<string>(() => GetHashName(lazy.Value, count));
         _lazyTypeParameters = new Lazy<ITypeParameterSymbol[]>(() => GetTypeParameterSymbols(typeSymbol).ToArray());
     }

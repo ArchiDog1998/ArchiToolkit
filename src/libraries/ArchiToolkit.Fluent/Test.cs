@@ -2,6 +2,7 @@
 
 public struct Test
 {
+    public string Name;
     /// <summary>
     ///     This looks good
     /// </summary>
@@ -27,43 +28,8 @@ public struct Test
     }
 }
 
-public static class FluentObjectsExtensions
+public static partial class FluentObjectsExtensions
 {
-    /// <summary>
-    ///     Set the value <see cref="Test.Data" /> in <see cref="Test" />
-    ///     <para>
-    ///         <inheritdoc cref="Test.Data" />
-    ///     </para>
-    /// </summary>
-    /// <param name="fluent">Self</param>
-    /// <param name="value">The value to input</param>
-    /// <returns>Self</returns>
-    public static Fluent<Test> WithData(this Fluent<Test> fluent, int value)
-    {
-        return fluent.AddProperty(Modify);
-
-        void Modify(ref Test data)
-        {
-            data.Data = value;
-        }
-    }
-
-    /// <summary>
-    ///     <inheritdoc cref="WithData(ArchiToolkit.Fluent.Fluent{ArchiToolkit.Fluent.Test},int)" />
-    /// </summary>
-    /// <param name="fluent">Self</param>
-    /// <param name="modifyValue">The method to modify it</param>
-    /// <returns>Self</returns>
-    public static Fluent<Test> WithData(this Fluent<Test> fluent, ModifyDelegate<int> modifyValue)
-    {
-        return fluent.AddProperty(Modify);
-
-        void Modify(ref Test data)
-        {
-            data.Data = modifyValue(data.Data);
-        }
-    }
-
     /// <summary>
     /// Invoke the method <see cref="Test.Check"/> in <see cref="Test"/>
     /// <para><inheritdoc cref="Test.Check"/></para>

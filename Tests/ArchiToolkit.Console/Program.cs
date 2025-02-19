@@ -42,6 +42,8 @@ using Microsoft.Extensions.Logging;
 
 var obj = new Test();
 
+Console.WriteLine(MyRegex().Replace("global::Hello.MyFir,En", "_"));
+
 var t = obj.AsFluent(FluentType.Immediate)
     .WithData(1)
     .DoCheck(123)
@@ -53,3 +55,8 @@ var r1 = t.Result;
 Console.WriteLine(r1.Data);
 Console.WriteLine(typeof(Type).GetFulTypeName());
 
+partial class Program
+{
+    [GeneratedRegex(@"[.\[\]<>,\s:]")]
+    private static partial Regex MyRegex();
+}
