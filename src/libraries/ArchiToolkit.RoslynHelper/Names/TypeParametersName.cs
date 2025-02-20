@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using ArchiToolkit.RoslynHelper.Extensions;
+using Microsoft.CodeAnalysis;
 
 namespace ArchiToolkit.RoslynHelper.Names;
 
@@ -9,14 +10,17 @@ namespace ArchiToolkit.RoslynHelper.Names;
 public abstract class TypeParametersName<T> : BaseName<T>, ITypeParametersName
     where T : ISymbol
 {
-    private readonly Lazy<ITypeParameterSymbol[]> _lazyTypeParameters;
+    private readonly Lazy<TypeParamName[]> _lazyTypeParameters;
 
     /// <inheritdoc />
-    public ITypeParameterSymbol[] TypeParameters => _lazyTypeParameters.Value;
+    public bool HasTypeParameters => TypeParameters.Length > 0;
+
+    /// <inheritdoc />
+    public TypeParamName[] TypeParameters => _lazyTypeParameters.Value;
 
     private protected TypeParametersName(T symbol) : base(symbol)
     {
-        _lazyTypeParameters = new Lazy<ITypeParameterSymbol[]>(() => GetTypeParameters(symbol).ToArray());
+        _lazyTypeParameters = new Lazy<TypeParamName[]>(() => GetTypeParameters(symbol).GetNames().ToArray());
     }
 
     private protected abstract IEnumerable<ITypeParameterSymbol> GetTypeParameters(T symbol);

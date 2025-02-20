@@ -54,14 +54,14 @@ public partial class FormatGenerator : IIncrementalGenerator
         static ITypeSymbol? GetCollectionElementType(ITypeSymbol typeSymbol)
         {
             var iCollectionInterface = typeSymbol.AllInterfaces
-                .FirstOrDefault(i => i.OriginalDefinition.ToString() == "System.Collections.Generic.ICollection<T>");
+                .FirstOrDefault(i => i.OriginalDefinition.GetName().FullName == "global::System.Collections.Generic.ICollection<T>");
             return iCollectionInterface?.TypeArguments.FirstOrDefault();
         }
     }
 
     private static bool HasInterface(ITypeSymbol typeSymbol, string interfaceName)
     {
-        return typeSymbol.AllInterfaces.Any(i => i.OriginalDefinition.ToString() == interfaceName);
+        return typeSymbol.AllInterfaces.Any(i => i.OriginalDefinition.GetName().FullName == interfaceName);
     }
 
     private static void Generate(SourceProductionContext context, ParseItem[] items)
@@ -84,12 +84,12 @@ public partial class FormatGenerator : IIncrementalGenerator
 
         foreach (var item in items)
         {
-            var metadataName = item.Type.GetMetadataName();
-            if (metadataName.HasTypeParameter) continue;
-            var methodName = "Add_" + metadataName.HashName;
+            var metadataName = item.Type.GetName();
+            if (metadataName.TypeParameters.Length > 0) continue;
+            var methodName = "Add_" + metadataName.SafeName;
             var root = NamespaceDeclaration("ArchiToolkit.InterpolatedParser",
-                    $"For adding the formatted type of {metadataName.TypeName}")
-                .AddMembers(BasicStruct(metadataName.TypeName, methodName, item, validTypes));
+                    $"For adding the formatted type of {metadataName.FullName}")
+                .AddMembers(BasicStruct(metadataName.FullName, methodName, item, validTypes));
             context.AddSource($"Format.{metadataName.SafeName}.g.cs", root.NodeToString());
         }
     }
@@ -97,8 +97,8 @@ public partial class FormatGenerator : IIncrementalGenerator
     private static bool Generate(SourceProductionContext context, ITypeSymbol type,
         out ObjectCreationExpressionSyntax creation)
     {
-        var name = type.GetMetadataName();
-        if (name.HasTypeParameter)
+        var name = type.GetName();
+        if (name.HasTypeParameters)
         {
             creation = null!;
             return false;
@@ -108,7 +108,7 @@ public partial class FormatGenerator : IIncrementalGenerator
         if (classDeclaration == null) return false;
 
         var root = NamespaceDeclaration("ArchiToolkit.InterpolatedParser",
-                $"For adding the formatted type of {name.TypeName}")
+                $"For adding the formatted type of {name.FullName}")
             .AddMembers(StructDeclaration("InterpolatedParseStringHandler")
                 .WithModifiers(
                     TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.PartialKeyword)))

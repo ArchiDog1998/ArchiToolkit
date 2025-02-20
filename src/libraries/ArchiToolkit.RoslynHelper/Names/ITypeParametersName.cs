@@ -8,7 +8,12 @@ namespace ArchiToolkit.RoslynHelper.Names;
 public interface ITypeParametersName
 {
     /// <summary>
+    /// Has the type parameters.
+    /// </summary>
+    bool HasTypeParameters { get; }
+
+    /// <summary>
     ///     Get the type parameters symbol
     /// </summary>
-    ITypeParameterSymbol[] TypeParameters { get; }
+    TypeParamName[] TypeParameters { get; }
 }

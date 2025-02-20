@@ -12,17 +12,15 @@ public static class SymbolExtensions
     ///     Get the type name.
     /// </summary>
     /// <param name="symbol"></param>
-    /// <param name="hashCount"></param>
     /// <returns></returns>
-    public static TypeName GetName(this ITypeSymbol symbol, int hashCount = 32) => new(symbol, hashCount);
+    public static TypeName GetName(this ITypeSymbol symbol) => new(symbol);
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="symbol"></param>
-    /// <param name="prefix"></param>
     /// <returns></returns>
-    public static TypeParamName GetName(this ITypeParameterSymbol symbol, string prefix = "") => new(symbol, prefix);
+    public static TypeParamName GetName(this ITypeParameterSymbol symbol) => new(symbol);
 
     /// <summary>
     ///
@@ -42,19 +40,16 @@ public static class SymbolExtensions
     ///
     /// </summary>
     /// <param name="symbols"></param>
-    /// <param name="prefix"></param>
     /// <returns></returns>
-    public static IEnumerable<TypeParamName> GetNames(this IEnumerable<ITypeParameterSymbol> symbols,
-        string prefix = "")
+    public static IEnumerable<TypeParamName> GetNames(this IEnumerable<ITypeParameterSymbol> symbols)
     {
-        return symbols.Select(symbol => symbol.GetName(prefix));
+        return symbols.Select(symbol => symbol.GetName());
     }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="symbols"></param>
-    /// <param name="???"></param>
     /// <returns></returns>
     public static IEnumerable<ParameterName> GetNames(this IEnumerable<IParameterSymbol> symbols)
     {

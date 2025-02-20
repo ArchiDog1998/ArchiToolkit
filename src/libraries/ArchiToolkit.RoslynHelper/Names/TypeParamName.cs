@@ -7,20 +7,23 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace ArchiToolkit.RoslynHelper.Names;
 
 /// <summary>
-///
 /// </summary>
-public class TypeParamName: BaseName<ITypeSymbol>
+public class TypeParamName : BaseName<ITypeParameterSymbol>
 {
-    private readonly ITypeParameterSymbol _typeParameter;
-    private readonly string _prefix;
+    internal TypeParamName(ITypeParameterSymbol symbol) : base(symbol)
+    {
+    }
 
     /// <summary>
-    ///
+    ///     Prefix
     /// </summary>
-    public TypeParameterSyntax Syntax => TypeParameter(Identifier(_prefix + _typeParameter.Name));
+    public string Prefix { get; set; } = string.Empty;
 
     /// <summary>
-    ///
+    /// </summary>
+    public TypeParameterSyntax Syntax => TypeParameter(Identifier(Prefix + Symbol.Name));
+
+    /// <summary>
     /// </summary>
     public TypeParameterConstraintClauseSyntax? ConstraintClause
     {
@@ -28,37 +31,30 @@ public class TypeParamName: BaseName<ITypeSymbol>
         {
             var constraints = new List<TypeParameterConstraintSyntax>();
 
-            if (_typeParameter.HasReferenceTypeConstraint)
+            if (Symbol.HasReferenceTypeConstraint)
                 constraints.Add(ClassOrStructConstraint(SyntaxKind.ClassConstraint));
 
-            if (_typeParameter.HasValueTypeConstraint)
+            if (Symbol.HasValueTypeConstraint)
                 constraints.Add(ClassOrStructConstraint(SyntaxKind.StructConstraint));
 
-            if (_typeParameter.HasUnmanagedTypeConstraint)
+            if (Symbol.HasUnmanagedTypeConstraint)
                 constraints.Add(TypeConstraint(IdentifierName("unmanaged")));
 
-            if (_typeParameter.HasNotNullConstraint)
+            if (Symbol.HasNotNullConstraint)
                 constraints.Add(TypeConstraint(IdentifierName("notnull")));
 
-            foreach (var constraintType in _typeParameter.ConstraintTypes)
+            foreach (var constraintType in Symbol.ConstraintTypes)
                 constraints.Add(TypeConstraint(ParseTypeName(constraintType.GetName().FullName)));
 
-            if (_typeParameter.HasConstructorConstraint)
+            if (Symbol.HasConstructorConstraint)
                 constraints.Add(ConstructorConstraint());
 
             if (constraints.Count is 0) return null;
 
             return TypeParameterConstraintClause(
-                IdentifierName(_prefix + _typeParameter.Name),
+                IdentifierName(Prefix + Symbol.Name),
                 SeparatedList(constraints)
             );
         }
-    }
-
-
-    internal TypeParamName(ITypeParameterSymbol symbol, string prefix) : base(symbol)
-    {
-        _typeParameter = symbol;
-        _prefix = prefix;
     }
 }

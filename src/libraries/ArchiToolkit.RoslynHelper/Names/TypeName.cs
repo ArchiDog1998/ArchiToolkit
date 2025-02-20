@@ -10,7 +10,7 @@ namespace ArchiToolkit.RoslynHelper.Names;
 /// </summary>
 public class TypeName : TypeParametersName<ITypeSymbol>
 {
-    private readonly Lazy<string> _lazySafeName, _lazyHashName, _lazySummaryName;
+    private readonly Lazy<string> _lazySafeName, _lazySummaryName;
 
     /// <summary>
     ///     The safe name.
@@ -18,31 +18,24 @@ public class TypeName : TypeParametersName<ITypeSymbol>
     public string SafeName => _lazySafeName.Value;
 
     /// <summary>
-    ///     The hash name.
-    /// </summary>
-    public string HashName => _lazyHashName.Value;
-
-
-    /// <summary>
     ///     The summary name
     /// </summary>
     public string SummaryName => _lazySummaryName.Value;
 
-    internal TypeName(ITypeSymbol typeSymbol, int count) : base(typeSymbol)
+    internal TypeName(ITypeSymbol typeSymbol) : base(typeSymbol)
     {
         _lazySafeName = new Lazy<string>(() =>
         {
             var name = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat
                 .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
-            return Regex.Replace(name, @"[.\[\]<>,\s:]", "_");
+            return Regex.Replace(name, @"[.\[\]<>,\s:]", "_") + "_" + GetHashName(FullName, 8);
         });
-        _lazyHashName = new Lazy<string>(() => GetHashName(FullName, count));
         _lazySummaryName = new Lazy<string>(() => ToSummary(FullName));
     }
 
     private static string GetHashName(string input, int count)
     {
-        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_1234567890";
+        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         using var sha256 = SHA256.Create();
         var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
         return string.Concat(hashBytes.Take(count).Select(b => chars[b % chars.Length]));
