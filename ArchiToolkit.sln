@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Fluent", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Fluent.SourceGenerator", "src\analyzers\ArchiToolkit.Fluent.SourceGenerator\ArchiToolkit.Fluent.SourceGenerator.csproj", "{3490DEB1-6611-4F1B-A044-F4F92E77EFA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Fluent.Tests", "tests\ArchiToolkit.Fluent.Tests\ArchiToolkit.Fluent.Tests.csproj", "{053FB41D-9490-4C6F-9B3E-B0F1A5154A4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{3490DEB1-6611-4F1B-A044-F4F92E77EFA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3490DEB1-6611-4F1B-A044-F4F92E77EFA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3490DEB1-6611-4F1B-A044-F4F92E77EFA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{053FB41D-9490-4C6F-9B3E-B0F1A5154A4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{053FB41D-9490-4C6F-9B3E-B0F1A5154A4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{053FB41D-9490-4C6F-9B3E-B0F1A5154A4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{053FB41D-9490-4C6F-9B3E-B0F1A5154A4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,5 +157,6 @@ Global
 		{C40CB50D-D8A5-4267-A0DB-E24911B80E5F} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 		{3D4A7F69-466B-40FA-AC81-D4488CC007AD} = {C40CB50D-D8A5-4267-A0DB-E24911B80E5F}
 		{3490DEB1-6611-4F1B-A044-F4F92E77EFA1} = {C40CB50D-D8A5-4267-A0DB-E24911B80E5F}
+		{053FB41D-9490-4C6F-9B3E-B0F1A5154A4E} = {C40CB50D-D8A5-4267-A0DB-E24911B80E5F}
 	EndGlobalSection
 EndGlobal

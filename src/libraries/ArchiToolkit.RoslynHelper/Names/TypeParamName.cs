@@ -34,11 +34,10 @@ public class TypeParamName : BaseName<ITypeParameterSymbol>
             if (Symbol.HasReferenceTypeConstraint)
                 constraints.Add(ClassOrStructConstraint(SyntaxKind.ClassConstraint));
 
-            if (Symbol.HasValueTypeConstraint)
-                constraints.Add(ClassOrStructConstraint(SyntaxKind.StructConstraint));
-
             if (Symbol.HasUnmanagedTypeConstraint)
                 constraints.Add(TypeConstraint(IdentifierName("unmanaged")));
+            else if (Symbol.HasValueTypeConstraint)
+                constraints.Add(ClassOrStructConstraint(SyntaxKind.StructConstraint));
 
             if (Symbol.HasNotNullConstraint)
                 constraints.Add(TypeConstraint(IdentifierName("notnull")));

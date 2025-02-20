@@ -5,10 +5,17 @@ namespace ArchiToolkit.Fluent.SourceGenerator;
 
 internal static class Extensions
 {
+
     public static MethodDeclarationSyntax AddTypeParameters(this MethodDeclarationSyntax method,
         TypeName type)
     {
         return method.AddTypeParameters(type.TypeParameters);
+    }
+
+    public static MethodDeclarationSyntax AddTypeParameters(this MethodDeclarationSyntax method,
+        MethodName type)
+    {
+        return method.AddTypeParameters([..type.ContainingType.TypeParameters.Concat(type.TypeParameters).ToImmutableHashSet()]);
     }
 
     public static MethodDeclarationSyntax AddTypeParameters(this MethodDeclarationSyntax method,

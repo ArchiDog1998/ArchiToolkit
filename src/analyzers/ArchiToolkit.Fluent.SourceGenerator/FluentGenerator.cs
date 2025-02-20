@@ -207,6 +207,7 @@ public class FluentGenerator : IIncrementalGenerator
                 Identifier("Do" + method.Name))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
             .AddAttributes()
+            .AddTypeParameters(method)
             .WithParameterList(
                 ParameterList(
                 [
@@ -238,7 +239,7 @@ public class FluentGenerator : IIncrementalGenerator
                   /// </summary>
                   /// <param name="fluent">Self</param>
                   /// {{string.Join("\n/// ", inParameters.Select(p => $"<param name=\"{p.Name}\"><inheritdoc cref=\"{summary}\"/></param>"))}}
-                  /// <returns>Self</returns>
+                  /// <returns>Self and Result</returns>
                   """);
 
     }
@@ -318,7 +319,7 @@ public class FluentGenerator : IIncrementalGenerator
                               ///     </para>
                               /// </summary>
                               /// <param name="fluent">Self</param>
-                              /// <param name="modifyValue">The method to modify it</param>
+                              /// {{parameterSummary}}
                               /// <returns>Self</returns>
                               """);
     }

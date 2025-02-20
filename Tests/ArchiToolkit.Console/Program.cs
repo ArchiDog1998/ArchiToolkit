@@ -46,13 +46,6 @@ var a =
         .WithData(12)
         .Result;
 
-var t = new Test().AsFluent(FluentType.Immediate)
-    .WithData(1)
-    .DoCheck(123)
-    .ContinueWhen(t => t == 1)
-    .WithData(2);
-
 Console.WriteLine("Wait for the result");
-var r1 = t.Result;
-Console.WriteLine(r1.Data);
+var r1 = a;
 Console.WriteLine(typeof(Type).GetFulTypeName());
