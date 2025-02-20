@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using ArchiToolkit.Fluent;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -24,5 +25,18 @@ public static class Helper
         var typeSymbol = model.GetSymbolInfo(variableType).Symbol as ITypeSymbol;
 
         return typeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? "Unknown";
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="TestClass{T}"/>
+    /// <inheritdoc cref="global::ArchiToolkit.Console.TestClass{TTTT}" />
+    /// </summary>
+    /// <typeparam name="TT"></typeparam>
+    public static void Test<TT>() where TT : struct
+    {
+        var a =
+            new TestClass<TT>().AsFluent()
+                .WithData(default(TT))
+                .Result;
     }
 }

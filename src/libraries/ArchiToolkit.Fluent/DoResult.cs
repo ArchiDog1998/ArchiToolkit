@@ -1,23 +1,22 @@
 ﻿namespace ArchiToolkit.Fluent;
 
 /// <summary>
+/// The Do things result.
 /// </summary>
 /// <param name="fluent"></param>
 /// <typeparam name="TResult"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public class DoResult<TValue, TResult>(Fluent<TValue> fluent, Lazy<TResult> lazy)
+public sealed class DoResult<TValue, TResult>(Fluent<TValue> fluent, Lazy<(bool, TResult)> lazy)
 {
+    /// <summary>
+    /// Did it run the method.
+    /// </summary>
+    public bool DidIt  => lazy.Value.Item1;
+
     /// <summary>
     ///     The return value
     /// </summary>
-    public TResult ReturnValue
-    {
-        get
-        {
-            fluent.Executed = true;
-            return lazy.Value;
-        }
-    }
+    public TResult ReturnValue => lazy.Value.Item2;
 
     /// <inheritdoc cref="Fluent{TTarget}.Result" />
     public TValue Result => Continue.Result;
@@ -34,7 +33,7 @@ public class DoResult<TValue, TResult>(Fluent<TValue> fluent, Lazy<TResult> lazy
     /// <returns></returns>
     public Fluent<TValue> ContinueWhen(Predicate<TResult> canContinue)
     {
-        return fluent.AddCondition(() => canContinue(lazy.Value));
+        return fluent.AddCondition(() => canContinue(lazy.Value.Item2));
     }
 
     /// <summary>

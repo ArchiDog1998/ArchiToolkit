@@ -23,13 +23,13 @@ public class FluentGenerator : IIncrementalGenerator
             [
                 GeneratedCodeAttribute(typeof(FluentGenerator)).AddAttributes(NonUserCodeAttribute())
             ]));
-        context.AddSource($"Major.g.cs", root.NodeToString());
+        context.AddSource("_Major.g.cs", root.NodeToString());
     }
 
     private static bool Predicate(SyntaxNode node, CancellationToken token)
     {
         if (node is not InvocationExpressionSyntax invocation) return false;
-        return invocation.ArgumentList.Arguments.Count > 0;
+        return invocation.ArgumentList.Arguments.Count >= 0;
     }
 
     private static (IAssemblySymbol?, IEnumerable<TypeInfo>) TransForm(GeneratorSyntaxContext context,
@@ -53,7 +53,6 @@ public class FluentGenerator : IIncrementalGenerator
         {
             yield return model.GetTypeInfo(memberAccess.Expression);
         }
-
         foreach (var arg in invocation.ArgumentList.Arguments)
         {
             yield return model.GetTypeInfo(arg.Expression);
@@ -88,13 +87,13 @@ public class FluentGenerator : IIncrementalGenerator
         var root = NamespaceDeclaration("ArchiToolkit.Fluent",
             $"For adding the fluent extensions of {name.FullName}").AddMembers(
             GetClass().AddMembers([
-                ..type.GetMembers().SelectMany(member => GetMemberDeclarations(name.FullName, member, assembly))
+                ..type.GetMembers().SelectMany(member => GetMemberDeclarations(name, member, assembly))
             ]));
 
-        context.AddSource($"Fluent.{name.SafeName}.g.cs", root.NodeToString());
+        context.AddSource($"{name.SafeName}.g.cs", root.NodeToString());
     }
 
-    private static IEnumerable<MemberDeclarationSyntax> GetMemberDeclarations(string typeName, ISymbol member,
+    private static IEnumerable<MemberDeclarationSyntax> GetMemberDeclarations(TypeName typeName, ISymbol member,
         IAssemblySymbol? assembly)
     {
         if (member.IsStatic) yield break;
@@ -131,19 +130,20 @@ public class FluentGenerator : IIncrementalGenerator
     private const string Fluent = "global::ArchiToolkit.Fluent.Fluent",
         ModifyDelegate = "global::ArchiToolkit.Fluent.ModifyDelegate";
 
-    private static MethodDeclarationSyntax SetPropertyDirect(string typeName, string propertyType, string propertyName)
+    private static MethodDeclarationSyntax SetPropertyDirect(TypeName typeName, string propertyType, string propertyName)
     {
         return MethodDeclaration(GenericName(Identifier(Fluent))
-                    .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName)])),
+                    .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName.FullName)])),
                 Identifier("With" + propertyName))
             .WithModifiers(
                 TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
+            .AddTypeParameters(typeName)
             .WithParameterList(ParameterList(
             [
                 Parameter(Identifier("fluent")).WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
                     .WithType(GenericName(Identifier(Fluent))
                         .WithTypeArgumentList(
-                            TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName(typeName))))),
+                            TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName(typeName.FullName))))),
                 Parameter(Identifier("value")).WithType(IdentifierName(propertyType))
             ]))
             .WithBody(Block(ReturnStatement(InvocationExpression(
@@ -154,7 +154,7 @@ public class FluentGenerator : IIncrementalGenerator
                     .WithParameterList(ParameterList(
                     [
                         Parameter(Identifier("data")).WithModifiers(TokenList(Token(SyntaxKind.RefKeyword)))
-                            .WithType(IdentifierName(typeName))
+                            .WithType(IdentifierName(typeName.FullName))
                     ]))
                     .WithBody(Block(ExpressionStatement(
                         AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
@@ -168,9 +168,9 @@ public class FluentGenerator : IIncrementalGenerator
             .WithXmlComment(
                 $$"""
                   /// <summary>
-                  ///     Set the value <see cref="{{typeName}}.{{propertyName}}" /> in <see cref="{{typeName}}" />
+                  ///     Set the value <see cref="{{typeName.SummaryName}}.{{propertyName}}" /> in <see cref="{{typeName.SummaryName}}" />
                   ///     <para>
-                  ///         <inheritdoc cref="{{typeName}}.{{propertyName}}" />
+                  ///         <inheritdoc cref="{{typeName.SummaryName}}.{{propertyName}}" />
                   ///     </para>
                   /// </summary>
                   /// <param name="fluent">Self</param>
@@ -179,16 +179,18 @@ public class FluentGenerator : IIncrementalGenerator
                   """);
     }
 
-    private static MethodDeclarationSyntax SetPropertyInvoke(string typeName, string propertyType, string propertyName)
+
+    private static MethodDeclarationSyntax SetPropertyInvoke(TypeName typeName, string propertyType, string propertyName)
     {
         return MethodDeclaration(GenericName(Identifier(Fluent))
-                .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName)])), Identifier("With" + propertyName))
+                .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName.FullName)])), Identifier("With" + propertyName))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
+            .AddTypeParameters(typeName)
             .WithParameterList(ParameterList(
             [
                 Parameter(Identifier("fluent")).WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
                     .WithType(GenericName(Identifier(Fluent))
-                        .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName)]))),
+                        .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName.FullName)]))),
                 Parameter(Identifier("modifyValue"))
                     .WithType(GenericName(Identifier(ModifyDelegate)).WithTypeArgumentList(
                         TypeArgumentList([IdentifierName(propertyType)])))
@@ -202,7 +204,7 @@ public class FluentGenerator : IIncrementalGenerator
                     [
                         Parameter(Identifier("data"))
                             .WithModifiers(TokenList(Token(SyntaxKind.RefKeyword)))
-                            .WithType(IdentifierName(typeName))
+                            .WithType(IdentifierName(typeName.FullName))
                     ]))
                     .WithBody(Block(ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("data"),
@@ -218,7 +220,10 @@ public class FluentGenerator : IIncrementalGenerator
             ])
             .WithXmlComment($$"""
                             /// <summary>
-                            ///     <inheritdoc cref="With{{propertyName}}(ArchiToolkit.Fluent.Fluent{{{typeName}}},{{propertyType}})" />
+                            ///     Set the value <see cref="{{typeName.SummaryName}}.{{propertyName}}" /> in <see cref="{{typeName.SummaryName}}" />
+                            ///     <para>
+                            ///         <inheritdoc cref="{{typeName.SummaryName}}.{{propertyName}}" />
+                            ///     </para>
                             /// </summary>
                             /// <param name="fluent">Self</param>
                             /// <param name="modifyValue">The method to modify it</param>

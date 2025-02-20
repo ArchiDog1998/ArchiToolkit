@@ -7,6 +7,9 @@ public static class FluentExtensions
 {
     /// <summary>
     /// Make this value as a fluent one.
+    /// <remarks>
+    /// <para><c>⚠ WARNING:</c> The <paramref name="type"/> is <see cref="FluentType.Lazy"/> be default, don't forget to call the <see cref="IDisposable.Dispose"/> or <see cref="Fluent{TTarget}.Result"/>.</para>
+    /// </remarks>
     /// </summary>
     /// <param name="value"></param>
     /// <param name="type"></param>

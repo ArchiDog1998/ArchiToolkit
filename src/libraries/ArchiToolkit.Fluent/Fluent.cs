@@ -10,7 +10,6 @@ public class Fluent<TTarget> : IDisposable
     private readonly FluentType _type;
     private bool _canContinue = true;
     private TTarget _target;
-    internal bool Executed;
 
     internal Fluent(in TTarget target, FluentType type)
     {
@@ -21,14 +20,7 @@ public class Fluent<TTarget> : IDisposable
     /// <summary>
     ///     Get the result of it, actually it is not necessary, because it already modified the original one for you.
     /// </summary>
-    public TTarget Result
-    {
-        get
-        {
-            Execute();
-            return _target;
-        }
-    }
+    public TTarget Result => Execute();
 
     /// <inheritdoc />
     public void Dispose()
@@ -37,11 +29,11 @@ public class Fluent<TTarget> : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private void Execute()
+    private TTarget Execute()
     {
-        if (Executed) return;
-        Executed = true;
+        _canContinue = true;
         while (_canContinue && _actions.Count > 0) _actions.Dequeue().Invoke();
+        return _target;
     }
 
     internal Fluent<TTarget> AddCondition(Func<bool> condition)
@@ -49,27 +41,42 @@ public class Fluent<TTarget> : IDisposable
         return AddAction(() => _canContinue = condition());
     }
 
+    /// <summary>
+    ///     Add the property to this fluent
+    /// </summary>
+    /// <param name="property"></param>
+    /// <returns></returns>
     public Fluent<TTarget> AddProperty(PropertyDelegate<TTarget> property)
     {
         return AddAction(() => property(ref _target));
     }
 
+    /// <summary>
+    ///     Invoke the method you want.
+    /// </summary>
+    /// <param name="method"></param>
+    /// <typeparam name="TResult"></typeparam>
+    /// <returns></returns>
     public DoResult<TTarget, TResult> InvokeMethod<TResult>(MethodDelegate<TTarget, TResult> method)
     {
         var actions = _actions.ToArray();
         _actions.Clear();
-        var lazy = new Lazy<TResult>(() =>
+        var lazy = new Lazy<(bool, TResult)>(() =>
         {
-            foreach (var action in actions) action();
-            return method(ref _target);
+            _canContinue = true;
+            foreach (var action in actions)
+            {
+                if (_canContinue) action();
+                else return (false, default!);
+            }
+
+            return (true, method(ref _target));
         });
         return new DoResult<TTarget, TResult>(AddAction(() => { _ = lazy.Value; }), lazy);
     }
 
     private Fluent<TTarget> AddAction(Action action)
     {
-        if (Executed) throw new NotSupportedException("You cannot add more actions after executing.");
-
         switch (_type)
         {
             case FluentType.Immediate:

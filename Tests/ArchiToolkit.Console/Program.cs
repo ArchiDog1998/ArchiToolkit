@@ -1,6 +1,7 @@
 ﻿// ReSharper disable LocalizableElement
 
-using System.Text.RegularExpressions;using ArchiToolkit.Assertions;
+using System.Text.RegularExpressions;
+using ArchiToolkit.Assertions;
 using ArchiToolkit.Assertions.Assertions;
 using ArchiToolkit.Assertions.Assertions.Extensions;
 using ArchiToolkit.Assertions.Logging;
@@ -40,11 +41,12 @@ using Microsoft.Extensions.Logging;
 //var a = 0;
 //"abc10".Parse($"abc{a}");
 
-var obj = new Test();
+var a =
+    new TestClass<int>().AsFluent()
+        .WithData(12)
+        .Result;
 
-Console.WriteLine(MyRegex().Replace("global::Hello.MyFir,En", "_"));
-
-var t = obj.AsFluent(FluentType.Immediate)
+var t = new Test().AsFluent(FluentType.Immediate)
     .WithData(1)
     .DoCheck(123)
     .ContinueWhen(t => t == 1)
@@ -54,9 +56,3 @@ Console.WriteLine("Wait for the result");
 var r1 = t.Result;
 Console.WriteLine(r1.Data);
 Console.WriteLine(typeof(Type).GetFulTypeName());
-
-partial class Program
-{
-    [GeneratedRegex(@"[.\[\]<>,\s:]")]
-    private static partial Regex MyRegex();
-}
