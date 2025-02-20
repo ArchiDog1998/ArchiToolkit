@@ -63,14 +63,7 @@ public static class FluentObjectsExtensions
     /// </item>
     /// </list>
     /// </returns>
-    public static DoResult<Test, int> DoCheck(this Fluent<Test> fluent, int abc)
-    {
-        return fluent.InvokeMethod(Invoke);
-        int Invoke(ref Test data)
-        {
-            return data.Check(abc);
-        }
-    }
+
 
     /// <summary>
     /// <inheritdoc cref="Test.Check"/>

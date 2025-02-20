@@ -11,6 +11,9 @@ public abstract class BaseName<T> : IName<T> where T : ISymbol
     public T Symbol { get; }
 
     /// <inheritdoc />
+    public string Name => Symbol.Name;
+
+    /// <inheritdoc />
     public string FullName => _lazyFullName.Value;
 
     private protected BaseName(T symbol)

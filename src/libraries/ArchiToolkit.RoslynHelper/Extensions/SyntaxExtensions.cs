@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Diagnostics.Contracts;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -80,6 +81,15 @@ public static class SyntaxExtensions
     public static AttributeSyntax NonUserCodeAttribute()
     {
         return Attribute(IdentifierName("global::System.Diagnostics.DebuggerNonUserCode"));
+    }
+
+    /// <summary>
+    /// Pure attribute.
+    /// </summary>
+    /// <returns></returns>
+    public static AttributeSyntax PureAttribute()
+    {
+        return Attribute(IdentifierName("global::System.Diagnostics.Contracts.Pure"));
     }
 
     /// <summary>

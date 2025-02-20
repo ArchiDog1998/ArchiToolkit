@@ -17,16 +17,22 @@ public class MethodName : TypeParametersName<IMethodSymbol>
     /// <summary>
     ///
     /// </summary>
-    public IParameterSymbol[] Parameters { get; }
+    public ParameterName[] Parameters { get; }
 
     /// <summary>
     /// Return types.
     /// </summary>
     public TypeName ReturnType { get; }
 
+    /// <summary>
+    /// ContainingType
+    /// </summary>
+    public TypeName ContainingType { get; }
+
     internal MethodName(IMethodSymbol methodSymbol) : base(methodSymbol)
     {
-        Parameters = methodSymbol.Parameters.ToArray();
+        Parameters = methodSymbol.Parameters.GetNames().ToArray();
         ReturnType = methodSymbol.ReturnType.GetName();
+        ContainingType = methodSymbol.ContainingType.GetName();
     }
 }

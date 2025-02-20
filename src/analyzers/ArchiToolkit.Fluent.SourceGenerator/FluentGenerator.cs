@@ -55,6 +55,7 @@ public class FluentGenerator : IIncrementalGenerator
         {
             yield return model.GetTypeInfo(memberAccess.Expression);
         }
+
         foreach (var arg in invocation.ArgumentList.Arguments)
         {
             yield return model.GetTypeInfo(arg.Expression);
@@ -124,114 +125,73 @@ public class FluentGenerator : IIncrementalGenerator
                 yield return SetPropertyInvoke(typeName, fieldType, fieldName);
                 break;
             }
-            case IMethodSymbol method  when CanAccess(method, assembly):
+            case IMethodSymbol method when CanAccess(method, assembly) && method.MethodKind == MethodKind.Ordinary:
                 var methodName = method.GetName();
-                if (methodName.Parameters.GetNames().All(n => n.IsIn))
+                if (methodName.Parameters.All(n => n.IsIn))
                 {
-                    //yield return InvokeAllIn(methodName);
+                    if (methodName.ReturnType.Symbol.SpecialType is not SpecialType.System_Void)
+                    {
+                        yield return InvokeAllInReturn(methodName);
+                    }
                 }
                 else
                 {
-
                 }
+
                 break;
         }
     }
 
-    private static MethodDeclarationSyntax InvokeAllIn(MethodName method)
+    private static MethodDeclarationSyntax InvokeAllInReturn(MethodName method)
     {
-        return MethodDeclaration(
-                GenericName(
-                        Identifier("DoResult"))
+        var returnType = IdentifierName(method.ReturnType.FullName);
+        var inParameters = method.Parameters.Where(p => p.IsIn).ToArray();
+
+        return MethodDeclaration(GenericName(Identifier("DoResult"))
                     .WithTypeArgumentList(
                         TypeArgumentList(
-                            SeparatedList<TypeSyntax>(
-                                new SyntaxNodeOrToken[]
-                                {
-                                    IdentifierName("Test"),
-                                    Token(SyntaxKind.CommaToken),
-                                    PredefinedType(
-                                        Token(SyntaxKind.IntKeyword))
-                                }))),
-                Identifier("DoCheck"))
-            .WithModifiers(
-                TokenList(
-                    new[]
-                    {
-                        Token(SyntaxKind.PublicKeyword),
-                        Token(SyntaxKind.StaticKeyword)
-                    }))
+                        [
+                            IdentifierName(method.ContainingType.FullName), returnType
+                        ])),
+                Identifier("Do" + method.Name))
+            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
+            .AddAttributes()
             .WithParameterList(
                 ParameterList(
-                    SeparatedList<ParameterSyntax>(
-                        new SyntaxNodeOrToken[]
-                        {
-                            Parameter(
-                                    Identifier("fluent"))
-                                .WithModifiers(
-                                    TokenList(
-                                        Token(SyntaxKind.ThisKeyword)))
-                                .WithType(
-                                    GenericName(
-                                            Identifier("Fluent"))
-                                        .WithTypeArgumentList(
-                                            TypeArgumentList(
-                                                SingletonSeparatedList<TypeSyntax>(
-                                                    IdentifierName("Test"))))),
-                            Token(SyntaxKind.CommaToken),
-                            Parameter(
-                                    Identifier("abc"))
-                                .WithType(
-                                    PredefinedType(
-                                        Token(SyntaxKind.IntKeyword)))
-                        })))
-            .WithBody(
-                Block(
-                    ReturnStatement(
-                        InvocationExpression(
-                                MemberAccessExpression(
-                                    SyntaxKind.SimpleMemberAccessExpression,
-                                    IdentifierName("fluent"),
-                                    IdentifierName("InvokeMethod")))
+                [
+                    Parameter(Identifier("fluent")).WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
+                        .WithType(GenericName(Identifier(Fluent))
+                            .WithTypeArgumentList(TypeArgumentList([IdentifierName(method.ContainingType.FullName)]))),
+                    ..inParameters.Select(n =>
+                        Parameter(Identifier(n.Name)).WithType(IdentifierName(n.Type.FullName)))
+                ]))
+            .WithBody(Block(ReturnStatement(InvocationExpression(MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression, IdentifierName("fluent"),
+                        IdentifierName("InvokeMethod")))
+                    .WithArgumentList(ArgumentList([Argument(IdentifierName("Invoke"))]))),
+                LocalFunctionStatement(returnType, Identifier("Invoke"))
+                    .WithParameterList(ParameterList([
+                        Parameter(Identifier("data")).WithModifiers(
+                                TokenList(Token(SyntaxKind.RefKeyword)))
+                            .WithType(IdentifierName(method.ContainingType.FullName))
+                    ]))
+                    .WithBody(Block(SingletonList<StatementSyntax>(ReturnStatement(
+                        InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("data"),
+                                IdentifierName(method.Name)))
                             .WithArgumentList(
                                 ArgumentList(
-                                    SingletonSeparatedList<ArgumentSyntax>(
-                                        Argument(
-                                            IdentifierName("Invoke")))))),
-                    LocalFunctionStatement(
-                            PredefinedType(
-                                Token(SyntaxKind.IntKeyword)),
-                            Identifier("Invoke"))
-                        .WithParameterList(
-                            ParameterList(
-                                SingletonSeparatedList<ParameterSyntax>(
-                                    Parameter(
-                                            Identifier("data"))
-                                        .WithModifiers(
-                                            TokenList(
-                                                Token(SyntaxKind.RefKeyword)))
-                                        .WithType(
-                                            IdentifierName("Test")))))
-                        .WithBody(
-                            Block(
-                                SingletonList<StatementSyntax>(
-                                    ReturnStatement(
-                                        InvocationExpression(
-                                                MemberAccessExpression(
-                                                    SyntaxKind.SimpleMemberAccessExpression,
-                                                    IdentifierName("data"),
-                                                    IdentifierName("Check")))
-                                            .WithArgumentList(
-                                                ArgumentList(
-                                                    SingletonSeparatedList<ArgumentSyntax>(
-                                                        Argument(
-                                                            IdentifierName("abc")))))))))));
+                                [
+                                    ..inParameters.Select(n =>
+                                        Argument(IdentifierName(n.Name)))
+                                ]))))))));
     }
 
     private const string Fluent = "global::ArchiToolkit.Fluent.Fluent",
         ModifyDelegate = "global::ArchiToolkit.Fluent.ModifyDelegate";
 
-    private static MethodDeclarationSyntax SetPropertyDirect(TypeName typeName, string propertyType, string propertyName)
+    private static MethodDeclarationSyntax SetPropertyDirect(TypeName typeName, string propertyType,
+        string propertyName)
     {
         return MethodDeclaration(GenericName(Identifier(Fluent))
                     .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName.FullName)])),
@@ -262,10 +222,7 @@ public class FluentGenerator : IIncrementalGenerator
                             MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("data"),
                                 IdentifierName(propertyName)),
                             IdentifierName("value")))))))
-            .WithAttributeLists(
-            [
-                GeneratedCodeAttribute(typeof(FluentGenerator)).AddAttributes(NonUserCodeAttribute())
-            ])
+            .AddAttributes()
             .WithXmlComment(
                 $$"""
                   /// <summary>
@@ -281,10 +238,12 @@ public class FluentGenerator : IIncrementalGenerator
     }
 
 
-    private static MethodDeclarationSyntax SetPropertyInvoke(TypeName typeName, string propertyType, string propertyName)
+    private static MethodDeclarationSyntax SetPropertyInvoke(TypeName typeName, string propertyType,
+        string propertyName)
     {
         return MethodDeclaration(GenericName(Identifier(Fluent))
-                .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName.FullName)])), Identifier("With" + propertyName))
+                    .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName.FullName)])),
+                Identifier("With" + propertyName))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
             .AddTypeParameters(typeName)
             .WithParameterList(ParameterList(
@@ -313,23 +272,21 @@ public class FluentGenerator : IIncrementalGenerator
                         InvocationExpression(IdentifierName("modifyValue"))
                             .WithArgumentList(ArgumentList(
                             [
-                                Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("data"), IdentifierName(propertyName)))
+                                Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("data"), IdentifierName(propertyName)))
                             ]))))))))
-            .WithAttributeLists(
-            [
-                GeneratedCodeAttribute(typeof(FluentGenerator)).AddAttributes(NonUserCodeAttribute())
-            ])
+            .AddAttributes()
             .WithXmlComment($$"""
-                            /// <summary>
-                            ///     Set the value <see cref="{{typeName.SummaryName}}.{{propertyName}}" /> in <see cref="{{typeName.SummaryName}}" />
-                            ///     <para>
-                            ///         <inheritdoc cref="{{typeName.SummaryName}}.{{propertyName}}" />
-                            ///     </para>
-                            /// </summary>
-                            /// <param name="fluent">Self</param>
-                            /// <param name="modifyValue">The method to modify it</param>
-                            /// <returns>Self</returns>
-                            """);
+                              /// <summary>
+                              ///     Set the value <see cref="{{typeName.SummaryName}}.{{propertyName}}" /> in <see cref="{{typeName.SummaryName}}" />
+                              ///     <para>
+                              ///         <inheritdoc cref="{{typeName.SummaryName}}.{{propertyName}}" />
+                              ///     </para>
+                              /// </summary>
+                              /// <param name="fluent">Self</param>
+                              /// <param name="modifyValue">The method to modify it</param>
+                              /// <returns>Self</returns>
+                              """);
     }
 
     private static bool CanAccess(ISymbol? symbol, IAssemblySymbol? assembly)

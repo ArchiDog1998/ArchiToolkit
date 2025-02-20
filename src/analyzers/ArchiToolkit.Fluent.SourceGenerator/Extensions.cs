@@ -16,4 +16,13 @@ internal static class Extensions
         if (constraints.Length == 0) return method;
         return method.WithConstraintClauses([..constraints!]);
     }
+
+
+    public static MethodDeclarationSyntax AddAttributes(this MethodDeclarationSyntax method)
+    {
+        return method.WithAttributeLists(
+        [
+            GeneratedCodeAttribute(typeof(FluentGenerator)).AddAttributes(NonUserCodeAttribute(), PureAttribute())
+        ]);
+    }
 }
