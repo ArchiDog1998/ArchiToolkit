@@ -19,6 +19,11 @@ public interface IName<out T> where T : ISymbol
     string FullName { get; }
 
     /// <summary>
+    /// Summary Name
+    /// </summary>
+    string SummaryName  { get; }
+
+    /// <summary>
     /// Name
     /// </summary>
     string Name { get; }

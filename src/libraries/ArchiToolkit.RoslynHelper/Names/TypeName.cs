@@ -10,17 +10,13 @@ namespace ArchiToolkit.RoslynHelper.Names;
 /// </summary>
 public class TypeName : TypeParametersName<ITypeSymbol>
 {
-    private readonly Lazy<string> _lazySafeName, _lazySummaryName;
+    private readonly Lazy<string> _lazySafeName;
 
     /// <summary>
     ///     The safe name.
     /// </summary>
     public string SafeName => _lazySafeName.Value;
 
-    /// <summary>
-    ///     The summary name
-    /// </summary>
-    public string SummaryName => _lazySummaryName.Value;
 
     internal TypeName(ITypeSymbol typeSymbol) : base(typeSymbol)
     {
@@ -30,7 +26,6 @@ public class TypeName : TypeParametersName<ITypeSymbol>
                 .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
             return Regex.Replace(name, @"[.\[\]<>,\s:]", "_") + "_" + GetHashName(FullName, 8);
         });
-        _lazySummaryName = new Lazy<string>(() => ToSummary(FullName));
     }
 
     private static string GetHashName(string input, int count)
@@ -39,16 +34,6 @@ public class TypeName : TypeParametersName<ITypeSymbol>
         using var sha256 = SHA256.Create();
         var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
         return string.Concat(hashBytes.Take(count).Select(b => chars[b % chars.Length]));
-    }
-
-    private static string ToSummary(string typeName)
-    {
-        return Regex.Replace(typeName, "<[^>]+>", match =>
-        {
-            var count = match.Value.Split(',').Length;
-            var replacement = "{" + string.Join(", ", Enumerable.Range(1, count).Select(i => $"T{i}")) + "}";
-            return replacement;
-        });
     }
 
     private protected override IEnumerable<ITypeParameterSymbol> GetTypeParameters(ITypeSymbol symbol)

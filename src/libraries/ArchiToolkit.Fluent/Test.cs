@@ -29,8 +29,9 @@ public struct Test
         return Data;
     }
 
-    public void VoidCheck(in int abc)
+    public void VoidCheck(in int abc, out int cde, ref int x)
     {
+        cde = 2;
         Console.WriteLine("Invoke the Check " + abc);
     }
 }
@@ -63,20 +64,13 @@ public static class FluentObjectsExtensions
     /// </item>
     /// </list>
     /// </returns>
-
-
-    /// <summary>
-    /// <inheritdoc cref="Test.Check"/>
-    /// </summary>
-    /// <param name="fluent"></param>
-    /// <param name="abc"><inheritdoc cref="Test.Check"/></param>
-    /// <returns></returns>
-    public static DoResult<Test> DoVoidCheck(this Fluent<Test> fluent, int abc)
+    public static DoResult<Test, (int cde, int x)> DoVoidCheck(this Fluent<Test> fluent, int abc, int x)
     {
         return fluent.InvokeMethod(Invoke);
-        void Invoke(ref Test data)
+        (int cde, int x) Invoke(ref Test data)
         {
-            data.VoidCheck(abc);
+            data.VoidCheck(abc, out var cde, ref x);
+            return (cde, x);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using System.Text.RegularExpressions;
-using ArchiToolkit.RoslynHelper.Extensions;
+﻿using ArchiToolkit.RoslynHelper.Extensions;
 using ArchiToolkit.RoslynHelper.Names;
 using TypeInfo = Microsoft.CodeAnalysis.TypeInfo;
 
@@ -78,7 +76,9 @@ public class FluentGenerator : IIncrementalGenerator
             foreach (var type in types.SelectMany(tps => tps.Item2))
             {
                 if (type.Type is not { } typeSymbol) continue;
-                if (typeSymbol.GetName().FullName is "global::ArchiToolkit.Fluent.FluentType") continue;
+                typeSymbol = typeSymbol.OriginalDefinition;
+                if (typeSymbol.GetName().FullName is "global::ArchiToolkit.Fluent.FluentType"
+                    or "global::ArchiToolkit.Fluent.Fluent<TTarget>") continue;
                 yield return typeSymbol;
             }
         }
@@ -126,33 +126,84 @@ public class FluentGenerator : IIncrementalGenerator
                 break;
             }
             case IMethodSymbol method when CanAccess(method, assembly) && method.MethodKind == MethodKind.Ordinary:
-                var methodName = method.GetName();
-                if (methodName.Parameters.All(n => n.IsIn))
-                {
-                    if (methodName.ReturnType.Symbol.SpecialType is not SpecialType.System_Void)
-                    {
-                        yield return InvokeAllInReturn(methodName);
-                    }
-                }
-                else
-                {
-                }
-
+                yield return Invoke(method.GetName());
                 break;
         }
     }
 
-    private static MethodDeclarationSyntax InvokeAllInReturn(MethodName method)
+    private static TypeSyntax? GetReturnType(MethodName method)
     {
-        var returnType = IdentifierName(method.ReturnType.FullName);
+        var tuples = method.Parameters.Where(p => p.IsOut)
+            .Select(p => TupleElement(IdentifierName(p.Type.FullName)).WithIdentifier(Identifier(p.Name))).ToArray();
+        var isVoid = method.ReturnType.Symbol.SpecialType == SpecialType.System_Void;
+
+        if (tuples.Length is 0)
+        {
+            if (isVoid) return null;
+            return IdentifierName(method.ReturnType.FullName);
+        }
+        else
+        {
+            if (isVoid) return TupleType([..tuples]);
+            return TupleType([
+                TupleElement(IdentifierName(method.ReturnType.FullName)).WithIdentifier(Identifier("result")),
+                ..tuples
+            ]);
+        }
+    }
+
+    private static MethodDeclarationSyntax Invoke(MethodName method)
+    {
+        var returnType = GetReturnType(method);
         var inParameters = method.Parameters.Where(p => p.IsIn).ToArray();
 
+        var types = new List<TypeSyntax>(2) { IdentifierName(method.ContainingType.FullName) };
+        if (returnType is not null) types.Add(returnType);
+
+        var invocation = InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                IdentifierName("data"),
+                IdentifierName(method.Name)))
+            .WithArgumentList(
+                ArgumentList(
+                [
+                    ..method.Parameters.Select(n =>
+                    {
+                        return n.Symbol.RefKind switch
+                        {
+                            RefKind.Ref => Argument(IdentifierName(n.Name))
+                                .WithRefOrOutKeyword(Token(SyntaxKind.RefKeyword)),
+                            RefKind.Out => Argument(DeclarationExpression(IdentifierName("var"),
+                                    SingleVariableDesignation(Identifier(n.Name))))
+                                .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword)),
+                            _ => Argument(IdentifierName(n.Name))
+                        };
+                    })
+                ]));
+
+        List<StatementSyntax> statements = [];
+        if (returnType is null)
+        {
+            statements.Add(ExpressionStatement(invocation));
+        }
+        else
+        {
+            var names = method.Parameters.Where(p => p.IsOut).Select(i => i.Name).ToList();
+            if (method.ReturnType.Symbol.SpecialType == SpecialType.System_Void)
+            {
+                statements.Add(ExpressionStatement(invocation));
+            }
+            else
+            {
+                statements.Add(LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
+                    .WithVariables([VariableDeclarator(Identifier("result")).WithInitializer(EqualsValueClause(invocation))])));
+                names.Insert(0, "result");
+            }
+            statements.Add(ReturnStatement(TupleExpression([..names.Select(n => Argument(IdentifierName(n)))])));
+        }
+        var summary = method.ContainingType.SummaryName + "." + method.SummaryName;
+
         return MethodDeclaration(GenericName(Identifier("DoResult"))
-                    .WithTypeArgumentList(
-                        TypeArgumentList(
-                        [
-                            IdentifierName(method.ContainingType.FullName), returnType
-                        ])),
+                    .WithTypeArgumentList(TypeArgumentList([..types])),
                 Identifier("Do" + method.Name))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
             .AddAttributes()
@@ -169,22 +220,27 @@ public class FluentGenerator : IIncrementalGenerator
                         SyntaxKind.SimpleMemberAccessExpression, IdentifierName("fluent"),
                         IdentifierName("InvokeMethod")))
                     .WithArgumentList(ArgumentList([Argument(IdentifierName("Invoke"))]))),
-                LocalFunctionStatement(returnType, Identifier("Invoke"))
+                LocalFunctionStatement(returnType ?? PredefinedType(Token(SyntaxKind.VoidKeyword)),
+                        Identifier("Invoke"))
                     .WithParameterList(ParameterList([
                         Parameter(Identifier("data")).WithModifiers(
                                 TokenList(Token(SyntaxKind.RefKeyword)))
                             .WithType(IdentifierName(method.ContainingType.FullName))
                     ]))
-                    .WithBody(Block(SingletonList<StatementSyntax>(ReturnStatement(
-                        InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                IdentifierName("data"),
-                                IdentifierName(method.Name)))
-                            .WithArgumentList(
-                                ArgumentList(
-                                [
-                                    ..inParameters.Select(n =>
-                                        Argument(IdentifierName(n.Name)))
-                                ]))))))));
+                    .WithBody(Block(statements))))
+            .WithXmlComment(
+                $$"""
+                  /// <summary>
+                  ///     Invoke the method <see cref="{{summary}}" /> in <see cref="{{method.ContainingType.SummaryName}}" />
+                  ///     <para>
+                  ///         <inheritdoc cref="{{summary}}" />
+                  ///     </para>
+                  /// </summary>
+                  /// <param name="fluent">Self</param>
+                  /// {{string.Join("\n/// ", inParameters.Select(p => $"<param name=\"{p.Name}\"><inheritdoc cref=\"{summary}\"/></param>"))}}
+                  /// <returns>Self</returns>
+                  """);
+
     }
 
     private const string Fluent = "global::ArchiToolkit.Fluent.Fluent",
@@ -192,6 +248,42 @@ public class FluentGenerator : IIncrementalGenerator
 
     private static MethodDeclarationSyntax SetPropertyDirect(TypeName typeName, string propertyType,
         string propertyName)
+    {
+        var parameter = Parameter(Identifier("value")).WithType(IdentifierName(propertyType));
+        var statement = ExpressionStatement(
+            AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("data"),
+                    IdentifierName(propertyName)),
+                IdentifierName("value")));
+        const string paramSummary = "<param name=\"value\">The value to input</param>";
+
+        return SetProperty(typeName, propertyName, parameter, paramSummary, statement);
+    }
+
+    private static MethodDeclarationSyntax SetPropertyInvoke(TypeName typeName, string propertyType,
+        string propertyName)
+    {
+        var parameter = Parameter(Identifier("modifyValue"))
+            .WithType(GenericName(Identifier(ModifyDelegate)).WithTypeArgumentList(
+                TypeArgumentList([IdentifierName(propertyType)])));
+
+        var statement = ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("data"),
+                IdentifierName(propertyName)),
+            InvocationExpression(IdentifierName("modifyValue"))
+                .WithArgumentList(ArgumentList(
+                [
+                    Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("data"), IdentifierName(propertyName)))
+                ]))));
+
+        const string paramSummary = "<param name=\"modifyValue\">The method to modify it</param>";
+
+        return SetProperty(typeName, propertyName, parameter, paramSummary, statement);
+    }
+
+    private static MethodDeclarationSyntax SetProperty(TypeName typeName,
+        string propertyName, ParameterSyntax parameter, string parameterSummary, params StatementSyntax[] statements)
     {
         return MethodDeclaration(GenericName(Identifier(Fluent))
                     .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName.FullName)])),
@@ -202,10 +294,9 @@ public class FluentGenerator : IIncrementalGenerator
             .WithParameterList(ParameterList(
             [
                 Parameter(Identifier("fluent")).WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
-                    .WithType(GenericName(Identifier(Fluent))
-                        .WithTypeArgumentList(
-                            TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName(typeName.FullName))))),
-                Parameter(Identifier("value")).WithType(IdentifierName(propertyType))
+                    .WithType(GenericName(Identifier(Fluent)).WithTypeArgumentList(
+                        TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName(typeName.FullName))))),
+                parameter
             ]))
             .WithBody(Block(ReturnStatement(InvocationExpression(
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("fluent"),
@@ -217,64 +308,7 @@ public class FluentGenerator : IIncrementalGenerator
                         Parameter(Identifier("data")).WithModifiers(TokenList(Token(SyntaxKind.RefKeyword)))
                             .WithType(IdentifierName(typeName.FullName))
                     ]))
-                    .WithBody(Block(ExpressionStatement(
-                        AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
-                            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("data"),
-                                IdentifierName(propertyName)),
-                            IdentifierName("value")))))))
-            .AddAttributes()
-            .WithXmlComment(
-                $$"""
-                  /// <summary>
-                  ///     Set the value <see cref="{{typeName.SummaryName}}.{{propertyName}}" /> in <see cref="{{typeName.SummaryName}}" />
-                  ///     <para>
-                  ///         <inheritdoc cref="{{typeName.SummaryName}}.{{propertyName}}" />
-                  ///     </para>
-                  /// </summary>
-                  /// <param name="fluent">Self</param>
-                  /// <param name="value">The value to input</param>
-                  /// <returns>Self</returns>
-                  """);
-    }
-
-
-    private static MethodDeclarationSyntax SetPropertyInvoke(TypeName typeName, string propertyType,
-        string propertyName)
-    {
-        return MethodDeclaration(GenericName(Identifier(Fluent))
-                    .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName.FullName)])),
-                Identifier("With" + propertyName))
-            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
-            .AddTypeParameters(typeName)
-            .WithParameterList(ParameterList(
-            [
-                Parameter(Identifier("fluent")).WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
-                    .WithType(GenericName(Identifier(Fluent))
-                        .WithTypeArgumentList(TypeArgumentList([IdentifierName(typeName.FullName)]))),
-                Parameter(Identifier("modifyValue"))
-                    .WithType(GenericName(Identifier(ModifyDelegate)).WithTypeArgumentList(
-                        TypeArgumentList([IdentifierName(propertyType)])))
-            ]))
-            .WithBody(Block(ReturnStatement(InvocationExpression(
-                        MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("fluent"),
-                            IdentifierName("AddProperty")))
-                    .WithArgumentList(ArgumentList([Argument(IdentifierName("Modify"))]))),
-                LocalFunctionStatement(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("Modify"))
-                    .WithParameterList(ParameterList(
-                    [
-                        Parameter(Identifier("data"))
-                            .WithModifiers(TokenList(Token(SyntaxKind.RefKeyword)))
-                            .WithType(IdentifierName(typeName.FullName))
-                    ]))
-                    .WithBody(Block(ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
-                        MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("data"),
-                            IdentifierName(propertyName)),
-                        InvocationExpression(IdentifierName("modifyValue"))
-                            .WithArgumentList(ArgumentList(
-                            [
-                                Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                    IdentifierName("data"), IdentifierName(propertyName)))
-                            ]))))))))
+                    .WithBody(Block(statements))))
             .AddAttributes()
             .WithXmlComment($$"""
                               /// <summary>

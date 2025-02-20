@@ -5,7 +5,7 @@ namespace ArchiToolkit.RoslynHelper.Names;
 /// <inheritdoc />
 public abstract class BaseName<T> : IName<T> where T : ISymbol
 {
-    private readonly Lazy<string> _lazyFullName;
+    private readonly Lazy<string> _lazyFullName, _lazySummaryName;
 
     /// <inheritdoc />
     public T Symbol { get; }
@@ -16,9 +16,16 @@ public abstract class BaseName<T> : IName<T> where T : ISymbol
     /// <inheritdoc />
     public string FullName => _lazyFullName.Value;
 
+    /// <inheritdoc />
+    public string SummaryName => _lazySummaryName.Value;
+
+
     private protected BaseName(T symbol)
     {
         Symbol = symbol;
         _lazyFullName = new Lazy<string>(() => symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+        _lazySummaryName = new Lazy<string>(() => symbol
+            .OriginalDefinition.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+            .Replace('<', '{').Replace('>', '}'));
     }
 }

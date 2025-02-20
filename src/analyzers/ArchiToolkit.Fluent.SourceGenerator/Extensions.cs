@@ -8,7 +8,12 @@ internal static class Extensions
     public static MethodDeclarationSyntax AddTypeParameters(this MethodDeclarationSyntax method,
         TypeName type)
     {
-        var typeParameters = type.TypeParameters.ToArray();
+        return method.AddTypeParameters(type.TypeParameters);
+    }
+
+    public static MethodDeclarationSyntax AddTypeParameters(this MethodDeclarationSyntax method,
+        params TypeParamName[] typeParameters)
+    {
         if (typeParameters.Length == 0) return method;
         method = method.WithTypeParameterList(TypeParameterList([..typeParameters.Select(t => t.Syntax)]));
         var constraints = typeParameters
@@ -16,7 +21,6 @@ internal static class Extensions
         if (constraints.Length == 0) return method;
         return method.WithConstraintClauses([..constraints!]);
     }
-
 
     public static MethodDeclarationSyntax AddAttributes(this MethodDeclarationSyntax method)
     {
