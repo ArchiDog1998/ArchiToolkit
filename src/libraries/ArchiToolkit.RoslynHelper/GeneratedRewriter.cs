@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static ArchiToolkit.RoslynHelper.SyntaxFactory;
+using static ArchiToolkit.RoslynHelper.Extensions.SyntaxExtensions;
 
 namespace ArchiToolkit.RoslynHelper;
 

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace ArchiToolkit.RoslynHelper;
+namespace ArchiToolkit.RoslynHelper.Extensions;
 
 /// <summary>
 ///     For the string extensions.

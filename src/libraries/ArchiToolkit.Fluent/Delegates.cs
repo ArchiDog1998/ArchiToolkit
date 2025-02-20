@@ -18,3 +18,9 @@ public delegate void PropertyDelegate<T>(ref T target);
 /// <typeparam name="TTarget"></typeparam>
 /// <typeparam name="TResult"></typeparam>
 public delegate TResult MethodDelegate<TTarget, out TResult>(ref TTarget target);
+
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="TTarget"></typeparam>
+public delegate void MethodDelegate<TTarget>(ref TTarget target);

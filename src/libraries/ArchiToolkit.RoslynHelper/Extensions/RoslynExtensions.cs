@@ -1,9 +1,7 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace ArchiToolkit.RoslynHelper;
+namespace ArchiToolkit.RoslynHelper.Extensions;
 
 /// <summary>
 ///     The default Roslyn Extensions.
@@ -55,23 +53,16 @@ public static class RoslynExtensions
     }
 
     /// <summary>
-    /// Get the type name.
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="hashCount"></param>
-    /// <returns></returns>
-    public static TypeName GetTypeName(this ITypeSymbol symbol, int hashCount = 32) =>
-        new(symbol, hashCount);
-
-    /// <summary>
-    /// Get the metadata name of the symbol
+    ///     Get the metadata name of the symbol
     /// </summary>
     /// <param name="symbol"></param>
     /// <param name="hashCount"></param>
     /// <returns></returns>
     [Obsolete]
-    public static MetadataName GetMetadataName(this ISymbol symbol, int hashCount = 32) =>
-        new(symbol, hashCount);
+    public static MetadataName GetMetadataName(this ISymbol symbol, int hashCount = 32)
+    {
+        return new MetadataName(symbol, hashCount);
+    }
 
     /// <summary>
     ///     Get the full symbol name.

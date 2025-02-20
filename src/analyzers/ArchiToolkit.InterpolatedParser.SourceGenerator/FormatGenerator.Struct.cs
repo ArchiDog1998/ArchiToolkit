@@ -1,4 +1,6 @@
-﻿namespace ArchiToolkit.InterpolatedParser.SourceGenerator;
+﻿using ArchiToolkit.RoslynHelper.Extensions;
+
+namespace ArchiToolkit.InterpolatedParser.SourceGenerator;
 
 partial class FormatGenerator
 {

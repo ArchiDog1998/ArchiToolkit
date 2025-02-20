@@ -3,12 +3,12 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace ArchiToolkit.RoslynHelper;
+namespace ArchiToolkit.RoslynHelper.Extensions;
 
 /// <summary>
 ///     The extensions for the <see cref="Microsoft.CodeAnalysis.CSharp.SyntaxFactory" />
 /// </summary>
-public static class SyntaxFactory
+public static class SyntaxExtensions
 {
     /// <summary>
     ///     Add the comment

@@ -1,4 +1,6 @@
-﻿namespace ArchiToolkit.InterpolatedParser.SourceGenerator;
+﻿using ArchiToolkit.RoslynHelper.Extensions;
+
+namespace ArchiToolkit.InterpolatedParser.SourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
 public partial class FormatGenerator : IIncrementalGenerator
@@ -22,7 +24,7 @@ public partial class FormatGenerator : IIncrementalGenerator
         var model = context.SemanticModel;
         if (context.Node is not InvocationExpressionSyntax invocation) yield break;
         if (model.GetSymbolInfo(invocation).Symbol is not IMethodSymbol symbol) yield break;
-        if (symbol.ContainingType.GetTypeName().FullName is not
+        if (symbol.ContainingType.GetName().FullName is not
             "global::ArchiToolkit.InterpolatedParser.InterpolatedParserExtensions") yield break;
 
         foreach (var arg in invocation.ArgumentList.Arguments)

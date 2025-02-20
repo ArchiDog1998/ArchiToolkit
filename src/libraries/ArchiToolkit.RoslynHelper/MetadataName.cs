@@ -1,34 +1,36 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using ArchiToolkit.RoslynHelper.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace ArchiToolkit.RoslynHelper;
 
 /// <summary>
-/// The metadataName for the symbol
+///     The metadataName for the symbol
 /// </summary>
 [Obsolete]
 public readonly struct MetadataName
 {
     private readonly Lazy<string> _typeName, _safeName, _hashName;
     private readonly Lazy<bool> _hasTypeParameters;
+
     /// <summary>
-    /// The typeName
+    ///     The typeName
     /// </summary>
     public string TypeName => _typeName.Value;
 
     /// <summary>
-    /// Without special characters
+    ///     Without special characters
     /// </summary>
     public string SafeName => _safeName.Value;
 
     /// <summary>
-    /// The hashName
+    ///     The hashName
     /// </summary>
     public string HashName => _hashName.Value;
 
     /// <summary>
-    /// Has type Parameter
+    ///     Has type Parameter
     /// </summary>
     public bool HasTypeParameter => _hasTypeParameters.Value;
 

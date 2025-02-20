@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
+using ArchiToolkit.RoslynHelper.Extensions;
+using ArchiToolkit.RoslynHelper.Names;
 using TypeInfo = Microsoft.CodeAnalysis.TypeInfo;
 
 namespace ArchiToolkit.Fluent.SourceGenerator;
@@ -75,7 +77,7 @@ public class FluentGenerator : IIncrementalGenerator
             foreach (var type in types.SelectMany(tps => tps.Item2))
             {
                 if (type.Type is not { } typeSymbol) continue;
-                if (typeSymbol.GetTypeName().FullName is "global::ArchiToolkit.Fluent.FluentType") continue;
+                if (typeSymbol.GetName().FullName is "global::ArchiToolkit.Fluent.FluentType") continue;
                 yield return typeSymbol;
             }
         }
@@ -83,7 +85,7 @@ public class FluentGenerator : IIncrementalGenerator
 
     private static void Generate(SourceProductionContext context, ITypeSymbol type, IAssemblySymbol? assembly)
     {
-        var name = type.GetTypeName();
+        var name = type.GetName();
         var root = NamespaceDeclaration("ArchiToolkit.Fluent",
             $"For adding the fluent extensions of {name.FullName}").AddMembers(
             GetClass().AddMembers([
@@ -101,7 +103,7 @@ public class FluentGenerator : IIncrementalGenerator
         {
             case IPropertySymbol property:
             {
-                var propType = property.Type.GetTypeName().FullName;
+                var propType = property.Type.GetName().FullName;
                 var propName = property.Name;
                 if (CanAccess(property.SetMethod, assembly))
                 {
@@ -116,15 +118,114 @@ public class FluentGenerator : IIncrementalGenerator
             }
             case IFieldSymbol field when CanAccess(field, assembly):
             {
-                var fieldType = field.Type.GetTypeName().FullName;
+                var fieldType = field.Type.GetName().FullName;
                 var fieldName = field.Name;
                 yield return SetPropertyDirect(typeName, fieldType, fieldName);
                 yield return SetPropertyInvoke(typeName, fieldType, fieldName);
                 break;
             }
-            case IMethodSymbol method:
+            case IMethodSymbol method  when CanAccess(method, assembly):
+                var methodName = method.GetName();
+                if (methodName.Parameters.GetNames().All(n => n.IsIn))
+                {
+                    //yield return InvokeAllIn(methodName);
+                }
+                else
+                {
+
+                }
                 break;
         }
+    }
+
+    private static MethodDeclarationSyntax InvokeAllIn(MethodName method)
+    {
+        return MethodDeclaration(
+                GenericName(
+                        Identifier("DoResult"))
+                    .WithTypeArgumentList(
+                        TypeArgumentList(
+                            SeparatedList<TypeSyntax>(
+                                new SyntaxNodeOrToken[]
+                                {
+                                    IdentifierName("Test"),
+                                    Token(SyntaxKind.CommaToken),
+                                    PredefinedType(
+                                        Token(SyntaxKind.IntKeyword))
+                                }))),
+                Identifier("DoCheck"))
+            .WithModifiers(
+                TokenList(
+                    new[]
+                    {
+                        Token(SyntaxKind.PublicKeyword),
+                        Token(SyntaxKind.StaticKeyword)
+                    }))
+            .WithParameterList(
+                ParameterList(
+                    SeparatedList<ParameterSyntax>(
+                        new SyntaxNodeOrToken[]
+                        {
+                            Parameter(
+                                    Identifier("fluent"))
+                                .WithModifiers(
+                                    TokenList(
+                                        Token(SyntaxKind.ThisKeyword)))
+                                .WithType(
+                                    GenericName(
+                                            Identifier("Fluent"))
+                                        .WithTypeArgumentList(
+                                            TypeArgumentList(
+                                                SingletonSeparatedList<TypeSyntax>(
+                                                    IdentifierName("Test"))))),
+                            Token(SyntaxKind.CommaToken),
+                            Parameter(
+                                    Identifier("abc"))
+                                .WithType(
+                                    PredefinedType(
+                                        Token(SyntaxKind.IntKeyword)))
+                        })))
+            .WithBody(
+                Block(
+                    ReturnStatement(
+                        InvocationExpression(
+                                MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("fluent"),
+                                    IdentifierName("InvokeMethod")))
+                            .WithArgumentList(
+                                ArgumentList(
+                                    SingletonSeparatedList<ArgumentSyntax>(
+                                        Argument(
+                                            IdentifierName("Invoke")))))),
+                    LocalFunctionStatement(
+                            PredefinedType(
+                                Token(SyntaxKind.IntKeyword)),
+                            Identifier("Invoke"))
+                        .WithParameterList(
+                            ParameterList(
+                                SingletonSeparatedList<ParameterSyntax>(
+                                    Parameter(
+                                            Identifier("data"))
+                                        .WithModifiers(
+                                            TokenList(
+                                                Token(SyntaxKind.RefKeyword)))
+                                        .WithType(
+                                            IdentifierName("Test")))))
+                        .WithBody(
+                            Block(
+                                SingletonList<StatementSyntax>(
+                                    ReturnStatement(
+                                        InvocationExpression(
+                                                MemberAccessExpression(
+                                                    SyntaxKind.SimpleMemberAccessExpression,
+                                                    IdentifierName("data"),
+                                                    IdentifierName("Check")))
+                                            .WithArgumentList(
+                                                ArgumentList(
+                                                    SingletonSeparatedList<ArgumentSyntax>(
+                                                        Argument(
+                                                            IdentifierName("abc")))))))))));
     }
 
     private const string Fluent = "global::ArchiToolkit.Fluent.Fluent",

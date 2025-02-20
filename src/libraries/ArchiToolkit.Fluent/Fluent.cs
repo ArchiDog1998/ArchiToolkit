@@ -59,20 +59,44 @@ public class Fluent<TTarget> : IDisposable
     /// <returns></returns>
     public DoResult<TTarget, TResult> InvokeMethod<TResult>(MethodDelegate<TTarget, TResult> method)
     {
+        var lazy = InvokeMethod(b =>
+        {
+            if (b) return (b, method(ref _target));
+            return (b, default!);
+        });
+        return new DoResult<TTarget, TResult>(AddAction(() => { _ = lazy.Value; }), lazy);
+    }
+
+    /// <summary>
+    /// Invokes.
+    /// </summary>
+    /// <param name="method"></param>
+    /// <returns></returns>
+    public DoResult<TTarget> InvokeMethod(MethodDelegate<TTarget> method)
+    {
+        var lazy = InvokeMethod(b =>
+        {
+            if (b) method(ref _target);
+            return b;
+        });
+        return new DoResult<TTarget>(AddAction(() => { _ = lazy.Value; }), lazy);
+    }
+
+    private Lazy<T> InvokeMethod<T>(Func<bool, T> method)
+    {
         var actions = _actions.ToArray();
         _actions.Clear();
-        var lazy = new Lazy<(bool, TResult)>(() =>
+        return new Lazy<T>(() =>
         {
             _canContinue = true;
             foreach (var action in actions)
             {
                 if (_canContinue) action();
-                else return (false, default!);
+                else return method(false);
             }
 
-            return (true, method(ref _target));
+            return method(true);
         });
-        return new DoResult<TTarget, TResult>(AddAction(() => { _ = lazy.Value; }), lazy);
     }
 
     private Fluent<TTarget> AddAction(Action action)
