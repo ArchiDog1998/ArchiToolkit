@@ -143,7 +143,7 @@ partial class Build : NukeBuild
                     DeletePackage(packageId, deletingVersion);
                 if (existVersions.Contains(version)) continue;
                 if (!PushPackage(package)) continue;
-                PushedPackages.Add($"[{packageName}](https://www.nuget.org/packages/{packageId}/{version})");
+                PushedPackages.Add($"- [{packageName}](https://www.nuget.org/packages/{packageId}/{version})");
             }
         });
 
@@ -297,7 +297,7 @@ partial class Build : NukeBuild
             ReleaseNote.AppendLine(repository.Description);
             if (PushedPackages.Count > 0)
             {
-                ReleaseNote.AppendLine($"Nuget Packages: {string.Join(", ", PushedPackages)}");
+                ReleaseNote.AppendLine($"Nuget Packages:\n{string.Join("\n", PushedPackages)}");
             }
 
             ReleaseNote.Append(PullRequestNote);

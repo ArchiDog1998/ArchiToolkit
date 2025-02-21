@@ -77,8 +77,7 @@ public class FluentGenerator : IIncrementalGenerator
             {
                 if (type.Type is not { } typeSymbol) continue;
                 typeSymbol = typeSymbol.OriginalDefinition;
-                if (typeSymbol.GetName().FullName is "global::ArchiToolkit.Fluent.FluentType"
-                    or "global::ArchiToolkit.Fluent.Fluent<TTarget>") continue;
+                if (typeSymbol.GetName().FullName.StartsWith("global::ArchiToolkit.Fluent.")) continue;
                 yield return typeSymbol;
             }
         }

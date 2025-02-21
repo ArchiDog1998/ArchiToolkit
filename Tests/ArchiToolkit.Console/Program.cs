@@ -41,11 +41,21 @@ using Microsoft.Extensions.Logging;
 //var a = 0;
 //"abc10".Parse($"abc{a}");
 
-var a =
-    new TestClass<int>().AsFluent()
-        .WithData(12)
-        .Result;
 
+
+var point = new Point().AsFluent()
+    .WithX(5)
+    .DoAddX(6)
+    .Result;
 Console.WriteLine("Wait for the result");
-var r1 = a;
+
+Console.WriteLine(point.X);
+Console.WriteLine(point.Y);
 Console.WriteLine(typeof(Type).GetFulTypeName());
+
+class Point
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public void AddX(double x) => X += x;
+}

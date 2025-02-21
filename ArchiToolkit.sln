@@ -31,6 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{0859616C
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		build\Build.cs = build\Build.cs
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.InterpolatedParser", "src\libraries\ArchiToolkit.InterpolatedParser\ArchiToolkit.InterpolatedParser.csproj", "{007E82FD-1972-4DF4-A7BF-E75BE39E15B4}"

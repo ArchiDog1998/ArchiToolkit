@@ -25,7 +25,7 @@ public class ParameterName : BaseName<IParameterSymbol>
 
     internal ParameterName(IParameterSymbol symbol) : base(symbol)
     {
-        IsIn = symbol.RefKind is RefKind.In or RefKind.Ref;
+        IsIn = symbol.RefKind is RefKind.In or RefKind.Ref or RefKind.None;
         IsOut = symbol.RefKind is RefKind.Out or RefKind.Ref;
         Type = symbol.Type.GetName();
     }

@@ -1,0 +1,9 @@
+# Pure Const
+
+We all love C++!
+
+So I bring the key word `const` to C#! I hope you'll like it.
+
+Add the Attribute `ArchiToolkit.PureConst.ConstAttribute` to your Method or Parameter.
+
+Have fun!
