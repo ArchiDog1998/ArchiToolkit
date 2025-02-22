@@ -20,7 +20,7 @@ public class Fluent<TTarget> : IDisposable
     /// <summary>
     ///     Get the result of it, actually it is not necessary, because it already modified the original one for you.
     /// </summary>
-    public TTarget Result => Execute();
+    public ref TTarget Result => ref Execute();
 
     /// <inheritdoc />
     public void Dispose()
@@ -29,57 +29,59 @@ public class Fluent<TTarget> : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private TTarget Execute()
+    private ref TTarget Execute()
     {
-        _canContinue = true;
         while (_canContinue && _actions.Count > 0) _actions.Dequeue().Invoke();
-        return _target;
+        return ref _target;
     }
 
-    internal Fluent<TTarget> AddCondition(Func<bool> condition)
+    internal Fluent<TTarget> AddCondition(Func<bool> condition, FluentType? type)
     {
-        return AddAction(() => _canContinue = condition());
+        return AddAction(() => _canContinue = condition(), type);
     }
 
     /// <summary>
     ///     Add the property to this fluent
     /// </summary>
     /// <param name="property"></param>
+    /// <param name="type"></param>
     /// <returns></returns>
-    public Fluent<TTarget> AddProperty(PropertyDelegate<TTarget> property)
+    public Fluent<TTarget> AddProperty(PropertyDelegate<TTarget> property, FluentType? type)
     {
-        return AddAction(() => property(ref _target));
+        return AddAction(() => property(ref _target), type);
     }
 
     /// <summary>
     ///     Invoke the method you want.
     /// </summary>
     /// <param name="method"></param>
+    /// <param name="type"></param>
     /// <typeparam name="TResult"></typeparam>
     /// <returns></returns>
-    public DoResult<TTarget, TResult> InvokeMethod<TResult>(MethodDelegate<TTarget, TResult> method)
+    public DoResult<TTarget, TResult> InvokeMethod<TResult>(MethodDelegate<TTarget, TResult> method, FluentType? type)
     {
         var lazy = InvokeMethod(b =>
         {
             if (b) return (b, method(ref _target));
             return (b, default!);
         });
-        return new DoResult<TTarget, TResult>(AddAction(() => { _ = lazy.Value; }), lazy);
+        return new DoResult<TTarget, TResult>(AddAction(() => { _ = lazy.Value; }, type), lazy);
     }
 
     /// <summary>
     /// Invokes.
     /// </summary>
     /// <param name="method"></param>
+    /// <param name="type"></param>
     /// <returns></returns>
-    public DoResult<TTarget> InvokeMethod(MethodDelegate<TTarget> method)
+    public DoResult<TTarget> InvokeMethod(MethodDelegate<TTarget> method, FluentType? type)
     {
         var lazy = InvokeMethod(b =>
         {
             if (b) method(ref _target);
             return b;
         });
-        return new DoResult<TTarget>(AddAction(() => { _ = lazy.Value; }), lazy);
+        return new DoResult<TTarget>(AddAction(() => { _ = lazy.Value; }, type), lazy);
     }
 
     private Lazy<T> InvokeMethod<T>(Func<bool, T> method)
@@ -88,7 +90,6 @@ public class Fluent<TTarget> : IDisposable
         _actions.Clear();
         return new Lazy<T>(() =>
         {
-            _canContinue = true;
             foreach (var action in actions)
             {
                 if (_canContinue) action();
@@ -99,18 +100,20 @@ public class Fluent<TTarget> : IDisposable
         });
     }
 
-    private Fluent<TTarget> AddAction(Action action)
+    private Fluent<TTarget> AddAction(Action action, FluentType? type)
     {
-        switch (_type)
+        type ??= _type;
+        switch (type)
         {
             case FluentType.Immediate:
+                Execute();
                 if (_canContinue) action.Invoke();
                 break;
             case FluentType.Lazy:
                 _actions.Enqueue(action);
                 break;
             default:
-                throw new NotSupportedException($"Unsupported fluent type {_type}");
+                throw new NotSupportedException($"Unsupported fluent type {type}");
         }
 
         return this;

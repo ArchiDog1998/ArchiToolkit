@@ -24,8 +24,14 @@ public abstract class BaseName<T> : IName<T> where T : ISymbol
     {
         Symbol = symbol;
         _lazyFullName = new Lazy<string>(() => symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
-        _lazySummaryName = new Lazy<string>(() => symbol
-            .OriginalDefinition.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-            .Replace('<', '{').Replace('>', '}'));
+        _lazySummaryName = new Lazy<string>(GetSummaryName);
     }
+
+    private protected virtual string GetSummaryName()
+    {
+        return ToSummary(Symbol.OriginalDefinition
+            .ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+    }
+
+    private protected static string ToSummary(string name) => name.Replace('<', '{').Replace('>', '}');
 }

@@ -35,6 +35,11 @@ public class DoResult<TValue>(Fluent<TValue> fluent, Lazy<bool> lazy) : DoResult
 {
     /// <inheritdoc />
     public override bool DidIt => lazy.Value;
+
+    public DoResult(Fluent<TValue> fluent) : this(fluent, new Lazy<bool>(() => true))
+    {
+
+    }
 }
 
 /// <inheritdoc />
@@ -49,14 +54,21 @@ public sealed class DoResult<TValue, TResult>(Fluent<TValue> fluent, Lazy<(bool,
     /// </summary>
     public TResult ReturnValue => lazy.Value.Item2;
 
+    public DoResult(Fluent<TValue> fluent, TResult result)
+        : this(fluent, new Lazy<(bool, TResult)> (() => (true, result)))
+    {
+
+    }
+
     /// <summary>
     ///     Continue when can continue.
     /// </summary>
     /// <param name="canContinue"></param>
-    /// <returns></returns>
-    public Fluent<TValue> ContinueWhen(Predicate<TResult> canContinue)
+    /// <param name="type"></param>
+    /// <returns>fluent type</returns>
+    public Fluent<TValue> ContinueWhen(Predicate<TResult> canContinue, FluentType? type = null)
     {
-        return Fluent.AddCondition(() => canContinue(lazy.Value.Item2));
+        return Fluent.AddCondition(() => canContinue(lazy.Value.Item2), type);
     }
 
     /// <summary>

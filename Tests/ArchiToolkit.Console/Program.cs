@@ -41,8 +41,6 @@ using Microsoft.Extensions.Logging;
 //var a = 0;
 //"abc10".Parse($"abc{a}");
 
-
-
 var point = new Point().AsFluent()
     .WithX(5)
     .DoAddX(6)

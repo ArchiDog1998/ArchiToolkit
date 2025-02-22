@@ -1,4 +1,5 @@
-﻿namespace ArchiToolkit.Console;
+﻿
+namespace ArchiToolkit.Console;
 
 /// <summary>
 /// Test summary.
