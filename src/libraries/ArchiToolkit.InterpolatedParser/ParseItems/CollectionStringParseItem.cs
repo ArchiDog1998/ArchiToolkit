@@ -7,7 +7,6 @@ namespace ArchiToolkit.InterpolatedParser.ParseItems;
 ///     The collection parser.
 /// </summary>
 /// <param name="value"></param>
-/// <param name="index"></param>
 /// <param name="parser"></param>
 /// <param name="separator"></param>
 /// <param name="preModify"></param>
@@ -60,6 +59,7 @@ public sealed class CollectionStringParseItem<TCollection, TValue>(
                 {
                     result.Add(false);
                 }
+                break;
             }
             else
             {

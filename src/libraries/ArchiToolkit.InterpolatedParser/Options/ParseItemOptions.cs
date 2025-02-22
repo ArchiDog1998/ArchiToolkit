@@ -71,13 +71,11 @@ public readonly record struct ParseItemOptions([CallerMemberName] string Paramet
         return value?.ToString() ?? "<null>";
     }
 
-#pragma warning disable CS1066 // The default value specified will have no effect because it applies to a member that is used in contexts that do not allow optional arguments
-    public static implicit operator ParseItemOptions([CallerMemberName] string parameterName = "")
+    public static implicit operator ParseItemOptions(string parameterName)
     {
         return new ParseItemOptions(parameterName)
         {
             ParseType = ParseType.In
         };
     }
-#pragma warning restore CS1066 // The default value specified will have no effect because it applies to a member that is used in contexts that do not allow optional arguments
 }
