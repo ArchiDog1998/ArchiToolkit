@@ -39,6 +39,6 @@ using Microsoft.Extensions.Logging;
 // }
 
 var a = "";
-"I am cool!!".Parse($"I am {a}");
+"I am sooooo cool!!".Parse($"I am so+ {a}!+");
 Console.WriteLine(a);
 

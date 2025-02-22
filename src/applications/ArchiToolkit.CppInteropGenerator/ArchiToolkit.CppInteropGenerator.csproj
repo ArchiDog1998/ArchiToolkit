@@ -16,11 +16,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.1" />
-        <PackageReference Include="Seq.Extensions.Logging" Version="8.0.0" />
-        <PackageReference Include="WPF-UI" Version="4.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1"/>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"/>
+        <PackageReference Include="Seq.Extensions.Logging"/>
+        <PackageReference Include="WPF-UI"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting"/>
+        <PackageReference Include="CommunityToolkit.Mvvm"/>
     </ItemGroup>
 
     <ItemGroup>

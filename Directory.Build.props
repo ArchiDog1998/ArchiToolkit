@@ -48,7 +48,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="$(NeedRoslyn)">
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp"/>
     </ItemGroup>
 
     <PropertyGroup Condition="$(NeedAlmostAllFrameWorks)">
@@ -56,7 +56,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="$(NeedAlmostAllFrameWorks)">
-        <PackageReference Include="PolySharp" Version="1.15.0">
+        <PackageReference Include="PolySharp">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
