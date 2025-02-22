@@ -1,11 +1,9 @@
-﻿using ArchiToolkit.RoslynHelper.Extensions;
-using ArchiToolkit.RoslynHelper.Names;
+﻿using ArchiToolkit.RoslynHelper.Names;
 
 namespace ArchiToolkit.Fluent.SourceGenerator;
 
 internal static class Extensions
 {
-
     public static MethodDeclarationSyntax AddTypeParameters(this MethodDeclarationSyntax method,
         TypeName type)
     {
@@ -15,7 +13,9 @@ internal static class Extensions
     public static MethodDeclarationSyntax AddTypeParameters(this MethodDeclarationSyntax method,
         MethodName type)
     {
-        return method.AddTypeParameters([..type.ContainingType.TypeParameters.Concat(type.TypeParameters).ToImmutableHashSet()]);
+        return method.AddTypeParameters([
+            ..type.ContainingType.TypeParameters.Concat(type.TypeParameters).ToImmutableHashSet()
+        ]);
     }
 
     public static MethodDeclarationSyntax AddTypeParameters(this MethodDeclarationSyntax method,
@@ -33,7 +33,7 @@ internal static class Extensions
     {
         return method.WithAttributeLists(
         [
-            GeneratedCodeAttribute(typeof(FluentGenerator)).AddAttributes(NonUserCodeAttribute(), PureAttribute())
+            GeneratedCodeAttribute(typeof(FluentGenerator)).AddAttributes(NonUserCodeAttribute())
         ]);
     }
 }

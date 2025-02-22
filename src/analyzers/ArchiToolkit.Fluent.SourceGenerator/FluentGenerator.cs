@@ -1,12 +1,15 @@
 ﻿using ArchiToolkit.RoslynHelper.Extensions;
 using ArchiToolkit.RoslynHelper.Names;
-using TypeInfo = Microsoft.CodeAnalysis.TypeInfo;
 
 namespace ArchiToolkit.Fluent.SourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
 public class FluentGenerator : IIncrementalGenerator
 {
+    private const string Fluent = "global::ArchiToolkit.Fluent.Fluent",
+        ModifyDelegate = "global::ArchiToolkit.Fluent.ModifyDelegate",
+        FluentType = "global::ArchiToolkit.Fluent.FluentType";
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(InitializationOutput);
@@ -17,7 +20,7 @@ public class FluentGenerator : IIncrementalGenerator
 
         var attributeProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: static (node, _) => node is AttributeSyntax,
+                static (node, _) => node is AttributeSyntax,
                 TransformAttributes)
             .SelectMany((i, _) => i)
             .Collect();
@@ -25,7 +28,8 @@ public class FluentGenerator : IIncrementalGenerator
         var attributeTypes = context.SyntaxProvider
             .ForAttributeWithMetadataName("ArchiToolkit.Fluent.FluentApiAttribute",
                 static (node, _) => node is BaseTypeDeclarationSyntax,
-                static ITypeSymbol (ctx, _) => ctx.SemanticModel.GetDeclaredSymbol((BaseTypeDeclarationSyntax)ctx.TargetNode)!)
+                static ITypeSymbol (ctx, _) =>
+                    ctx.SemanticModel.GetDeclaredSymbol((BaseTypeDeclarationSyntax)ctx.TargetNode)!)
             .Collect();
 
         var merged = methodInvocations
@@ -63,9 +67,7 @@ public class FluentGenerator : IIncrementalGenerator
                      .OfType<TypeOfExpressionSyntax>()
                      .Select(typeSyntax => semanticModel.GetSymbolInfo(typeSyntax.Type).Symbol as ITypeSymbol)
                      .OfType<ITypeSymbol>())
-        {
             yield return typeSymbol;
-        }
     }
 
     private static void Generate(SourceProductionContext context,
@@ -74,9 +76,7 @@ public class FluentGenerator : IIncrementalGenerator
         var assembly = arg.compilation.Assembly;
         foreach (var type in GetTypes(arg.types).ToImmutableHashSet(SymbolEqualityComparer.Default)
                      .OfType<ITypeSymbol>())
-        {
             Generate(context, type, assembly);
-        }
 
         return;
 
@@ -108,14 +108,12 @@ public class FluentGenerator : IIncrementalGenerator
             "global::ArchiToolkit.Fluent.FluentExtensions") yield break;
 
         if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
-        {
-            if (model.GetTypeInfo(memberAccess.Expression).Type is { } type) yield return type;
-        }
+            if (model.GetTypeInfo(memberAccess.Expression).Type is { } type)
+                yield return type;
 
         foreach (var arg in invocation.ArgumentList.Arguments)
-        {
-            if (model.GetTypeInfo(arg.Expression).Type is { } type) yield return type;
-        }
+            if (model.GetTypeInfo(arg.Expression).Type is { } type)
+                yield return type;
     }
 
 
@@ -145,9 +143,7 @@ public class FluentGenerator : IIncrementalGenerator
                 {
                     yield return SetPropertyDirect(typeName, propType, propName);
                     if (CanAccess(property.GetMethod, assembly))
-                    {
                         yield return SetPropertyInvoke(typeName, propType, propName);
-                    }
                 }
 
                 break;
@@ -178,14 +174,12 @@ public class FluentGenerator : IIncrementalGenerator
             if (isVoid) return null;
             return IdentifierName(method.ReturnType.FullName);
         }
-        else
-        {
-            if (isVoid) return TupleType([..tuples]);
-            return TupleType([
-                TupleElement(IdentifierName(method.ReturnType.FullName)).WithIdentifier(Identifier("result")),
-                ..tuples
-            ]);
-        }
+
+        if (isVoid) return TupleType([..tuples]);
+        return TupleType([
+            TupleElement(IdentifierName(method.ReturnType.FullName)).WithIdentifier(Identifier("result")),
+            ..tuples
+        ]);
     }
 
     private static MethodDeclarationSyntax Invoke(MethodName method)
@@ -272,14 +266,16 @@ public class FluentGenerator : IIncrementalGenerator
                     Parameter(Identifier("_fluent")).WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
                         .WithType(GenericName(Identifier(Fluent))
                             .WithTypeArgumentList(TypeArgumentList([IdentifierName(method.ContainingType.FullName)]))),
-                    ..parameters,
+                    ..parameters
                 ]))
             .WithBody(isRefLike
                 ? block
                 : Block(ReturnStatement(InvocationExpression(MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression, IdentifierName("_fluent"),
                             IdentifierName("InvokeMethod")))
-                        .WithArgumentList(ArgumentList([Argument(IdentifierName("Invoke")), Argument(IdentifierName("_type"))]))),
+                        .WithArgumentList(ArgumentList([
+                            Argument(IdentifierName("Invoke")), Argument(IdentifierName("_type"))
+                        ]))),
                     LocalFunctionStatement(returnType ?? PredefinedType(Token(SyntaxKind.VoidKeyword)),
                             Identifier("Invoke"))
                         .WithParameterList(ParameterList([
@@ -290,22 +286,18 @@ public class FluentGenerator : IIncrementalGenerator
                         .WithBody(block)))
             .WithXmlComment(
                 $"""
-                  /// <summary>
-                  ///     Invoke the method <see cref="{summary}" /> in <see cref="{method.ContainingType.SummaryName}" />
-                  ///     <para>
-                  ///         <inheritdoc cref="{summary}" />
-                  ///     </para>
-                  /// </summary>
-                  /// <param name="_fluent">Self</param>
-                  /// {string.Join("\n/// ", inParameters.Select(p => $"<param name=\"{p.Name}\"><inheritdoc cref=\"{summary}\"/></param>"))}
-                  /// {(isRefLike ? "<remarks>⚠️WARNING:This method will be invoked immediately!</remarks>" : "<param name=\"_type\">Fluent type</param>")}
-                  /// <returns>Self and Result</returns>
-                  """);
+                 /// <summary>
+                 ///     🔧 Invoke the <b>Method</b> <see cref="{summary}" /> in <see cref="{method.ContainingType.SummaryName}" />
+                 ///     <para>
+                 ///         <inheritdoc cref="{summary}" />
+                 ///     </para>
+                 /// </summary>
+                 /// <param name="_fluent">Self</param>
+                 /// {string.Join("\n/// ", inParameters.Select(p => $"<param name=\"{p.Name}\"><inheritdoc cref=\"{summary}\"/></param>"))}
+                 /// {(isRefLike ? "<remarks>⚠️<b>WARNING:</b> This method will be invoked immediately!</remarks>" : "<param name=\"_type\">Fluent type</param>")}
+                 /// <returns>Self and Result</returns>
+                 """);
     }
-
-    private const string Fluent = "global::ArchiToolkit.Fluent.Fluent",
-        ModifyDelegate = "global::ArchiToolkit.Fluent.ModifyDelegate",
-        FluentType = "global::ArchiToolkit.Fluent.FluentType";
 
     private static MethodDeclarationSyntax SetPropertyDirect(TypeName typeName, string propertyType,
         string propertyName)
@@ -365,7 +357,9 @@ public class FluentGenerator : IIncrementalGenerator
             .WithBody(Block(ReturnStatement(InvocationExpression(
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("_fluent"),
                             IdentifierName("AddProperty")))
-                    .WithArgumentList(ArgumentList([Argument(IdentifierName("Modify")),Argument(IdentifierName("_type"))]))),
+                    .WithArgumentList(ArgumentList([
+                        Argument(IdentifierName("Modify")), Argument(IdentifierName("_type"))
+                    ]))),
                 LocalFunctionStatement(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("Modify"))
                     .WithParameterList(ParameterList(
                     [
@@ -375,17 +369,17 @@ public class FluentGenerator : IIncrementalGenerator
                     .WithBody(Block(statements))))
             .AddAttributes()
             .WithXmlComment($"""
-                              /// <summary>
-                              ///     Set the value <see cref="{typeName.SummaryName}.{propertyName}" /> in <see cref="{typeName.SummaryName}" />
-                              ///     <para>
-                              ///         <inheritdoc cref="{typeName.SummaryName}.{propertyName}" />
-                              ///     </para>
-                              /// </summary>
-                              /// <param name="_fluent">Self</param>
-                              /// {parameterSummary}
-                              /// <param name="_type">Fluent type</param>
-                              /// <returns>Self</returns>
-                              """);
+                             /// <summary>
+                             ///     🏠 Set the <b>Property</b> <see cref="{typeName.SummaryName}.{propertyName}" /> in <see cref="{typeName.SummaryName}" />
+                             ///     <para>
+                             ///         <inheritdoc cref="{typeName.SummaryName}.{propertyName}" />
+                             ///     </para>
+                             /// </summary>
+                             /// <param name="_fluent">Self</param>
+                             /// {parameterSummary}
+                             /// <param name="_type">Fluent type</param>
+                             /// <returns>Self</returns>
+                             """);
     }
 
     private static bool CanAccess(ISymbol? symbol, IAssemblySymbol? assembly)
@@ -394,9 +388,8 @@ public class FluentGenerator : IIncrementalGenerator
         var access = symbol.DeclaredAccessibility;
         if (access == Accessibility.Public) return true;
         if (assembly is not null && symbol.ContainingAssembly.Equals(assembly, SymbolEqualityComparer.Default))
-        {
-            if (access is Accessibility.Internal or Accessibility.ProtectedOrInternal) return true;
-        }
+            if (access is Accessibility.Internal or Accessibility.ProtectedOrInternal)
+                return true;
 
         return false;
     }

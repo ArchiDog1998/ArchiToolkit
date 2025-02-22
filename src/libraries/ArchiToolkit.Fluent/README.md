@@ -23,3 +23,16 @@ var point = new Point().AsFluent()
     .Result;
 ```
 It'll make your Properties and Fields to the method `WithXXX`, and your method to `DoXXX`.
+### Api Generator
+If the target's api isn't generated, you can use `FluentApi` Attribute to make it generate.
+```c#
+[assembly: FluentApi(typeof(BasicType<,>))]
+[assembly: FluentApi(typeof(int))]
+
+[FluentApi]
+public class MyClass
+{
+    
+}
+```
+Or you can just manually add your own extensions
