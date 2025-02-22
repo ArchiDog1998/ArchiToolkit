@@ -109,7 +109,7 @@ public partial class FormatGenerator : IIncrementalGenerator
 
         var root = NamespaceDeclaration("ArchiToolkit.InterpolatedParser",
                 $"For adding the formatted type of {name.FullName}")
-            .AddMembers(StructDeclaration("InterpolatedParseStringHandler")
+            .AddMembers(ClassDeclaration("InterpolatedParseStringHandler")
                 .WithModifiers(
                     TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.PartialKeyword)))
                 .AddMembers(classDeclaration.WithAttributeLists([

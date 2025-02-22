@@ -4,13 +4,13 @@ using System.Diagnostics.CodeAnalysis;
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
 /// <summary>
-/// The span parser.
+///     The span parser.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public interface ISpanParser<T> : IParser
 {
     /// <summary>
-    /// Parse it
+    ///     Parse it
     /// </summary>
     /// <param name="s"></param>
     /// <param name="provider"></param>
@@ -18,7 +18,7 @@ public interface ISpanParser<T> : IParser
     T Parse(ReadOnlySpan<char> s, IFormatProvider? provider);
 
     /// <summary>
-    /// Try parse it.
+    ///     Try parse it.
     /// </summary>
     /// <param name="s"></param>
     /// <param name="provider"></param>

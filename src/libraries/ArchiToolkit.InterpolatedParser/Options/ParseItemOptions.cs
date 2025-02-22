@@ -4,59 +4,59 @@ using ArchiToolkit.InterpolatedParser.Parsers;
 namespace ArchiToolkit.InterpolatedParser.Options;
 
 /// <summary>
-/// The option to one specific parameter
+///     The option to one specific parameter
 /// </summary>
-/// <param name="ParameterName">Please use <see langword="nameof"/></param> to get the symbol word
-public readonly record struct ParseItemOptions([CallerMemberName]string ParameterName = "")
+/// <param name="ParameterName">Please use <see langword="nameof" /></param>
+/// to get the symbol word
+public readonly record struct ParseItemOptions([CallerMemberName] string ParameterName = "")
 {
     /// <summary>
-    /// The delegate about what you want to get the string.
+    ///     The delegate about what you want to get the string.
     /// </summary>
     public delegate string ToStringDelegate(object? value, string? format);
 
     /// <summary>
-    /// The default value.
+    ///     The default value.
     /// </summary>
     // ReSharper disable once ExplicitCallerInfoArgument
     public static readonly ParseItemOptions Default = new("");
 
     /// <summary>
-    /// In or Out?
+    ///     In or Out?
     /// </summary>
     public ParseType ParseType { get; init; }
 
     /// <summary>
-    /// List or Item?
+    ///     List or Item?
     /// </summary>
     public DataType DataType { get; init; }
 
     /// <summary>
-    ///
     /// </summary>
     public PreModifyOptions? PreModification { get; init; }
 
     /// <summary>
-    /// Patch at the beginning
+    ///     Patch at the beginning
     /// </summary>
     public bool Beginning { get; init; }
 
     /// <summary>
-    /// Your custom parser?
+    ///     Your custom parser?
     /// </summary>
     public IParser? Parser { get; init; }
 
     /// <summary>
-    /// Your separator for the case you set <see cref="DataType"/> to <see cref="DataType.List"/>.
+    ///     Your separator for the case you set <see cref="DataType" /> to <see cref="DataType.List" />.
     /// </summary>
     public string Separator { get; init; } = ",";
 
     /// <summary>
-    /// Your custom way to make it as string.
+    ///     Your custom way to make it as string.
     /// </summary>
     public ToStringDelegate? CustomToString { get; init; }
 
     /// <summary>
-    /// To string the custom way
+    ///     To string the custom way
     /// </summary>
     /// <param name="value">the target</param>
     /// <param name="format">format</param>
@@ -72,9 +72,12 @@ public readonly record struct ParseItemOptions([CallerMemberName]string Paramete
     }
 
 #pragma warning disable CS1066 // The default value specified will have no effect because it applies to a member that is used in contexts that do not allow optional arguments
-    public static implicit operator ParseItemOptions([CallerMemberName] string parameterName = "") => new(parameterName)
+    public static implicit operator ParseItemOptions([CallerMemberName] string parameterName = "")
     {
-        ParseType = ParseType.In,
-    };
+        return new ParseItemOptions(parameterName)
+        {
+            ParseType = ParseType.In
+        };
+    }
 #pragma warning restore CS1066 // The default value specified will have no effect because it applies to a member that is used in contexts that do not allow optional arguments
 }

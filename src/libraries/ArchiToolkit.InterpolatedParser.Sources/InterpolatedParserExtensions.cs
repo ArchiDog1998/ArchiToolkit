@@ -15,10 +15,10 @@ internal static class InterpolatedParserExtensions
     /// <param name="input"></param>
     /// <param name="template"></param>
     public static void Parse(this string input,
-        [StringSyntax(StringSyntaxAttribute.Regex)][InterpolatedStringHandlerArgument(nameof(input))]
-        InterpolatedParseStringHandler template)
+        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(input))]
+        ParseStringHandler template)
     {
-        template.Parse();
+        template.Solve();
     }
 
     /// <summary>
@@ -28,9 +28,9 @@ internal static class InterpolatedParserExtensions
     /// <param name="template"></param>
     public static void Parse(this string input, ParseOptions options,
         [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(input), nameof(options))]
-        InterpolatedParseStringHandler template)
+        ParseStringHandler template)
     {
-        template.Parse();
+        template.Solve();
     }
 
     /// <summary>
@@ -39,10 +39,10 @@ internal static class InterpolatedParserExtensions
     /// <param name="template"></param>
     /// <returns></returns>
     public static ParseResult[] TryParse(this string input,
-        [StringSyntax(StringSyntaxAttribute.Regex)][InterpolatedStringHandlerArgument(nameof(input))]
-        InterpolatedParseStringHandler template)
+        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(input))]
+        TryParseStringHandler template)
     {
-        return template.TryParse();
+        return template.Solve();
     }
 
     /// <summary>
@@ -53,8 +53,8 @@ internal static class InterpolatedParserExtensions
     /// <returns></returns>
     public static ParseResult[] TryParse(this string input, ParseOptions options,
         [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(input), nameof(options))]
-        InterpolatedParseStringHandler template)
+        TryParseStringHandler template)
     {
-        return template.TryParse();
+        return template.Solve();
     }
 }

@@ -38,22 +38,7 @@ using Microsoft.Extensions.Logging;
 //     }).And.ContainSingle(3).Which.Could.Be(2);
 // }
 
-//var a = 0;
-//"abc10".Parse($"abc{a}");
+var a = "";
+"I am cool!!".Parse($"I am {a}");
+Console.WriteLine(a);
 
-var point = new Point().AsFluent()
-    .WithX(5)
-    .DoAddX(6)
-    .Result;
-Console.WriteLine("Wait for the result");
-
-Console.WriteLine(point.X);
-Console.WriteLine(point.Y);
-Console.WriteLine(typeof(Type).GetFulTypeName());
-
-class Point
-{
-    public double X { get; set; }
-    public double Y { get; set; }
-    public void AddX(double x) => X += x;
-}

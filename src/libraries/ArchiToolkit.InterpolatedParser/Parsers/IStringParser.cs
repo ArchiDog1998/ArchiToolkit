@@ -3,13 +3,13 @@
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
 /// <summary>
-/// The string parser
+///     The string parser
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public interface IStringParser<T> : IParser
 {
     /// <summary>
-    /// Parse it.
+    ///     Parse it.
     /// </summary>
     /// <param name="s"></param>
     /// <param name="provider"></param>
@@ -17,7 +17,7 @@ public interface IStringParser<T> : IParser
     T Parse(string s, IFormatProvider? provider);
 
     /// <summary>
-    /// Try parse it.
+    ///     Try parse it.
     /// </summary>
     /// <param name="s"></param>
     /// <param name="provider"></param>

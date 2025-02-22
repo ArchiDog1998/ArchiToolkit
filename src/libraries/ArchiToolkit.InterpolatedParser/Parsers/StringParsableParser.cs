@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace ArchiToolkit.InterpolatedParser.Parsers;
 
 /// <summary>
-/// For the parsable items.
+///     For the parsable items.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public abstract class StringParsableParser<T> : StringParser<T> where T : IParsable<T>

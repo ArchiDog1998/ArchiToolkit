@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using ArchiToolkit.InterpolatedParser.Options;
 
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
@@ -9,16 +8,12 @@ public abstract unsafe class ParseItem<T> : IParseItem
 {
     private readonly void* _ptr;
 
-    private protected ParseItem(in T value, int index, PreModifyOptions preModify)
+    private protected ParseItem(in T value, PreModifyOptions preModify)
     {
         ref var t = ref Unsafe.AsRef(in value);
         _ptr = Unsafe.AsPointer(ref t);
-        RegexIndex = index;
         PreModification = preModify;
     }
-
-    /// <inheritdoc />
-    public int RegexIndex { get; }
 
     /// <inheritdoc />
     public PreModifyOptions PreModification { get; }

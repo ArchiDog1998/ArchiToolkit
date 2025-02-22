@@ -3,29 +3,28 @@
 namespace ArchiToolkit.InterpolatedParser.Options;
 
 /// <summary>
-/// The options
+///     The options
 /// </summary>
 public readonly record struct ParseOptions()
 {
     private readonly Dictionary<string, ParseItemOptions> _options = [];
 
     /// <summary>
-    /// Patch at the beginning
+    ///     Patch at the beginning
     /// </summary>
     public bool Beginning { get; init; }
 
     /// <summary>
-    /// Format provider
+    ///     Format provider
     /// </summary>
     public IFormatProvider? FormatProvider { get; init; }
 
     /// <summary>
-    ///
     /// </summary>
     public PreModifyOptions ProModification { get; init; } = new();
 
     /// <summary>
-    /// Your parameters options.
+    ///     Your parameters options.
     /// </summary>
     public ParseItemOptions[] ParameterOptions
     {
@@ -33,19 +32,19 @@ public readonly record struct ParseOptions()
     }
 
     /// <summary>
-    /// Just your parsers. For the case it can't find the parser.
+    ///     Just your parsers. For the case it can't find the parser.
     /// </summary>
     public IParser[] Parsers { get; init; } = [];
 
     /// <summary>
-    /// Get the option.
+    ///     Get the option.
     /// </summary>
     /// <param name="parameterName"></param>
     public ParseItemOptions this[string parameterName]
         => _options.TryGetValue(parameterName, out var options) ? options : ParseItemOptions.Default;
 
     /// <summary>
-    /// Converters.
+    ///     Converters.
     /// </summary>
     /// <param name="options"></param>
     /// <returns></returns>
@@ -58,7 +57,7 @@ public readonly record struct ParseOptions()
     }
 
     /// <summary>
-    /// Converters.
+    ///     Converters.
     /// </summary>
     /// <param name="parsers"></param>
     /// <returns></returns>

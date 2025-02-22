@@ -1,7 +1,7 @@
 ﻿namespace ArchiToolkit.InterpolatedParser.Options;
 
 /// <summary>
-/// The parse type.
+///     The parse type.
 /// </summary>
 public enum ParseType : byte
 {

@@ -5,10 +5,9 @@ using ArchiToolkit.InterpolatedParser.Parsers;
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
 /// <summary>
-/// The parse item for collections.
+///     The parse item for collections.
 /// </summary>
 /// <param name="value"></param>
-/// <param name="index"></param>
 /// <param name="parser"></param>
 /// <param name="separator"></param>
 /// <param name="preModify"></param>
@@ -16,11 +15,10 @@ namespace ArchiToolkit.InterpolatedParser.ParseItems;
 /// <typeparam name="TValue"></typeparam>
 public sealed class CollectionSpanParseItem<TCollection, TValue>(
     in TCollection value,
-    int index,
     ISpanParser<TValue> parser,
     string separator,
     PreModifyOptions preModify)
-    : ParseItem<TCollection>(value, index, preModify), ISpanParseItem
+    : ParseItem<TCollection>(value, preModify), ISpanParseItem
     where TCollection : ICollection<TValue>, new()
 {
     /// <inheritdoc />
@@ -64,6 +62,7 @@ public sealed class CollectionSpanParseItem<TCollection, TValue>(
                 {
                     result.Add(false);
                 }
+
                 break;
             }
             else

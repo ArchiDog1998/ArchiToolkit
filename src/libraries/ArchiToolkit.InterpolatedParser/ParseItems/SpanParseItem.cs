@@ -5,15 +5,15 @@ using ArchiToolkit.InterpolatedParser.Parsers;
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
 /// <summary>
-/// Parse by the span
+///     Parse by the span
 /// </summary>
 /// <param name="value"></param>
 /// <param name="index"></param>
 /// <param name="parser"></param>
 /// <param name="preModify"></param>
 /// <typeparam name="T"></typeparam>
-public sealed class SpanParseItem<T>(in T value, int index, ISpanParser<T> parser, PreModifyOptions preModify)
-    : ParseItem<T>(value, index, preModify), ISpanParseItem
+public sealed class SpanParseItem<T>(in T value, ISpanParser<T> parser, PreModifyOptions preModify)
+    : ParseItem<T>(value, preModify), ISpanParseItem
 {
     /// <inheritdoc />
     public void Parse(ReadOnlySpan<char> s, IFormatProvider? provider)

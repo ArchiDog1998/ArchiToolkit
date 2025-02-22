@@ -26,7 +26,7 @@ partial class FormatGenerator
         { "decimal", "NumericFormat" }
     };
 
-    private static StructDeclarationSyntax BasicStruct(string typeName, string methodName, ParseItem item,
+    private static ClassDeclarationSyntax BasicStruct(string typeName, string methodName, ParseItem item,
         IImmutableDictionary<ITypeSymbol, ObjectCreationExpressionSyntax> creations)
     {
         var method1 = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("AppendFormatted"))
@@ -77,7 +77,7 @@ partial class FormatGenerator
                     Parameter(Identifier("callerName")).WithType(PredefinedType(Token(SyntaxKind.StringKeyword)))
                 ])), item, creations);
 
-        return StructDeclaration("InterpolatedParseStringHandler")
+        return ClassDeclaration("InterpolatedParseStringHandler")
             .WithModifiers(
                 TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.PartialKeyword)))
         .WithMembers([method1, method2, method3]);

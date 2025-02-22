@@ -3,19 +3,19 @@
 namespace ArchiToolkit.InterpolatedParser.ParseItems;
 
 /// <summary>
-/// The span parse item.
+///     The span parse item.
 /// </summary>
 public interface ISpanParseItem : IParseItem
 {
     /// <summary>
-    /// Parse it.
+    ///     Parse it.
     /// </summary>
     /// <param name="s"></param>
     /// <param name="provider"></param>
     void Parse(ReadOnlySpan<char> s, IFormatProvider? provider);
 
     /// <summary>
-    /// Try parse it.
+    ///     Try parse it.
     /// </summary>
     /// <param name="s"></param>
     /// <param name="provider"></param>

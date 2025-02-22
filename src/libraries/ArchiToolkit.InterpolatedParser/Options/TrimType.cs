@@ -26,7 +26,7 @@ public enum TrimType : byte
     TrimEnd,
 
     /// <summary>
-    /// Your custom way to modify it
+    ///     Your custom way to modify it
     /// </summary>
-    Custom,
+    Custom
 }
