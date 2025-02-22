@@ -15,6 +15,11 @@ public readonly record struct ParseOptions()
     public bool Beginning { get; init; }
 
     /// <summary>
+    /// Format provider
+    /// </summary>
+    public IFormatProvider? FormatProvider { get; init; }
+
+    /// <summary>
     ///
     /// </summary>
     public PreModifyOptions ProModification { get; init; } = new();

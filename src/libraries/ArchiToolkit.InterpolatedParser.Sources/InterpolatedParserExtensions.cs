@@ -14,13 +14,11 @@ internal static class InterpolatedParserExtensions
     /// </summary>
     /// <param name="input"></param>
     /// <param name="template"></param>
-    /// <param name="provider"></param>
     public static void Parse(this string input,
-        [StringSyntax(StringSyntaxAttribute.Regex)]
-        InterpolatedParseStringHandler template,
-        IFormatProvider? provider = null)
+        [StringSyntax(StringSyntaxAttribute.Regex)][InterpolatedStringHandlerArgument(nameof(input))]
+        InterpolatedParseStringHandler template)
     {
-        template.Parse(input, provider);
+        template.Parse();
     }
 
     /// <summary>
@@ -28,27 +26,23 @@ internal static class InterpolatedParserExtensions
     /// <param name="input"></param>
     /// <param name="options"></param>
     /// <param name="template"></param>
-    /// <param name="provider"></param>
     public static void Parse(this string input, ParseOptions options,
-        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(options))]
-        InterpolatedParseStringHandler template,
-        IFormatProvider? provider = null)
+        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(input), nameof(options))]
+        InterpolatedParseStringHandler template)
     {
-        template.Parse(input, provider);
+        template.Parse();
     }
 
     /// <summary>
     /// </summary>
     /// <param name="input"></param>
     /// <param name="template"></param>
-    /// <param name="provider"></param>
     /// <returns></returns>
     public static ParseResult[] TryParse(this string input,
-        [StringSyntax(StringSyntaxAttribute.Regex)]
-        InterpolatedParseStringHandler template,
-        IFormatProvider? provider = null)
+        [StringSyntax(StringSyntaxAttribute.Regex)][InterpolatedStringHandlerArgument(nameof(input))]
+        InterpolatedParseStringHandler template)
     {
-        return template.TryParse(input, provider);
+        return template.TryParse();
     }
 
     /// <summary>
@@ -56,13 +50,11 @@ internal static class InterpolatedParserExtensions
     /// <param name="input"></param>
     /// <param name="options"></param>
     /// <param name="template"></param>
-    /// <param name="provider"></param>
     /// <returns></returns>
     public static ParseResult[] TryParse(this string input, ParseOptions options,
-        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(options))]
-        InterpolatedParseStringHandler template,
-        IFormatProvider? provider = null)
+        [StringSyntax(StringSyntaxAttribute.Regex)] [InterpolatedStringHandlerArgument(nameof(input), nameof(options))]
+        InterpolatedParseStringHandler template)
     {
-        return template.TryParse(input, provider);
+        return template.TryParse();
     }
 }

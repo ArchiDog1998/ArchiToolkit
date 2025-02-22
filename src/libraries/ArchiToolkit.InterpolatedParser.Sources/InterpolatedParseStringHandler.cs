@@ -14,32 +14,39 @@ namespace ArchiToolkit.InterpolatedParser;
 /// </summary>
 [InterpolatedStringHandler]
 // ReSharper disable once PartialTypeWithSinglePart
-internal readonly partial struct InterpolatedParseStringHandler
+internal partial struct InterpolatedParseStringHandler
 {
     private readonly Queue<Func<IFormatProvider?, string>> _replacements;
     private readonly Queue<IParseItem> _items;
     private readonly int _formattedCount;
     private readonly ParseOptions _options = new();
+    private readonly string _input;
+
+    private IParseItem? _item;
+    private int _startIndex;
 
     /// <summary>
     /// </summary>
     /// <param name="literalLength"></param>
     /// <param name="formattedCount"></param>
+    /// <param name="input"></param>
     // ReSharper disable once UnusedParameter.Local
-    public InterpolatedParseStringHandler(int literalLength, int formattedCount)
+    public InterpolatedParseStringHandler(int literalLength, int formattedCount, string input)
     {
         _replacements = new Queue<Func<IFormatProvider?, string>>(2 * formattedCount + 1);
         _items = new Queue<IParseItem>(formattedCount);
         _formattedCount = formattedCount;
+        _input = input;
     }
 
     /// <summary>
     /// </summary>
     /// <param name="literalLength"></param>
     /// <param name="formattedCount"></param>
+    /// <param name="input"></param>
     /// <param name="options"></param>
-    public InterpolatedParseStringHandler(int literalLength, int formattedCount, ParseOptions options)
-        : this(literalLength, formattedCount)
+    public InterpolatedParseStringHandler(int literalLength, int formattedCount, string input, ParseOptions options)
+        : this(literalLength, formattedCount, input)
     {
         _options = options;
     }
@@ -201,10 +208,11 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     #region Parse
 
-    internal ParseResult[] TryParse(string input, IFormatProvider? provider)
+    internal ParseResult[] TryParse()
     {
+        var provider = _options.FormatProvider;
         List<ParseResult> result = new(_formattedCount);
-        Solve(input, (i, t, s, l) =>
+        Solve( (i, t, s, l) =>
         {
             switch (i)
             {
@@ -225,9 +233,10 @@ internal readonly partial struct InterpolatedParseStringHandler
         return result.ToArray();
     }
 
-    internal void Parse(string input, IFormatProvider? provider)
+    internal void Parse()
     {
-        Solve(input, (i, t, s, l) =>
+        var provider = _options.FormatProvider;
+        Solve((i, t, s, l) =>
         {
             switch (i)
             {
@@ -249,8 +258,9 @@ internal readonly partial struct InterpolatedParseStringHandler
 
     private delegate void ParseDelegate(IParseItem item, string text, int start, int? length);
 
-    private void Solve(string input, ParseDelegate action, IFormatProvider? provider)
+    private void Solve(ParseDelegate action, IFormatProvider? provider)
     {
+        var input = _input;
         var index = 0;
         var stringStart = 0;
 

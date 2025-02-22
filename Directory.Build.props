@@ -30,6 +30,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Authors>ArchiTed</Authors>
     </PropertyGroup>
 
     <ItemGroup Condition="$(NeedPackage)">
