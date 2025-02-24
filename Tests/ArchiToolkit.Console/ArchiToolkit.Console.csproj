@@ -8,7 +8,9 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.Fluent.SourceGenerator\ArchiToolkit.Fluent.SourceGenerator.csproj" OutputItemType="analyzer" />
         <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.InterpolatedParser.SourceGenerator\ArchiToolkit.InterpolatedParser.SourceGenerator.csproj" OutputItemType="analyzer" />
+        <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.PureConst.Analyzer\ArchiToolkit.PureConst.Analyzer.csproj" OutputItemType="analyzer" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Fluent\ArchiToolkit.Fluent.csproj" />
+        <ProjectReference Include="..\..\src\libraries\ArchiToolkit.PureConst\ArchiToolkit.PureConst.csproj" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj" OutputItemType="analyzer"  />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Assertions.Logging\ArchiToolkit.Assertions.Logging.csproj" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.InterpolatedParser\ArchiToolkit.InterpolatedParser.csproj" />

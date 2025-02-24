@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <PackageReference Include="TUnit"/>
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Assertions\ArchiToolkit.Assertions.csproj"/>
     </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ArchiToolkit.Pure {
+namespace ArchiToolkit.PureConst.Analyzer {
     using System;
     
     
@@ -38,7 +38,7 @@ namespace ArchiToolkit.Pure {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ArchiToolkit.Pure.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ArchiToolkit.PureConst.Analyzer.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -119,6 +119,33 @@ namespace ArchiToolkit.Pure {
         internal static string AB0002Title {
             get {
                 return ResourceManager.GetString("AB0002Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t use Const Attribute on an accessor..
+        /// </summary>
+        internal static string PC0001Description {
+            get {
+                return ResourceManager.GetString("PC0001Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t use Const Attribute on the accessor {0}..
+        /// </summary>
+        internal static string PC0001MessageFormat {
+            get {
+                return ResourceManager.GetString("PC0001MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t use Const Attribute on an accessor..
+        /// </summary>
+        internal static string PC0001Tittle {
+            get {
+                return ResourceManager.GetString("PC0001Tittle", resourceCulture);
             }
         }
     }

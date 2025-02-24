@@ -1,4 +1,6 @@
 ﻿
+using ArchiToolkit.PureConst;
+
 namespace ArchiToolkit.Console;
 
 /// <summary>
@@ -11,4 +13,19 @@ public class TestClass<T> where T :  struct
     /// What the hell.
     /// </summary>
     public T Data { get; set; } = default;
+
+
+    [Const]
+    public void TestMethod()
+    {
+        int a, b;
+
+        a = b = 1;
+
+        [Const]
+        void NestMethod()
+        {
+
+        }
+    }
 }

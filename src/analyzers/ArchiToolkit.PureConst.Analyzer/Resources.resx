@@ -51,4 +51,13 @@
         <value>The impossible speed</value>
         <comment>The title of the diagnostic.</comment>
     </data>
+    <data name="PC0001Tittle" xml:space="preserve">
+        <value>You can't use Const Attribute on an accessor.</value>
+    </data>
+    <data name="PC0001Description" xml:space="preserve">
+        <value>You can't use Const Attribute on an accessor.</value>
+    </data>
+    <data name="PC0001MessageFormat" xml:space="preserve">
+        <value>You can't use Const Attribute on the accessor {0}.</value>
+    </data>
 </root>

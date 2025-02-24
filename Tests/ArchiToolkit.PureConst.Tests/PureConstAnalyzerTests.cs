@@ -1,12 +1,12 @@
-using Xunit;
-using Verifier = Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<
-    ArchiToolkit.Pure.SampleSemanticAnalyzer>;
+using Verify = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerVerifier<
+    ArchiToolkit.PureConst.Analyzer.PureConstAnalyzer,
+    Microsoft.CodeAnalysis.Testing.DefaultVerifier>;
 
 namespace ArchiToolkit.Pure.Tests;
 
-public class SampleSemanticAnalyzerTests
+public class PureConstAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task SetSpeedHugeSpeedSpecified_AlertDiagnostic()
     {
         const string text = @"
@@ -25,9 +25,9 @@ public class Spaceship
 }
 ";
 
-        var expected = Verifier.Diagnostic()
-            .WithLocation(7, 28)
+        var expected = Verify.Diagnostic().WithLocation(7, 28)
             .WithArguments("300000000");
-        //await Verifier.VerifyAnalyzerAsync(text, expected);
+
+        //await Verify.VerifyAnalyzerAsync(text, expected);
     }
 }

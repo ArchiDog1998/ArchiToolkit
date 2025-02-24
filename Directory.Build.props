@@ -26,6 +26,10 @@
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup Condition="$(NeedTestsPackage)">
+        <PackageReference Include="TUnit" />
+    </ItemGroup>
+
     <PropertyGroup Condition="$(NeedPackage)">
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
