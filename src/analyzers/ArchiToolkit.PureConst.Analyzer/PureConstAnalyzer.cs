@@ -17,6 +17,9 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
         DescriptorType.PropertyConstMethod,
         DescriptorType.MethodConstMethod,
         DescriptorType.VariableConstMethod,
+        DescriptorType.FieldConstMethodWarning,
+        DescriptorType.PropertyConstMethodWarning,
+        DescriptorType.MethodConstMethodWarning,
 
         DescriptorType.CheckingSymbol,
         DescriptorType.CantFindSymbol,
@@ -77,9 +80,10 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
         ParameterListSyntax parameterList)
     {
         var model = context.SemanticModel;
-        var isConst = ConstAttributes(attributeLists, model).Any() || IsPure(attributeLists, model);
+        var isPure = IsPure(attributeLists, model);
+        var isConst = ConstAttributes(attributeLists, model).Any() || isPure;
         var parameters = parameterList.Parameters
-            .Where(param => IsPure(param.AttributeLists, model) || ConstAttributes(param.AttributeLists, model).Any())
+            .Where(param => isPure || ConstAttributes(param.AttributeLists, model).Any())
             .Select(p => model.GetDeclaredSymbol(p))
             .OfType<IParameterSymbol>();
         AnalyzeBody(context, body, isConst, [..parameters]);
@@ -100,7 +104,7 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
             foreach (var name in GetFirstAccessorName(context, itemNode))
             {
                 var s = context.SemanticModel.GetSymbolInfo(name).Symbol;
-                context.Report(DescriptorType.CheckingSymbol, name.GetLocation(), s?.GetType());
+                context.Report(DescriptorType.CheckingSymbol, name.GetLocation(), name);
                 switch (s)
                 {
                     case ILocalSymbol when constSymbols.Contains(s, SymbolEqualityComparer.Default):
@@ -118,24 +122,30 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
                     a.AttributeClass?.GetName().FullName is "global::ArchiToolkit.PureConst.ConstAttribute" or
                         "global::System.Diagnostics.Contracts.PureAttribute")) continue;
 
+            var isLocalDefined = methodSymbol.ContainingAssembly.Equals(context.Compilation.Assembly, SymbolEqualityComparer.Default);
+
             foreach (var name in GetFirstAccessorName(context, itemNode))
             {
                 var s = context.SemanticModel.GetSymbolInfo(name).Symbol;
-                context.Report(DescriptorType.CheckingSymbol, name.GetLocation(), s?.GetType());
+                context.Report(DescriptorType.CheckingSymbol, name.GetLocation(), name);
                 switch (s)
                 {
                     case IFieldSymbol when isConstMethod:
-                        context.Report(DescriptorType.FieldConstMethod, itemNode.GetLocation(), name);
+                        context.Report(isLocalDefined ? DescriptorType.FieldConstMethod : DescriptorType.FieldConstMethodWarning,
+                            itemNode.GetLocation(), name);
                         break;
                     case IPropertySymbol when isConstMethod:
-                        context.Report(DescriptorType.PropertyConstMethod, itemNode.GetLocation(), name);
+                        context.Report(isLocalDefined ? DescriptorType.PropertyConstMethod : DescriptorType.PropertyConstMethodWarning,
+                            itemNode.GetLocation(), name);
                         break;
                     case IMethodSymbol when isConstMethod:
-                        context.Report(DescriptorType.MethodConstMethod, itemNode.GetLocation(), name);
+                        context.Report(isLocalDefined ? DescriptorType.MethodConstMethod : DescriptorType.MethodConstMethodWarning,
+                            itemNode.GetLocation(), name);
                         break;
                     case ILocalSymbol when constSymbols.Contains(s, SymbolEqualityComparer.Default):
                     case IParameterSymbol when constSymbols.Contains(s, SymbolEqualityComparer.Default):
-                        context.Report(DescriptorType.VariableConstMethod, itemNode.GetLocation(), name);
+                        context.Report(isLocalDefined ? DescriptorType.VariableConstMethod : DescriptorType.VariableConstMethodWarning,
+                            itemNode.GetLocation(), name);
                         break;
                 }
             }
@@ -145,7 +155,7 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
     private static IEnumerable<ILocalSymbol> GetLocals(SyntaxNodeAnalysisContext context, SyntaxNode[] nodes,
         IParameterSymbol[] parameters)
     {
-        var referenceSymbols = parameters.Where(s => s.Type.IsReferenceType).ToArray();
+        var referenceSymbols = parameters.Where(s => s.Type.IsReferenceType).ToList<ISymbol>();
 
         foreach (var node in nodes.OfType<LocalDeclarationStatementSyntax>())
         {
@@ -170,6 +180,11 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
                                                        SymbolEqualityComparer.Default));
                                            }));
                 if (!isConst) continue;
+                if (localSymbol.Type.IsReferenceType)
+                {
+                    referenceSymbols.Add(localSymbol);
+                }
+
                 yield return localSymbol;
                 context.Report(DescriptorType.AdditionalVariable, variable.Identifier.GetLocation(), localSymbol.Name);
             }

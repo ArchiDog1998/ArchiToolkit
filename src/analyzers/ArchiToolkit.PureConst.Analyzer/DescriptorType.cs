@@ -28,6 +28,18 @@ public enum DescriptorType : byte
     [Descriptor("PC0005", DiagnosticSeverity.Error, "Usage")]
     VariableConstMethod,
 
+    [Descriptor("PC0006", DiagnosticSeverity.Warning, "Usage")]
+    FieldConstMethodWarning,
+
+    [Descriptor("PC0007", DiagnosticSeverity.Warning, "Usage")]
+    PropertyConstMethodWarning,
+
+    [Descriptor("PC0008", DiagnosticSeverity.Warning, "Usage")]
+    MethodConstMethodWarning,
+
+    [Descriptor("PC0009", DiagnosticSeverity.Warning, "Usage")]
+    VariableConstMethodWarning,
+
     [Descriptor("PC1001",
 #if DEBUG
         DiagnosticSeverity.Warning,

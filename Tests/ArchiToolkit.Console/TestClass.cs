@@ -1,4 +1,5 @@
-﻿using ArchiToolkit.PureConst;
+﻿using System.Diagnostics.Contracts;
+using ArchiToolkit.PureConst;
 
 namespace ArchiToolkit.Console;
 
@@ -20,19 +21,27 @@ public class TestClass<T> where T :  struct
         public Task<int> TestMethod() => Task.FromResult(1);
     }
 
-    public void TestMethod([Const]TestSub t)
+
+    private void NonConstMethod()
+    {
+
+    }
+
+    [Pure]
+    public void TestMethod(TestSub t)
     {
         var a = t.TestMethod().Result;
         t.A = 5;
         var c = t.A;
         var b = t;
-        b.A = 10;
+        var b2 = b;
+        b2.A = 10;
 
         var i = 0;
         i = 5;
         var j = 0; //.const
         j = i;
-
+        NonConstMethod();
         // var d = (10, "");
         // int a = t.A, b;
         // NestMethod();

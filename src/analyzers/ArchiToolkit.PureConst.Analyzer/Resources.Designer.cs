@@ -69,7 +69,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t use Const Attribute on the accessor {0}..
+        ///   Looks up a localized string similar to You can&apos;t use Const Attribute on the accessor [{0}]..
         /// </summary>
         internal static string PC0001MessageFormat {
             get {
@@ -96,7 +96,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t modify the field {0} here, becasue the mtethod is const.
+        ///   Looks up a localized string similar to You can&apos;t modify the field {[0}] here, becasue the mtethod is const.
         /// </summary>
         internal static string PC0002MessageFormat {
             get {
@@ -114,7 +114,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t modify this property here, becasue the mtethod is const.
+        ///   Looks up a localized string similar to You can&apos;t modify this property here, becasue the method is const.
         /// </summary>
         internal static string PC0003Description {
             get {
@@ -123,7 +123,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t modify the property {0} here, becasue the mtethod is const.
+        ///   Looks up a localized string similar to You can&apos;t modify the property [{0}] here, becasue the method is const.
         /// </summary>
         internal static string PC0003MessageFormat {
             get {
@@ -132,7 +132,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t modify this property here, becasue the mtethod is const.
+        ///   Looks up a localized string similar to You can&apos;t modify this property here, becasue the method is const.
         /// </summary>
         internal static string PC0003Tittle {
             get {
@@ -141,7 +141,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t invoke this method here, becasue the mtethod is const.
+        ///   Looks up a localized string similar to You can&apos;t invoke this method here, becasue the method is const.
         /// </summary>
         internal static string PC0004Description {
             get {
@@ -150,7 +150,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t invoke the method {0} here, becasue the mtethod is const.
+        ///   Looks up a localized string similar to You can&apos;t invoke the method [{0}] here, becasue the method is const.
         /// </summary>
         internal static string PC0004MessageFormat {
             get {
@@ -159,7 +159,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t invoke this method here, becasue the mtethod is const.
+        ///   Looks up a localized string similar to You can&apos;t invoke this method here, becasue the method is const.
         /// </summary>
         internal static string PC0004Tittle {
             get {
@@ -195,6 +195,114 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this field here, becasue the method is const.
+        /// </summary>
+        internal static string PC0006Description {
+            get {
+                return ResourceManager.GetString("PC0006Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify the field [{0}] here, becasue the method is const.
+        /// </summary>
+        internal static string PC0006MessageFormat {
+            get {
+                return ResourceManager.GetString("PC0006MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this field here, becasue the method is const.
+        /// </summary>
+        internal static string PC0006Tittle {
+            get {
+                return ResourceManager.GetString("PC0006Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this property here, becasue the method is const.
+        /// </summary>
+        internal static string PC0007Description {
+            get {
+                return ResourceManager.GetString("PC0007Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify the property {0} here, becasue the method is const.
+        /// </summary>
+        internal static string PC0007MessageFormat {
+            get {
+                return ResourceManager.GetString("PC0007MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this property here, becasue the method is const.
+        /// </summary>
+        internal static string PC0007Tittle {
+            get {
+                return ResourceManager.GetString("PC0007Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t invoke this method here, becasue the method is const.
+        /// </summary>
+        internal static string PC0008Description {
+            get {
+                return ResourceManager.GetString("PC0008Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t invoke the method[{0}] here, becasue the method is const.
+        /// </summary>
+        internal static string PC0008MessageFormat {
+            get {
+                return ResourceManager.GetString("PC0008MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t invoke this method here, becasue the method is const.
+        /// </summary>
+        internal static string PC0008Tittle {
+            get {
+                return ResourceManager.GetString("PC0008Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this variable here, because it is const.
+        /// </summary>
+        internal static string PC0009Description {
+            get {
+                return ResourceManager.GetString("PC0009Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify the variable [{0}] here, because it is const.
+        /// </summary>
+        internal static string PC0009MessageFormat {
+            get {
+                return ResourceManager.GetString("PC0009MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this variable here, because it is const.
+        /// </summary>
+        internal static string PC0009Tittle {
+            get {
+                return ResourceManager.GetString("PC0009Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This is the checking symbol.
         /// </summary>
         internal static string PC1001Description {
@@ -204,7 +312,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The {0} is the checking symbol.
+        ///   Looks up a localized string similar to The [{0}] is the checking symbol.
         /// </summary>
         internal static string PC1001MessageFormat {
             get {
@@ -249,7 +357,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Additioanl Varaible.
+        ///   Looks up a localized string similar to Additional varaible for checking.
         /// </summary>
         internal static string PC1003Description {
             get {
