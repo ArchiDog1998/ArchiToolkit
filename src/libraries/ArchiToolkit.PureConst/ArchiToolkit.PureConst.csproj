@@ -3,7 +3,6 @@
     <PropertyGroup>
         <Title>Pure Const</Title>
         <Description>Check the method for pure and the const thing</Description>
-        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     </PropertyGroup>
     <ItemGroup>
         <None Include="..\..\analyzers\ArchiToolkit.PureConst.Analyzer\bin\$(Configuration)\netstandard2.0\ArchiToolkit.PureConst.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />

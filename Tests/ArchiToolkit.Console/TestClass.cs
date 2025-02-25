@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using ArchiToolkit.PureConst;
-
-namespace ArchiToolkit.Console;
+﻿namespace ArchiToolkit.Console;
 
 /// <summary>
 /// Test summary.
@@ -27,7 +24,6 @@ public class TestClass<T> where T :  struct
 
     }
 
-    [Pure]
     public void TestMethod(TestSub t)
     {
         var a = t.TestMethod().Result;
@@ -39,7 +35,7 @@ public class TestClass<T> where T :  struct
 
         var i = 0;
         i = 5;
-        var j = 0; //.const
+        var j = 0;
         j = i;
         NonConstMethod();
         // var d = (10, "");
