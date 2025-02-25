@@ -3,3 +3,5 @@ files:
     translation: /src/libraries/ArchiToolkit.Assertions/Resources/AssertionLocalization.%two_letters_code%.resx
   - source: src/applications/ArchiToolkit.CppInteropGenerator/Resources/ApplicationLocalization.resx
     translation: /src/applications/ArchiToolkit.CppInteropGenerator/Resources/ApplicationLocalization.%two_letters_code%.resx
+  - source: /src/analyzers/ArchiToolkit.PureConst.Analyzer/Resources.resx
+    translation: /src/analyzers/ArchiToolkit.PureConst.Analyzer/Resources.%two_letters_code%.resx
