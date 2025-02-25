@@ -1,5 +1,4 @@
-﻿
-using ArchiToolkit.PureConst;
+﻿using ArchiToolkit.PureConst;
 
 namespace ArchiToolkit.Console;
 
@@ -15,17 +14,37 @@ public class TestClass<T> where T :  struct
     public T Data { get; set; } = default;
 
 
-    [Const]
-    public void TestMethod()
+    public class TestSub
     {
-        int a, b;
+        public int A { get; set; }
+        public Task<int> TestMethod() => Task.FromResult(1);
+    }
 
-        a = b = 1;
+    public void TestMethod([Const]TestSub t)
+    {
+        var a = t.TestMethod().Result;
+        t.A = 5;
+        var c = t.A;
+        var b = t;
+        b.A = 10;
 
-        [Const]
-        void NestMethod()
-        {
+        var i = 0;
+        i = 5;
+        var j = 0; //.const
+        j = i;
 
-        }
+        // var d = (10, "");
+        // int a = t.A, b;
+        // NestMethod();
+        // a = b = 1;
+        // var c = t.TestMethod().Result.Equals(1);
+        // return;
+        // //
+        // [Const]
+        // void NestMethod()
+        // {
+        //
+        // }
     }
 }
+

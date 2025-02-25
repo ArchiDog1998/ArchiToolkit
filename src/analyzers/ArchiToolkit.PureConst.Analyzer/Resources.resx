@@ -23,34 +23,6 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="AB0001Description" xml:space="preserve">
-        <value>Type names should not contain the company name.</value>
-        <comment>An optional longer localizable description of the diagnostic.</comment>
-    </data>
-    <data name="AB0001MessageFormat" xml:space="preserve">
-        <value>Type name '{0}' contains the company name</value>
-        <comment>The format-able message the diagnostic displays.</comment>
-    </data>
-    <data name="AB0001Title" xml:space="preserve">
-        <value>Type name contains the company name</value>
-        <comment>The title of the diagnostic.</comment>
-    </data>
-    <data name="AB0001CodeFixTitle" xml:space="preserve">
-        <value>Replace '{0}' with '{1}'</value>
-        <comment>The title of the code fix.</comment>
-    </data>
-    <data name="AB0002Description" xml:space="preserve">
-        <value>The speed must be lower than the Speed of Light.</value>
-        <comment>An optional longer localizable description of the diagnostic.</comment>
-    </data>
-    <data name="AB0002MessageFormat" xml:space="preserve">
-        <value>The specified speed '{0}' must be lower than the Speed of Light</value>
-        <comment>The format-able message the diagnostic displays.</comment>
-    </data>
-    <data name="AB0002Title" xml:space="preserve">
-        <value>The impossible speed</value>
-        <comment>The title of the diagnostic.</comment>
-    </data>
     <data name="PC0001Tittle" xml:space="preserve">
         <value>You can't use Const Attribute on an accessor.</value>
     </data>
@@ -59,5 +31,68 @@
     </data>
     <data name="PC0001MessageFormat" xml:space="preserve">
         <value>You can't use Const Attribute on the accessor {0}.</value>
+    </data>
+    <data name="PC1001Description" xml:space="preserve">
+        <value>This is the checking symbol</value>
+    </data>
+    <data name="PC1001MessageFormat" xml:space="preserve">
+        <value>The {0} is the checking symbol</value>
+    </data>
+    <data name="PC1001Tittle" xml:space="preserve">
+        <value>This is the checking symbol</value>
+    </data>
+    <data name="PC1002Description" xml:space="preserve">
+        <value>Can't find the symbol.</value>
+    </data>
+    <data name="PC1002MessageFormat" xml:space="preserve">
+        <value>Can't find the symbol {0}.</value>
+    </data>
+    <data name="PC1002Tittle" xml:space="preserve">
+        <value>Can't find the symbol</value>
+    </data>
+    <data name="PC1003Tittle" xml:space="preserve">
+        <value>Additional Varaible</value>
+    </data>
+    <data name="PC1003MessageFormat" xml:space="preserve">
+        <value>The variable {0} was added to check</value>
+    </data>
+    <data name="PC1003Description" xml:space="preserve">
+        <value>Additioanl Varaible</value>
+    </data>
+    <data name="PC0002Description" xml:space="preserve">
+        <value>You can't modify this field here, becasue the mtethod is const</value>
+    </data>
+    <data name="PC0002Tittle" xml:space="preserve">
+        <value>You can't modify this field here, becasue the mtethod is const</value>
+    </data>
+    <data name="PC0002MessageFormat" xml:space="preserve">
+        <value>You can't modify the field {0} here, becasue the mtethod is const</value>
+    </data>
+    <data name="PC0003Description" xml:space="preserve">
+        <value>You can't modify this property here, becasue the mtethod is const</value>
+    </data>
+    <data name="PC0003MessageFormat" xml:space="preserve">
+        <value>You can't modify the property {0} here, becasue the mtethod is const</value>
+    </data>
+    <data name="PC0003Tittle" xml:space="preserve">
+        <value>You can't modify this property here, becasue the mtethod is const</value>
+    </data>
+    <data name="PC0004Description" xml:space="preserve">
+        <value>You can't invoke this method here, becasue the mtethod is const</value>
+    </data>
+    <data name="PC0004MessageFormat" xml:space="preserve">
+        <value>You can't invoke the method {0} here, becasue the mtethod is const</value>
+    </data>
+    <data name="PC0004Tittle" xml:space="preserve">
+        <value>You can't invoke this method here, becasue the mtethod is const</value>
+    </data>
+    <data name="PC0005Tittle" xml:space="preserve">
+        <value>You can't modify this variable here, because it is const</value>
+    </data>
+    <data name="PC0005MessageFormat" xml:space="preserve">
+        <value>You can't modify the variable [{0}] here, because it is const</value>
+    </data>
+    <data name="PC0005Description" xml:space="preserve">
+        <value>You can't modify this variable here, because it is const</value>
     </data>
 </root>

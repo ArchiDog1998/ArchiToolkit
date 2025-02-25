@@ -60,69 +60,6 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Replace &apos;{0}&apos; with &apos;{1}&apos;.
-        /// </summary>
-        internal static string AB0001CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AB0001CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Type names should not contain the company name..
-        /// </summary>
-        internal static string AB0001Description {
-            get {
-                return ResourceManager.GetString("AB0001Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Type name &apos;{0}&apos; contains the company name.
-        /// </summary>
-        internal static string AB0001MessageFormat {
-            get {
-                return ResourceManager.GetString("AB0001MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Type name contains the company name.
-        /// </summary>
-        internal static string AB0001Title {
-            get {
-                return ResourceManager.GetString("AB0001Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The speed must be lower than the Speed of Light..
-        /// </summary>
-        internal static string AB0002Description {
-            get {
-                return ResourceManager.GetString("AB0002Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified speed &apos;{0}&apos; must be lower than the Speed of Light.
-        /// </summary>
-        internal static string AB0002MessageFormat {
-            get {
-                return ResourceManager.GetString("AB0002MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The impossible speed.
-        /// </summary>
-        internal static string AB0002Title {
-            get {
-                return ResourceManager.GetString("AB0002Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to You can&apos;t use Const Attribute on an accessor..
         /// </summary>
         internal static string PC0001Description {
@@ -146,6 +83,195 @@ namespace ArchiToolkit.PureConst.Analyzer {
         internal static string PC0001Tittle {
             get {
                 return ResourceManager.GetString("PC0001Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this field here, becasue the mtethod is const.
+        /// </summary>
+        internal static string PC0002Description {
+            get {
+                return ResourceManager.GetString("PC0002Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify the field {0} here, becasue the mtethod is const.
+        /// </summary>
+        internal static string PC0002MessageFormat {
+            get {
+                return ResourceManager.GetString("PC0002MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this field here, becasue the mtethod is const.
+        /// </summary>
+        internal static string PC0002Tittle {
+            get {
+                return ResourceManager.GetString("PC0002Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this property here, becasue the mtethod is const.
+        /// </summary>
+        internal static string PC0003Description {
+            get {
+                return ResourceManager.GetString("PC0003Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify the property {0} here, becasue the mtethod is const.
+        /// </summary>
+        internal static string PC0003MessageFormat {
+            get {
+                return ResourceManager.GetString("PC0003MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this property here, becasue the mtethod is const.
+        /// </summary>
+        internal static string PC0003Tittle {
+            get {
+                return ResourceManager.GetString("PC0003Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t invoke this method here, becasue the mtethod is const.
+        /// </summary>
+        internal static string PC0004Description {
+            get {
+                return ResourceManager.GetString("PC0004Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t invoke the method {0} here, becasue the mtethod is const.
+        /// </summary>
+        internal static string PC0004MessageFormat {
+            get {
+                return ResourceManager.GetString("PC0004MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t invoke this method here, becasue the mtethod is const.
+        /// </summary>
+        internal static string PC0004Tittle {
+            get {
+                return ResourceManager.GetString("PC0004Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this variable here, because it is const.
+        /// </summary>
+        internal static string PC0005Description {
+            get {
+                return ResourceManager.GetString("PC0005Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify the variable [{0}] here, because it is const.
+        /// </summary>
+        internal static string PC0005MessageFormat {
+            get {
+                return ResourceManager.GetString("PC0005MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t modify this variable here, because it is const.
+        /// </summary>
+        internal static string PC0005Tittle {
+            get {
+                return ResourceManager.GetString("PC0005Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the checking symbol.
+        /// </summary>
+        internal static string PC1001Description {
+            get {
+                return ResourceManager.GetString("PC1001Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0} is the checking symbol.
+        /// </summary>
+        internal static string PC1001MessageFormat {
+            get {
+                return ResourceManager.GetString("PC1001MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the checking symbol.
+        /// </summary>
+        internal static string PC1001Tittle {
+            get {
+                return ResourceManager.GetString("PC1001Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find the symbol..
+        /// </summary>
+        internal static string PC1002Description {
+            get {
+                return ResourceManager.GetString("PC1002Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find the symbol {0}..
+        /// </summary>
+        internal static string PC1002MessageFormat {
+            get {
+                return ResourceManager.GetString("PC1002MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find the symbol.
+        /// </summary>
+        internal static string PC1002Tittle {
+            get {
+                return ResourceManager.GetString("PC1002Tittle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Additioanl Varaible.
+        /// </summary>
+        internal static string PC1003Description {
+            get {
+                return ResourceManager.GetString("PC1003Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The variable {0} was added to check.
+        /// </summary>
+        internal static string PC1003MessageFormat {
+            get {
+                return ResourceManager.GetString("PC1003MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Additional Varaible.
+        /// </summary>
+        internal static string PC1003Tittle {
+            get {
+                return ResourceManager.GetString("PC1003Tittle", resourceCulture);
             }
         }
     }

@@ -31,7 +31,7 @@ public static class DescriptorExtensions
             return new DiagnosticDescriptor(diagnosticId,
                 GetLocalizableString(diagnosticId + "Tittle"),
                 GetLocalizableString(diagnosticId + "MessageFormat"),
-                category, severity, true,
+                category, severity, severity > DiagnosticSeverity.Info,
                 GetLocalizableString(diagnosticId + "Description"));
 
             static LocalizableString GetLocalizableString(string name)
