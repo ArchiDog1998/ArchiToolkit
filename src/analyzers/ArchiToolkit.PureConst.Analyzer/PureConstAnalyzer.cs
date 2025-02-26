@@ -47,7 +47,11 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
     private static void NoAccessorAnalyze(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not AccessorDeclarationSyntax accessorSyntax) return;
-        var constAttributes = ConstAttributes(accessorSyntax.AttributeLists, context.SemanticModel);
+        var constAttributes = accessorSyntax.AttributeLists.SelectMany(l => l.Attributes).Where(
+                attr =>
+                    context.SemanticModel.GetTypeInfo(attr).Type?.GetName().FullName is
+                        "global::ArchiToolkit.PureConst.ConstAttribute")
+            .ToArray();
         foreach (var attr in constAttributes)
         {
             context.Report(DescriptorType.CantUseOnAccessor, attr.GetLocation());
@@ -64,29 +68,77 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
     private static void AnalyzeMethodSyntax(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not MethodDeclarationSyntax node) return;
-        var body = node.Body as SyntaxNode ?? node.ExpressionBody;
-        AnalyzeBody(context, body, node.AttributeLists, node.ParameterList);
+        if ((node.Body as SyntaxNode ?? node.ExpressionBody) is not { } body) return;
+        if (context.SemanticModel.GetDeclaredSymbol(node) is not { } methodSymbol) return;
+        AnalyzeMethod(context, body, methodSymbol);
     }
 
     private static void AnalyzeLocalFunction(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not LocalFunctionStatementSyntax node) return;
-        var body = node.Body as SyntaxNode ?? node.ExpressionBody;
-        AnalyzeBody(context, body, node.AttributeLists, node.ParameterList);
+        if ((node.Body as SyntaxNode ?? node.ExpressionBody) is not { } body) return;
+        if (context.SemanticModel.GetDeclaredSymbol(node) is not { } methodSymbol) return;
+        AnalyzeMethod(context, body, methodSymbol);
     }
 
-    private static void AnalyzeBody(SyntaxNodeAnalysisContext context, SyntaxNode? body,
-        SyntaxList<AttributeListSyntax> attributeLists,
-        ParameterListSyntax parameterList)
+    private static bool CheckOverridenMethod(IMethodSymbol methodSymbol, Predicate<IMethodSymbol> predicate)
     {
-        var model = context.SemanticModel;
-        var isPure = IsPure(attributeLists, model);
-        var isConst = ConstAttributes(attributeLists, model).Any() || isPure;
-        var parameters = parameterList.Parameters
-            .Where(param => isPure || ConstAttributes(param.AttributeLists, model).Any())
-            .Select(p => model.GetDeclaredSymbol(p))
-            .OfType<IParameterSymbol>();
+        var method = methodSymbol;
+        while (method is not null)
+        {
+            if (predicate(method)) return true;
+            method = method.OverriddenMethod;
+        }
+
+        if (methodSymbol.ExplicitInterfaceImplementations.Any(interfaceMethod => predicate(interfaceMethod)))
+        {
+            return true;
+        }
+
+        return (from interfaceType in methodSymbol.ContainingType.AllInterfaces
+            from member in interfaceType.GetMembers().OfType<IMethodSymbol>()
+            where SymbolEqualityComparer.Default.Equals(methodSymbol,
+                methodSymbol.ContainingType.FindImplementationForInterfaceMember(member))
+            select member).Any(member => predicate(member));
+    }
+
+    private static void AnalyzeMethod(SyntaxNodeAnalysisContext context, SyntaxNode body, IMethodSymbol methodSymbol)
+    {
+        var isPure = CheckOverridenMethod(methodSymbol, IsPure);
+        var isConst = isPure || CheckOverridenMethod(methodSymbol, IsConst);
+        var parameters = methodSymbol.Parameters.Where((_, i) =>
+            isPure || CheckOverridenMethod(methodSymbol, symbol => IsConst(symbol.Parameters[i])));
         AnalyzeBody(context, body, isConst, [..parameters]);
+    }
+
+    private static void CheckSymbol(SyntaxNodeAnalysisContext context, ISymbol symbol, Location location,
+        SyntaxNode node,
+        bool isConstMethod, bool isLocalDefined, ISymbol[] constSymbols)
+    {
+        switch (symbol)
+        {
+            case IFieldSymbol when isConstMethod:
+                context.Report(
+                    isLocalDefined ? DescriptorType.FieldConstMethod : DescriptorType.FieldConstMethodWarning,
+                    location, node);
+                break;
+            case IPropertySymbol when isConstMethod:
+                context.Report(
+                    isLocalDefined
+                        ? DescriptorType.PropertyConstMethod
+                        : DescriptorType.PropertyConstMethodWarning,
+                    location, node);
+                break;
+            case IMethodSymbol when isConstMethod:
+                context.Report(
+                    isLocalDefined ? DescriptorType.MethodConstMethod : DescriptorType.MethodConstMethodWarning,
+                    location, node);
+                break;
+            case ILocalSymbol when constSymbols.Contains(symbol, SymbolEqualityComparer.Default):
+            case IParameterSymbol when constSymbols.Contains(symbol, SymbolEqualityComparer.Default):
+                context.Report(DescriptorType.VariableConstMethod, location, node);
+                break;
+        }
     }
 
     private static void AnalyzeBody(SyntaxNodeAnalysisContext context, SyntaxNode? body, bool isConstMethod,
@@ -103,51 +155,29 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
         {
             foreach (var name in GetFirstAccessorName(context, itemNode))
             {
-                var s = context.SemanticModel.GetSymbolInfo(name).Symbol;
                 context.Report(DescriptorType.CheckingSymbol, name.GetLocation(), name);
-                switch (s)
-                {
-                    case ILocalSymbol when constSymbols.Contains(s, SymbolEqualityComparer.Default):
-                    case IParameterSymbol when constSymbols.Contains(s, SymbolEqualityComparer.Default):
-                        context.Report(DescriptorType.VariableConstMethod, itemNode.GetLocation(), name);
-                        break;
-                }
+                var s = context.SemanticModel.GetSymbolInfo(name).Symbol;
+                if (s is null) continue;
+                var isLocalDefined =
+                    s.ContainingAssembly.Equals(context.Compilation.Assembly, SymbolEqualityComparer.Default);
+                CheckSymbol(context, s, itemNode.GetLocation(), name, isConstMethod, isLocalDefined, constSymbols);
             }
         }
 
         foreach (var itemNode in subNodes.OfType<InvocationExpressionSyntax>().Select(s => s.Expression))
         {
             if (context.SemanticModel.GetSymbolInfo(itemNode).Symbol is not IMethodSymbol methodSymbol) continue;
-            if (methodSymbol.GetAttributes().Any(a =>
-                    a.AttributeClass?.GetName().FullName is "global::ArchiToolkit.PureConst.ConstAttribute" or
-                        "global::System.Diagnostics.Contracts.PureAttribute")) continue;
+            if (IsConst(methodSymbol) || IsPure(methodSymbol)) continue;
 
-            var isLocalDefined = methodSymbol.ContainingAssembly.Equals(context.Compilation.Assembly, SymbolEqualityComparer.Default);
+            var isLocalDefined =
+                methodSymbol.ContainingAssembly.Equals(context.Compilation.Assembly, SymbolEqualityComparer.Default);
 
             foreach (var name in GetFirstAccessorName(context, itemNode))
             {
                 var s = context.SemanticModel.GetSymbolInfo(name).Symbol;
+                if (s is null) continue;
                 context.Report(DescriptorType.CheckingSymbol, name.GetLocation(), name);
-                switch (s)
-                {
-                    case IFieldSymbol when isConstMethod:
-                        context.Report(isLocalDefined ? DescriptorType.FieldConstMethod : DescriptorType.FieldConstMethodWarning,
-                            itemNode.GetLocation(), name);
-                        break;
-                    case IPropertySymbol when isConstMethod:
-                        context.Report(isLocalDefined ? DescriptorType.PropertyConstMethod : DescriptorType.PropertyConstMethodWarning,
-                            itemNode.GetLocation(), name);
-                        break;
-                    case IMethodSymbol when isConstMethod:
-                        context.Report(isLocalDefined ? DescriptorType.MethodConstMethod : DescriptorType.MethodConstMethodWarning,
-                            itemNode.GetLocation(), name);
-                        break;
-                    case ILocalSymbol when constSymbols.Contains(s, SymbolEqualityComparer.Default):
-                    case IParameterSymbol when constSymbols.Contains(s, SymbolEqualityComparer.Default):
-                        context.Report(isLocalDefined ? DescriptorType.VariableConstMethod : DescriptorType.VariableConstMethodWarning,
-                            itemNode.GetLocation(), name);
-                        break;
-                }
+                CheckSymbol(context, s, itemNode.GetLocation(), name, isConstMethod, isLocalDefined, constSymbols);
             }
         }
     }
@@ -191,20 +221,16 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
         }
     }
 
-    private static AttributeSyntax[] ConstAttributes(IEnumerable<AttributeListSyntax> attributeLists,
-        SemanticModel model)
+    public static bool IsPure(ISymbol symbol)
     {
-        return attributeLists.SelectMany(l => l.Attributes).Where(
-                attr =>
-                    model.GetTypeInfo(attr).Type?.GetName().FullName is "global::ArchiToolkit.PureConst.ConstAttribute")
-            .ToArray();
+        return symbol.GetAttributes().Any(a =>
+            a.AttributeClass?.GetName().FullName is "global::System.Diagnostics.Contracts.PureAttribute");
     }
 
-    private static bool IsPure(IEnumerable<AttributeListSyntax> attributeLists,
-        SemanticModel model)
+    public static bool IsConst(ISymbol symbol)
     {
-        return attributeLists.SelectMany(l => l.Attributes).Any(attr =>
-            model.GetTypeInfo(attr).Type?.GetName().FullName is "global::System.Diagnostics.Contracts.PureAttribute");
+        return symbol.GetAttributes().Any(a =>
+            a.AttributeClass?.GetName().FullName is "global::ArchiToolkit.PureConst.ConstAttribute");
     }
 
     private static IReadOnlyList<ExpressionSyntax> GetMemberAccess(SyntaxNodeAnalysisContext context,

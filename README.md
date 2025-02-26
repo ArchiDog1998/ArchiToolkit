@@ -1,7 +1,5 @@
 # ArchiToolkit
 
-Maybe, you need to use the language version `preview` to enable all features.
-
 You can check these packages on [Release](https://github.com/ArchiDog1998/ArchiToolkit/releases/latest).
 
 There are a lot of packages here.

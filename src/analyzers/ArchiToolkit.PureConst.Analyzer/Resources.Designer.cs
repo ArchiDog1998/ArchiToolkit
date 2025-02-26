@@ -96,7 +96,7 @@ namespace ArchiToolkit.PureConst.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t modify the field {[0}] here, becasue the mtethod is const.
+        ///   Looks up a localized string similar to You can&apos;t modify the field [{0}] here, becasue the mtethod is const.
         /// </summary>
         internal static string PC0002MessageFormat {
             get {

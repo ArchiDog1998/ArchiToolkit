@@ -25,8 +25,8 @@ public class Spaceship
 }
 ";
 
-        var expected = Verify.Diagnostic().WithLocation(7, 28)
-            .WithArguments("300000000");
+        // var expected = Verify.Diagnostic(diagnosticId:"abc").WithLocation(7, 28)
+        //     .WithArguments("300000000");
 
         //await Verify.VerifyAnalyzerAsync(text, expected);
     }

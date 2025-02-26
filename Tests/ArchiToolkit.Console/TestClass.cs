@@ -1,4 +1,6 @@
-﻿namespace ArchiToolkit.Console;
+﻿using ArchiToolkit.PureConst;
+
+namespace ArchiToolkit.Console;
 
 /// <summary>
 /// Test summary.
@@ -19,6 +21,7 @@ public class TestClass<T> where T :  struct
     }
 
 
+    [Const]
     private void NonConstMethod()
     {
 
@@ -45,11 +48,27 @@ public class TestClass<T> where T :  struct
         // var c = t.TestMethod().Result.Equals(1);
         // return;
         // //
-        // [Const]
-        // void NestMethod()
-        // {
-        //
-        // }
+        [Const]
+        void NestMethod()
+        {
+
+        }
     }
 }
 
+// public interface IParent
+// {
+//
+//     [Const]
+//     void TestMethod([Const] int t);
+// }
+//
+// public class Child : IParent
+// {
+//     private int _property;
+//     public void TestMethod(int t)
+//     {
+//         t = 0;
+//         _property = 1;
+//     }
+// }

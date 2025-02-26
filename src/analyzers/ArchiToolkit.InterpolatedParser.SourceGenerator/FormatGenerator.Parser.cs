@@ -20,7 +20,7 @@ partial class FormatGenerator
 
         var typeName = name.FullName;
         var basicClass = ClassDeclaration(className)
-            .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)))
+            .WithModifiers(TokenList([Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.SealedKeyword)]))
             .WithParameterList(ParameterList());
         creation = ObjectCreationExpression(IdentifierName(className))
             .WithArgumentList(ArgumentList());
