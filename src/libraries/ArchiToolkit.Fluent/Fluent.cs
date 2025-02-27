@@ -41,6 +41,17 @@ public class Fluent<TTarget> : IDisposable
     }
 
     /// <summary>
+    /// Continue when.
+    /// </summary>
+    /// <param name="canContinue"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public Fluent<TTarget> ContinueWhen(Predicate<TTarget> canContinue, FluentType? type = null)
+    {
+        return AddAction(() => _canContinue = canContinue(_target), type);
+    }
+
+    /// <summary>
     ///     Add the property to this fluent
     /// </summary>
     /// <param name="property"></param>
@@ -60,11 +71,7 @@ public class Fluent<TTarget> : IDisposable
     /// <returns></returns>
     public DoResult<TTarget, TResult> InvokeMethod<TResult>(MethodDelegate<TTarget, TResult> method, FluentType? type)
     {
-        var lazy = InvokeMethod(b =>
-        {
-            if (b) return (b, method(ref _target));
-            return (b, default!);
-        });
+        var lazy = InvokeMethod(b => b ? (b, method(ref _target)) : (b, default!));
         return new DoResult<TTarget, TResult>(AddAction(() => { _ = lazy.Value; }, type), lazy);
     }
 
