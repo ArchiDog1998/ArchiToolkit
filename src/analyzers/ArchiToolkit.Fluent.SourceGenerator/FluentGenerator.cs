@@ -12,8 +12,6 @@ public class FluentGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        context.RegisterPostInitializationOutput(InitializationOutput);
-
         var methodInvocations = context.SyntaxProvider
             .CreateSyntaxProvider(Predicate, TransformCallings)
             .SelectMany((i, _) => i).Collect();
@@ -42,16 +40,6 @@ public class FluentGenerator : IIncrementalGenerator
     }
 
 
-    private static void InitializationOutput(IncrementalGeneratorPostInitializationContext context)
-    {
-        var root = NamespaceDeclaration("ArchiToolkit.Fluent")
-            .AddMembers(GetClass().WithAttributeLists(
-            [
-                GeneratedCodeAttribute(typeof(FluentGenerator)).AddAttributes(NonUserCodeAttribute())
-            ]));
-        context.AddSource("_Major.g.cs", root.NodeToString());
-    }
-
     private static IEnumerable<ITypeSymbol> TransformAttributes(GeneratorSyntaxContext ctx, CancellationToken token)
     {
         var semanticModel = ctx.SemanticModel;
@@ -73,10 +61,16 @@ public class FluentGenerator : IIncrementalGenerator
     private static void Generate(SourceProductionContext context,
         (ImmutableArray<ITypeSymbol> types, Compilation compilation) arg)
     {
-        var assembly = arg.compilation.Assembly;
+        var staticClasses = GetAllStaticClasses(arg.compilation.GlobalNamespace)
+            .SelectMany(c => c.GetMembers())
+            .OfType<IMethodSymbol>()
+            .Where(m => m is { IsStatic: true, IsExtensionMethod: true, Parameters.Length: > 0 })
+            .GroupBy(m => m.Parameters[0].Type, SymbolEqualityComparer.Default)
+            .ToDictionary(m => m.Key, m => m.ToArray(), SymbolEqualityComparer.Default);
+
         foreach (var type in GetTypes(arg.types).ToImmutableHashSet(SymbolEqualityComparer.Default)
                      .OfType<ITypeSymbol>())
-            Generate(context, type, assembly);
+            Generate(context, type, arg.compilation.Assembly, staticClasses.TryGetValue(type, out var methods)? methods : []);
 
         return;
 
@@ -88,6 +82,25 @@ public class FluentGenerator : IIncrementalGenerator
                 if (typeSymbol.IsRefLikeType) continue;
                 if (typeSymbol.ContainingAssembly.Name is "ArchiToolkit.Fluent") continue;
                 yield return typeSymbol;
+            }
+        }
+    }
+
+    private static IEnumerable<INamedTypeSymbol> GetAllStaticClasses(INamespaceSymbol namespaceSymbol)
+    {
+        var staticClasses = namespaceSymbol.GetTypeMembers()
+            .Where(t => t.IsStatic && t.TypeKind == TypeKind.Class);
+
+        foreach (var staticClass in staticClasses)
+        {
+            yield return staticClass;
+        }
+
+        foreach (var nestedNamespace in namespaceSymbol.GetNamespaceMembers())
+        {
+            foreach (var nestedStaticClass in GetAllStaticClasses(nestedNamespace))
+            {
+                yield return nestedStaticClass;
             }
         }
     }
@@ -116,14 +129,15 @@ public class FluentGenerator : IIncrementalGenerator
                 yield return type;
     }
 
-
-    private static void Generate(SourceProductionContext context, ITypeSymbol type, IAssemblySymbol? assembly)
+    private static void Generate(SourceProductionContext context, ITypeSymbol type, IAssemblySymbol? assembly,
+        IEnumerable<IMethodSymbol> additionalMethods)
     {
         var name = type.GetName();
         var root = NamespaceDeclaration("ArchiToolkit.Fluent",
             $"For adding the fluent extensions of {name.FullName}").AddMembers(
-            GetClass().AddMembers([
-                ..type.GetMembers().SelectMany(member => GetMemberDeclarations(name, member, assembly))
+            GetClass(name.SafeName).AddMembers([
+                ..type.GetMembers().Where(m => !m.IsStatic).Concat(additionalMethods)
+                    .SelectMany(member => GetMemberDeclarations(name, member, assembly))
             ]));
 
         context.AddSource($"{name.SafeName}.g.cs", root.NodeToString());
@@ -132,10 +146,9 @@ public class FluentGenerator : IIncrementalGenerator
     private static IEnumerable<MemberDeclarationSyntax> GetMemberDeclarations(TypeName typeName, ISymbol member,
         IAssemblySymbol? assembly)
     {
-        if (member.IsStatic) yield break;
         switch (member)
         {
-            case IPropertySymbol property:
+            case IPropertySymbol property when !member.IsStatic:
             {
                 var propType = property.Type.GetName().FullName;
                 var propName = property.Name;
@@ -148,7 +161,7 @@ public class FluentGenerator : IIncrementalGenerator
 
                 break;
             }
-            case IFieldSymbol field when CanAccess(field, assembly):
+            case IFieldSymbol field when CanAccess(field, assembly) && !member.IsStatic:
             {
                 var fieldType = field.Type.GetName().FullName;
                 var fieldName = field.Name;
@@ -158,7 +171,12 @@ public class FluentGenerator : IIncrementalGenerator
             }
             case IMethodSymbol method when CanAccess(method, assembly)
                                            && method.MethodKind == MethodKind.Ordinary:
-                yield return Invoke(method.GetName());
+                if (!member.IsStatic
+                    || method.IsExtensionMethod)
+                {
+                    yield return Invoke(method.GetName());
+                }
+
                 break;
         }
     }
@@ -185,28 +203,34 @@ public class FluentGenerator : IIncrementalGenerator
     private static MethodDeclarationSyntax Invoke(MethodName method)
     {
         var returnType = GetReturnType(method);
-        var inParameters = method.Parameters.Where(p => p.IsIn).ToArray();
+        var isExtension = method.Symbol.IsExtensionMethod;
+        var hostType = isExtension
+            ? method.Parameters[0].Type
+            : method.ContainingType;
+        var methodParameters = isExtension ? method.Parameters.Skip(1).ToArray() : method.Parameters;
+        var inParameters = methodParameters.Where(p => p.IsIn).ToArray();
         var isRefLike = method.Parameters.Any(p => p.Type.Symbol.IsRefLikeType);
 
-        var types = new List<TypeSyntax>(2) { IdentifierName(method.ContainingType.FullName) };
+        var types = new List<TypeSyntax>(2) { IdentifierName(hostType.FullName) };
         if (returnType is not null) types.Add(returnType);
-
+        var thisData = isRefLike ? "_fluent.Result" : "data";
         var invocation = InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                IdentifierName(isRefLike ? "_fluent.Result" : "data"),
+                IdentifierName(isExtension ? method.ContainingType.FullName : thisData),
                 IdentifierName(method.Name)))
             .WithArgumentList(
                 ArgumentList(
                 [
-                    ..method.Parameters.Select(n =>
+                    ..method.Parameters.Select((n, i) =>
                     {
+                        var name = i == 0 && isExtension ? thisData : n.Name;
                         return n.Symbol.RefKind switch
                         {
-                            RefKind.Ref => Argument(IdentifierName(n.Name))
+                            RefKind.Ref => Argument(IdentifierName(name))
                                 .WithRefOrOutKeyword(Token(SyntaxKind.RefKeyword)),
                             RefKind.Out => Argument(DeclarationExpression(IdentifierName("var"),
-                                    SingleVariableDesignation(Identifier(n.Name))))
+                                    SingleVariableDesignation(Identifier(name))))
                                 .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword)),
-                            _ => Argument(IdentifierName(n.Name))
+                            _ => Argument(IdentifierName(name))
                         };
                     })
                 ]));
@@ -218,7 +242,7 @@ public class FluentGenerator : IIncrementalGenerator
         }
         else
         {
-            var names = method.Parameters.Where(p => p.IsOut).Select(i => i.Name).ToList();
+            var names = methodParameters.Where(p => p.IsOut).Select(i => i.Name).ToList();
             if (method.ReturnType.Symbol.SpecialType == SpecialType.System_Void)
             {
                 statements.Add(ExpressionStatement(invocation));
@@ -265,7 +289,7 @@ public class FluentGenerator : IIncrementalGenerator
                 [
                     Parameter(Identifier("_fluent")).WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
                         .WithType(GenericName(Identifier(Fluent))
-                            .WithTypeArgumentList(TypeArgumentList([IdentifierName(method.ContainingType.FullName)]))),
+                            .WithTypeArgumentList(TypeArgumentList([IdentifierName(hostType.FullName)]))),
                     ..parameters
                 ]))
             .WithBody(isRefLike
@@ -281,7 +305,7 @@ public class FluentGenerator : IIncrementalGenerator
                         .WithParameterList(ParameterList([
                             Parameter(Identifier("data")).WithModifiers(
                                     TokenList(Token(SyntaxKind.RefKeyword)))
-                                .WithType(IdentifierName(method.ContainingType.FullName))
+                                .WithType(IdentifierName(hostType.FullName))
                         ]))
                         .WithBody(block)))
             .WithXmlComment(
@@ -394,10 +418,14 @@ public class FluentGenerator : IIncrementalGenerator
         return false;
     }
 
-    private static ClassDeclarationSyntax GetClass()
+    private static ClassDeclarationSyntax GetClass(string className)
     {
-        return ClassDeclaration("FluentObjectsExtensions")
+        return ClassDeclaration(className + "_Extensions")
             .WithModifiers(TokenList(
-                Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.StaticKeyword), Token(SyntaxKind.PartialKeyword)));
+                Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.StaticKeyword), Token(SyntaxKind.PartialKeyword)))
+            .WithAttributeLists(
+            [
+                GeneratedCodeAttribute(typeof(FluentGenerator)).AddAttributes(NonUserCodeAttribute())
+            ]);
     }
 }
