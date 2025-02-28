@@ -1,74 +1,16 @@
-﻿using ArchiToolkit.PureConst;
+﻿using ArchiToolkit.Fluent;
+using ArchiToolkit.PureConst;
 
 namespace ArchiToolkit.Console;
 
 /// <summary>
 /// Test summary.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public class TestClass<T> where T :  struct
+[FluentApi(typeof(int))]
+public static class TestClass
 {
-    /// <summary>
-    /// What the hell.
-    /// </summary>
-    public T Data { get; set; } = default;
-
-
-    public class TestSub
+    public static void AddIt(this int i)
     {
-        public int A { get; set; }
-        public Task<int> TestMethod() => Task.FromResult(1);
-    }
-
-
-    [Const]
-    private void NonConstMethod()
-    {
-
-    }
-
-    public void TestMethod(TestSub t)
-    {
-        var a = t.TestMethod().Result;
-        t.A = 5;
-        var c = t.A;
-        var b = t;
-        var b2 = b;
-        b2.A = 10;
-
-        var i = 0;
-        i = 5;
-        var j = 0;
-        j = i;
-        NonConstMethod();
-        // var d = (10, "");
-        // int a = t.A, b;
-        // NestMethod();
-        // a = b = 1;
-        // var c = t.TestMethod().Result.Equals(1);
-        // return;
-        // //
-        [Const]
-        void NestMethod()
-        {
-
-        }
+        i += 1;
     }
 }
-
-// public interface IParent
-// {
-//
-//     [Const]
-//     void TestMethod([Const] int t);
-// }
-//
-// public class Child : IParent
-// {
-//     private int _property;
-//     public void TestMethod(int t)
-//     {
-//         t = 0;
-//         _property = 1;
-//     }
-// }

@@ -26,17 +26,4 @@ public static class Helper
 
         return typeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? "Unknown";
     }
-
-    /// <summary>
-    /// <inheritdoc cref="TestClass{T}"/>
-    /// <inheritdoc cref="global::ArchiToolkit.Console.TestClass{TTTT}" />
-    /// </summary>
-    /// <typeparam name="TT"></typeparam>
-    public static void Test<TT>() where TT : struct
-    {
-        var a =
-            new TestClass<TT>().AsFluent()
-                .WithData(default(TT))
-                .Result;
-    }
 }
