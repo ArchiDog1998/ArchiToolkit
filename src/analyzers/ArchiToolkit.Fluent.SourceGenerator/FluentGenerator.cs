@@ -65,12 +65,13 @@ public class FluentGenerator : IIncrementalGenerator
             .SelectMany(c => c.GetMembers())
             .OfType<IMethodSymbol>()
             .Where(m => m is { IsStatic: true, IsExtensionMethod: true, Parameters.Length: > 0 })
-            .GroupBy(m => m.Parameters[0].Type, SymbolEqualityComparer.Default)
+            .GroupBy(m => m.Parameters[0].Type.OriginalDefinition, SymbolEqualityComparer.Default)
             .ToDictionary(m => m.Key, m => m.ToArray(), SymbolEqualityComparer.Default);
 
         foreach (var type in GetTypes(arg.types).ToImmutableHashSet(SymbolEqualityComparer.Default)
                      .OfType<ITypeSymbol>())
-            Generate(context, type, arg.compilation.Assembly, staticClasses.TryGetValue(type, out var methods)? methods : []);
+            Generate(context, type, arg.compilation.Assembly,
+                staticClasses.TryGetValue(type.OriginalDefinition, out var methods) ? methods : []);
 
         return;
 
@@ -132,19 +133,20 @@ public class FluentGenerator : IIncrementalGenerator
     private static void Generate(SourceProductionContext context, ITypeSymbol type, IAssemblySymbol? assembly,
         IEnumerable<IMethodSymbol> additionalMethods)
     {
+        Dictionary<MethodSignature, Dictionary<string, int>> addedMethods = [];
         var name = type.GetName();
         var root = NamespaceDeclaration("ArchiToolkit.Fluent",
             $"For adding the fluent extensions of {name.FullName}").AddMembers(
             GetClass(name.SafeName).AddMembers([
                 ..type.GetMembers().Where(m => !m.IsStatic).Concat(additionalMethods)
-                    .SelectMany(member => GetMemberDeclarations(name, member, assembly))
+                    .SelectMany(member => GetMemberDeclarations(name, member, assembly, addedMethods))
             ]));
 
         context.AddSource($"{name.SafeName}.g.cs", root.NodeToString());
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GetMemberDeclarations(TypeName typeName, ISymbol member,
-        IAssemblySymbol? assembly)
+        IAssemblySymbol? assembly, Dictionary<MethodSignature, Dictionary<string, int>> addedMethods)
     {
         switch (member)
         {
@@ -170,14 +172,20 @@ public class FluentGenerator : IIncrementalGenerator
                 break;
             }
             case IMethodSymbol method when CanAccess(method, assembly)
-                                           && method.MethodKind == MethodKind.Ordinary:
-                if (!member.IsStatic
-                    || method.IsExtensionMethod)
+                                           && method.MethodKind == MethodKind.Ordinary
+                                           && (!member.IsStatic || method.IsExtensionMethod):
+            {
+                var key = new MethodSignature(method);
+                var hasIt = true;
+                if (!addedMethods.TryGetValue(key, out var dic))
                 {
-                    yield return Invoke(method.GetName());
+                    addedMethods[key] = dic = new Dictionary<string, int>();
+                    hasIt = false;
                 }
 
+                yield return Invoke(method.GetName(), hasIt, dic);
                 break;
+            }
         }
     }
 
@@ -200,7 +208,7 @@ public class FluentGenerator : IIncrementalGenerator
         ]);
     }
 
-    private static MethodDeclarationSyntax Invoke(MethodName method)
+    private static MethodDeclarationSyntax Invoke(MethodName method, bool hasIt, Dictionary<string, int> dic)
     {
         var returnType = GetReturnType(method);
         var isExtension = method.Symbol.IsExtensionMethod;
@@ -278,9 +286,29 @@ public class FluentGenerator : IIncrementalGenerator
                 .WithType(NullableType(IdentifierName(FluentType)))
                 .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression))));
 
+        var postFix = string.Empty;
+        if (hasIt)
+        {
+            var className = method.ContainingType.Name;
+            if (className.EndsWith("Extensions"))
+            {
+                className = className.Substring(0, className.Length - "Extensions".Length);
+            }
+
+            postFix = "_" + className;
+            if (dic.TryGetValue(className, out var count))
+            {
+                postFix += (dic[className] = ++count).ToString();
+            }
+            else
+            {
+                dic[className] = 0;
+            }
+        }
+
         return MethodDeclaration(GenericName(Identifier("DoResult"))
                     .WithTypeArgumentList(TypeArgumentList([..types])),
-                Identifier("Do" + method.Name))
+                Identifier("Do" + method.Name + postFix))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
             .AddAttributes()
             .AddTypeParameters(method)

@@ -9,13 +9,13 @@ public class BasicFluentTest
         fluent => fluent.WithDataA(new Random()));
 
     [Test]
-    public Task MethodTest()=> CheckAll<BasicType<Random, int>>(
+    public Task MethodTest() => CheckAll<BasicType<Random, int>>(
         async obj => await Assert.That(obj.Name).IsEmpty(),
         async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
         fluent => fluent.DoAMethod(1));
 
     [Test]
-    public Task ContinueTest()=> CheckAll<BasicType<Random, int>>(
+    public Task ContinueTest() => CheckAll<BasicType<Random, int>>(
         async obj =>
         {
             await Assert.That(obj.DataA).IsNull();
@@ -28,6 +28,24 @@ public class BasicFluentTest
         },
         fluent => fluent.DoAMethod(1).ContinueWhen(_ => false).WithDataA(new Random()));
 
+    [Test]
+    public Task ExtensionAMethodTest() => CheckAll<BasicType<Random, int>>(
+        async obj => await Assert.That(obj.Name).IsEmpty(),
+        async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
+        fluent => fluent.DoAMethod_BasicType(1));
+
+    [Test]
+    public Task ExtensionAMethod1Test() => CheckAll<BasicType<Random, int>>(
+        async obj => await Assert.That(obj.Name).IsEmpty(),
+        async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
+        fluent => fluent.DoAMethod_BasicType1(1));
+
+    [Test]
+    public Task ExtensionBMethodTest() => CheckAll<BasicType<Random, int>>(
+        async obj => await Assert.That(obj.Name).IsEmpty(),
+        async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
+        fluent => fluent.DoBMethod(1));
+
     private static async Task CheckAll<T>(Func<T, Task> checkBefore, Func<T, Task> checkAfter,
         Action<Fluent<T>> doWithFluent) where T : class, new()
     {
@@ -35,7 +53,8 @@ public class BasicFluentTest
             BasicTest(checkBefore, checkAfter, doWithFluent, FluentType.Immediate));
     }
 
-    private static async Task BasicTest<T>(Func<T, Task> checkBefore, Func<T, Task> checkAfter, Action<Fluent<T>> doWithFluent, FluentType type) where T : class, new()
+    private static async Task BasicTest<T>(Func<T, Task> checkBefore, Func<T, Task> checkAfter,
+        Action<Fluent<T>> doWithFluent, FluentType type) where T : class, new()
     {
         var obj = new T();
         await checkBefore(obj);
@@ -52,8 +71,8 @@ public class BasicFluentTest
                 break;
             default:
                 return;
-
         }
+
         _ = fluent.Result;
         await checkAfter(obj);
     }
