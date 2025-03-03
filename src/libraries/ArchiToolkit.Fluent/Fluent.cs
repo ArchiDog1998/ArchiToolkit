@@ -29,6 +29,11 @@ public class Fluent<TTarget> : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    public static implicit operator TTarget(Fluent<TTarget> fluent)
+    {
+        return fluent.Result;
+    }
+
     private ref TTarget Execute()
     {
         while (_canContinue && _actions.Count > 0) _actions.Dequeue().Invoke();
@@ -41,7 +46,7 @@ public class Fluent<TTarget> : IDisposable
     }
 
     /// <summary>
-    /// Continue when.
+    ///     Continue when.
     /// </summary>
     /// <param name="canContinue"></param>
     /// <param name="type"></param>
@@ -76,7 +81,7 @@ public class Fluent<TTarget> : IDisposable
     }
 
     /// <summary>
-    /// Invokes.
+    ///     Invokes.
     /// </summary>
     /// <param name="method"></param>
     /// <param name="type"></param>
@@ -98,10 +103,8 @@ public class Fluent<TTarget> : IDisposable
         return new Lazy<T>(() =>
         {
             foreach (var action in actions)
-            {
                 if (_canContinue) action();
                 else return method(false);
-            }
 
             return method(true);
         });

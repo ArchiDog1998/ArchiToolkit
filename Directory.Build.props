@@ -27,7 +27,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="$(NeedTestsPackage)">
-        <PackageReference Include="TUnit" />
+        <PackageReference Include="TUnit"/>
     </ItemGroup>
 
     <PropertyGroup Condition="$(NeedPackage)">
