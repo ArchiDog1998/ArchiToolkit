@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns="" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+  </resheader>
+  <data name="PC0001Tittle" xml:space="preserve">
+        <value>You can't use Const Attribute on an accessor.</value>
+    </data>
+  <data name="PC0001Description" xml:space="preserve">
+        <value>You can't use Const Attribute on an accessor.</value>
+    </data>
+  <data name="PC0001MessageFormat" xml:space="preserve">
+        <value>You can't use Const Attribute on the accessor [{0}].</value>
+    </data>
+  <data name="PC1001Description" xml:space="preserve">
+        <value>This is the checking symbol</value>
+    </data>
+  <data name="PC1001MessageFormat" xml:space="preserve">
+        <value>The [{0}] is the checking symbol</value>
+    </data>
+  <data name="PC1001Tittle" xml:space="preserve">
+        <value>This is the checking symbol</value>
+    </data>
+  <data name="PC1002Description" xml:space="preserve">
+        <value>Can't find the symbol.</value>
+    </data>
+  <data name="PC1002MessageFormat" xml:space="preserve">
+        <value>Can't find the symbol {0}.</value>
+    </data>
+  <data name="PC1002Tittle" xml:space="preserve">
+        <value>Can't find the symbol</value>
+    </data>
+  <data name="PC1003Tittle" xml:space="preserve">
+        <value>Additional Varaible</value>
+    </data>
+  <data name="PC1003MessageFormat" xml:space="preserve">
+        <value>The variable {0} was added to check</value>
+    </data>
+  <data name="PC1003Description" xml:space="preserve">
+        <value>Additional varaible for checking</value>
+    </data>
+  <data name="PC0002Description" xml:space="preserve">
+        <value>You can't modify this field here, becasue the mtethod is const</value>
+    </data>
+  <data name="PC0002Tittle" xml:space="preserve">
+        <value>You can't modify this field here, becasue the mtethod is const</value>
+    </data>
+  <data name="PC0002MessageFormat" xml:space="preserve">
+        <value>You can't modify the field [{0}] here, becasue the mtethod is const</value>
+    </data>
+  <data name="PC0003Description" xml:space="preserve">
+        <value>You can't modify this property here, becasue the method is const</value>
+    </data>
+  <data name="PC0003MessageFormat" xml:space="preserve">
+        <value>You can't modify the property [{0}] here, becasue the method is const</value>
+    </data>
+  <data name="PC0003Tittle" xml:space="preserve">
+        <value>You can't modify this property here, becasue the method is const</value>
+    </data>
+  <data name="PC0004Description" xml:space="preserve">
+        <value>You can't invoke this method here, becasue the method is const</value>
+    </data>
+  <data name="PC0004MessageFormat" xml:space="preserve">
+        <value>You can't invoke the method [{0}] here, becasue the method is const</value>
+    </data>
+  <data name="PC0004Tittle" xml:space="preserve">
+        <value>You can't invoke this method here, becasue the method is const</value>
+    </data>
+  <data name="PC0005Tittle" xml:space="preserve">
+        <value>You can't modify this variable here, because it is const</value>
+    </data>
+  <data name="PC0005MessageFormat" xml:space="preserve">
+        <value>You can't modify the variable [{0}] here, because it is const</value>
+    </data>
+  <data name="PC0005Description" xml:space="preserve">
+        <value>You can't modify this variable here, because it is const</value>
+    </data>
+  <data name="PC0006Tittle" xml:space="preserve">
+        <value>You can't modify this field here, becasue the method is const</value>
+    </data>
+  <data name="PC0006Description" xml:space="preserve">
+        <value>You can't modify this field here, becasue the method is const</value>
+    </data>
+  <data name="PC0006MessageFormat" xml:space="preserve">
+        <value>You can't modify the field [{0}] here, becasue the method is const</value>
+    </data>
+  <data name="PC0007Description" xml:space="preserve">
+        <value>You can't modify this property here, becasue the method is const</value>
+    </data>
+  <data name="PC0007Tittle" xml:space="preserve">
+        <value>You can't modify this property here, becasue the method is const</value>
+    </data>
+  <data name="PC0007MessageFormat" xml:space="preserve">
+        <value>You can't modify the property {0} here, becasue the method is const</value>
+    </data>
+  <data name="PC0008Tittle" xml:space="preserve">
+        <value>You can't invoke this method here, becasue the method is const</value>
+    </data>
+  <data name="PC0008Description" xml:space="preserve">
+        <value>You can't invoke this method here, becasue the method is const</value>
+    </data>
+  <data name="PC0008MessageFormat" xml:space="preserve">
+        <value>You can't invoke the method[{0}] here, becasue the method is const</value>
+    </data>
+  <data name="PC0009Tittle" xml:space="preserve">
+        <value>You can't modify this variable here, because it is const</value>
+    </data>
+  <data name="PC0009MessageFormat" xml:space="preserve">
+        <value>You can't modify the variable [{0}] here, because it is const</value>
+    </data>
+  <data name="PC0009Description" xml:space="preserve">
+        <value>You can't modify this variable here, because it is const</value>
+    </data>
+</root>
