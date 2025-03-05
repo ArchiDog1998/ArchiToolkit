@@ -2,5 +2,5 @@
 
 internal static class Constant
 {
-    public const string KeepGrasshopper = "KEEP_GRASSHOPPER";
+    public const string KeepAttributes = "KEEP_ARCHITOOLKIT_ATTRIBUTES";
 }

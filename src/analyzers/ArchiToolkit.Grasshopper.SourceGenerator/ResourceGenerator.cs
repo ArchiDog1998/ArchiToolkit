@@ -1,0 +1,88 @@
+﻿using ArchiToolkit.RoslynHelper.Extensions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static ArchiToolkit.RoslynHelper.Extensions.SyntaxExtensions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace ArchiToolkit.Grasshopper.SourceGenerator;
+
+[Generator(LanguageNames.CSharp)]
+public class ResourceGenerator : IIncrementalGenerator
+{
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        context.RegisterSourceOutput(context.CompilationProvider, (spc, compilation) =>
+        {
+            var rootNamespace = compilation.AssemblyName ?? "DefaultNamespace";
+            var resourceName = rootNamespace + ".l10n.ArchiToolkit.Resources";
+
+            var root = NamespaceDeclaration("ArchiToolkit.Grasshopper")
+                .AddMembers(GetResourceClass(resourceName));
+            spc.AddSource("ArchiToolkit.Resources.g.cs", root.NodeToString());
+        });
+    }
+
+    private static ClassDeclarationSyntax GetResourceClass(string resourceName)
+    {
+        return ClassDeclaration("ArchiToolkitResources")
+            .WithModifiers(
+                TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.StaticKeyword)))
+            .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator))])
+            .WithMembers(
+            [
+                FieldDeclaration(VariableDeclaration(NullableType(
+                            IdentifierName("global::System.Resources.ResourceManager")))
+                        .WithVariables([VariableDeclarator(Identifier("_resourceManager"))]))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword)))
+                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator))]),
+                PropertyDeclaration(
+                        IdentifierName("global::System.Resources.ResourceManager"),
+                        Identifier("ResourceManager"))
+                    .WithModifiers(
+                        TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword)))
+                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator))])
+                    .WithExpressionBody(ArrowExpressionClause(AssignmentExpression(
+                        SyntaxKind.CoalesceAssignmentExpression,
+                        IdentifierName("_resourceManager"),
+                        ObjectCreationExpression(IdentifierName("global::System.Resources.ResourceManager"))
+                            .WithArgumentList(ArgumentList(
+                            [
+                                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(resourceName))),
+                                Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                    TypeOfExpression(IdentifierName("ArchiToolkitResources")),
+                                    IdentifierName("Assembly")))
+                            ])))))
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                PropertyDeclaration(NullableType(IdentifierName("global::System.Globalization.CultureInfo")),
+                        Identifier("Culture"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
+                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator))])
+                    .WithAccessorList(AccessorList(
+                    [
+                        AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                        AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                    ])),
+                MethodDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("Get"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.StaticKeyword)))
+                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator))])
+                    .WithParameterList(ParameterList(
+                        [Parameter(Identifier("name")).WithType(PredefinedType(Token(SyntaxKind.StringKeyword)))]))
+                    .WithExpressionBody(ArrowExpressionClause(BinaryExpression(SyntaxKind.CoalesceExpression,
+                        InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("ResourceManager"), IdentifierName("GetString")))
+                            .WithArgumentList(
+                                ArgumentList(
+                                [
+                                    Argument(IdentifierName("name")),
+
+                                    Argument(IdentifierName("Culture"))
+                                ])),
+                        IdentifierName("name"))))
+                    .WithSemicolonToken(
+                        Token(SyntaxKind.SemicolonToken))
+            ]);
+    }
+}

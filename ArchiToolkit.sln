@@ -89,6 +89,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.BeforeBuild", "src\applications\ArchiToolkit.Grasshopper.BeforeBuild\ArchiToolkit.Grasshopper.BeforeBuild.csproj", "{AC304631-0DD1-40EC-85B4-224C0DDB6B1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.Sources", "src\libraries\ArchiToolkit.Grasshopper.Sources\ArchiToolkit.Grasshopper.Sources.csproj", "{F1BE5A2D-86D3-43DC-BB4E-76C14B15C7B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +181,9 @@ Global
 		{AC304631-0DD1-40EC-85B4-224C0DDB6B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC304631-0DD1-40EC-85B4-224C0DDB6B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC304631-0DD1-40EC-85B4-224C0DDB6B1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1BE5A2D-86D3-43DC-BB4E-76C14B15C7B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1BE5A2D-86D3-43DC-BB4E-76C14B15C7B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1BE5A2D-86D3-43DC-BB4E-76C14B15C7B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -211,5 +216,6 @@ Global
 		{ED2AFBFB-2405-4FE4-B6B8-4EA4D5551A59} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
 		{31552682-9BEF-49E9-B683-AC3B26EBA24E} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
 		{AC304631-0DD1-40EC-85B4-224C0DDB6B1B} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
+		{F1BE5A2D-86D3-43DC-BB4E-76C14B15C7B7} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
 	EndGlobalSection
 EndGlobal

@@ -11,22 +11,10 @@
         <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.Grasshopper.SourceGenerator\ArchiToolkit.Grasshopper.SourceGenerator.csproj" OutputItemType="analyzer" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Grasshopper\ArchiToolkit.Grasshopper.csproj" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj" OutputItemType="analyzer" />
+        <PackageReference Include="Grasshopper"/>
     </ItemGroup>
 
     <Target Name="RunExeBeforeBuild" BeforeTargets="BeforeBuild">
         <Exec Command="&quot;..\..\src\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\ArchiToolkit.Grasshopper.BeforeBuild.exe&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
-        <Touch Files="@(EmbeddedResource)" />
     </Target>
-
-	<ItemGroup>
-		<EmbeddedResource Update="l10n\ArchiToolkit.Resources.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>ArchiToolkit.Resources.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-		<Compile Update="l10n\ArchiToolkit.Resources.Designer.cs">
-			<DependentUpon>ArchiToolkit.Resources.resx</DependentUpon>
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-		</Compile>
-	</ItemGroup>
 </Project>

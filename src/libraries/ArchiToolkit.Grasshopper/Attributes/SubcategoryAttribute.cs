@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics;
-
 #pragma warning disable CS9113 // Parameter is unread.
 
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-///     The document objects.
+/// The subcategory of it.
 /// </summary>
+/// <param name="name"></param>
 /// <param name="recognizeName">for localization</param>
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 [Conditional(Constant.KeepAttributes)]
-public class DocObjAttribute(string recognizeName = "") : Attribute;
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method)]
+public class SubcategoryAttribute(string name, string recognizeName = "" ) : Attribute;
