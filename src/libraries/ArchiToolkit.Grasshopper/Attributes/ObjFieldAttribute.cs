@@ -4,7 +4,7 @@
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// if the input data is a field.
+/// if the input data is a field. the data must be <see langword="ref"/>.
 /// </summary>
 /// <param name="saveToFile">if it should be saved into the file</param>
 [AttributeUsage(AttributeTargets.Parameter)]

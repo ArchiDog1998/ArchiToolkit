@@ -12,6 +12,23 @@ public sealed class TestComponent() : GH_Component("", "", "", "", "")
     {
     }
 
+    private int i = 0;
+    protected override void BeforeSolveInstance()
+    {
+        TestBefore(ref i);
+        base.BeforeSolveInstance();
+    }
+
+    private void TestBefore(ref int i)
+    {
+
+    }
+
+    protected override void AfterSolveInstance()
+    {
+        base.AfterSolveInstance();
+    }
+
     protected override void SolveInstance(IGH_DataAccess DA)
     {
     }
