@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection.Metadata;
+using System.Text;
 using ArchiToolkit.RoslynHelper.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -14,6 +15,8 @@ public class MethodName : TypeParametersName<IMethodSymbol>
     {
         return symbol.TypeParameters;
     }
+
+    public MethodSignature Signature { get; }
 
     /// <summary>
     ///
@@ -35,6 +38,7 @@ public class MethodName : TypeParametersName<IMethodSymbol>
         Parameters = methodSymbol.Parameters.GetNames().ToArray();
         ReturnType = methodSymbol.ReturnType.GetName();
         ContainingType = methodSymbol.ContainingType.GetName();
+        Signature =  new MethodSignature(methodSymbol);
     }
 
     private protected override string GetSummaryName()

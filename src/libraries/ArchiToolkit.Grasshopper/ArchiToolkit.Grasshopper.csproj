@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <Title>Grasshopper</Title>
+        <Description>Make your grasshopper development much more easier</Description>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\analyzers\ArchiToolkit.Grasshopper.SourceGenerator\bin\$(Configuration)\netstandard2.0\ArchiToolkit.Grasshopper.SourceGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+        <None Include="..\..\libraries\ArchiToolkit.RoslynHelper\bin\$(Configuration)\netstandard2.0\ArchiToolkit.RoslynHelper.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+        <None Include="ArchiToolkit.Grasshopper.targets" Pack="true" PackagePath="build" Visible="false"/>
+        <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\ArchiToolkit.Grasshopper.BeforeBuild.exe" Pack="true" PackagePath="tools" Visible="false"/>
+        <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\ArchiToolkit.Grasshopper.BeforeBuild.dll" Pack="true" PackagePath="tools" Visible="false"/>
+        <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\ArchiToolkit.Grasshopper.BeforeBuild.runtimeconfig.json" Pack="true" PackagePath="tools" Visible="false"/>
+<!--        <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\Miscosoft.CodeAnalysis.dll" Pack="true" PackagePath="tools" Visible="false"/>-->
+<!--        <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\Miscosoft.CodeAnalysis.CSharp.dll" Pack="true" PackagePath="tools" Visible="false"/>-->
+        <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\System.Resources.NetStandard.dll" Pack="true" PackagePath="tools" Visible="false"/>
+        <PackageReference Include="Grasshopper"/>
+    </ItemGroup>
+</Project>

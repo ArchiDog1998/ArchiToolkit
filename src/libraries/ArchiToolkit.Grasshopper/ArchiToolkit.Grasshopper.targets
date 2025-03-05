@@ -1,0 +1,21 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <BeforeBuildPath>$(MSBuildThisFileDirectory)..\tools\ArchiToolkit.Grasshopper.BeforeBuild.exe</BeforeBuildPath>
+    </PropertyGroup>
+
+    <Target Name="RunExeBeforeBuild" BeforeTargets="Build">
+        <Exec Command="&quot;$(BeforeBuildPath)&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
+    </Target>
+
+    <ItemGroup>
+        <EmbeddedResource Update="l10n\ArchiToolkit.Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>ArchiToolkit.Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <Compile Update="l10n\ArchiToolkit.Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>ArchiToolkit.Resources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+</Project>

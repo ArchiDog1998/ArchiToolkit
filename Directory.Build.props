@@ -18,7 +18,7 @@
         <NeedAlmostAllFrameWorks>False</NeedAlmostAllFrameWorks>
         <NeedAlmostAllFrameWorks Condition="!$(IsTestProject) and $(IsLibraryProject) and !$(MSBuildProjectName.EndsWith('RoslynHelper'))">True</NeedAlmostAllFrameWorks>
         <NeedTestsPackage>False</NeedTestsPackage>
-        <NeedTestsPackage Condition="$(IsTestProject)">True</NeedTestsPackage>
+        <NeedTestsPackage Condition="$(IsTestProject) and $(MSBuildProjectName.EndsWith('Tests'))">True</NeedTestsPackage>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(NeedTestsPackage)">
@@ -55,7 +55,7 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp"/>
     </ItemGroup>
 
-    <PropertyGroup Condition="$(NeedAlmostAllFrameWorks)">
+    <PropertyGroup Condition="$(NeedAlmostAllFrameWorks) and !$(MSBuildProjectName.EndsWith('Grasshopper'))">
         <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0;net472;net48;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
 
