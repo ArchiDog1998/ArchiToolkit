@@ -10,4 +10,8 @@
     <PropertyGroup Condition="'$(KeepArchiToolkitAttributes)' == 'true'">
         <DefineConstants>$(DefineConstants);KEEP_ARCHITOOLKIT_ATTRIBUTES</DefineConstants> <!-- Define the symbol if true -->
     </PropertyGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Icons/*.png"/>
+    </ItemGroup>
 </Project>

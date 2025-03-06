@@ -12,3 +12,12 @@ namespace ArchiToolkit.Grasshopper;
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional(Constant.KeepAttributes)]
 public class AfterSolveAttribute(string methodName) : Attribute;
+
+/// <summary>
+/// <inheritdoc cref="AfterSolveAttribute"/>
+/// </summary>
+/// <param name="methodName"><inheritdoc cref="AfterSolveAttribute"/></param>
+/// <typeparam name="T">The type to get the data from</typeparam>
+[AttributeUsage(AttributeTargets.Method)]
+[Conditional(Constant.KeepAttributes)]
+public class AfterSolveAttribute<T>(string methodName) : Attribute;

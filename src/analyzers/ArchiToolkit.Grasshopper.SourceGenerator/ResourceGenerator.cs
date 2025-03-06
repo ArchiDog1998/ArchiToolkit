@@ -27,8 +27,7 @@ public class ResourceGenerator : IIncrementalGenerator
     {
         return ClassDeclaration("ArchiToolkitResources")
             .WithModifiers(
-                TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.StaticKeyword)))
-            .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator))])
+                TokenList(Token(SyntaxKind.PartialKeyword)))
             .WithMembers(
             [
                 FieldDeclaration(VariableDeclaration(NullableType(
@@ -41,7 +40,7 @@ public class ResourceGenerator : IIncrementalGenerator
                         Identifier("ResourceManager"))
                     .WithModifiers(
                         TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword)))
-                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator))])
+                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator)).AddAttributes(NonUserCodeAttribute())])
                     .WithExpressionBody(ArrowExpressionClause(AssignmentExpression(
                         SyntaxKind.CoalesceAssignmentExpression,
                         IdentifierName("_resourceManager"),
@@ -57,7 +56,7 @@ public class ResourceGenerator : IIncrementalGenerator
                 PropertyDeclaration(NullableType(IdentifierName("global::System.Globalization.CultureInfo")),
                         Identifier("Culture"))
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
-                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator))])
+                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator)).AddAttributes(NonUserCodeAttribute())])
                     .WithAccessorList(AccessorList(
                     [
                         AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
@@ -67,7 +66,7 @@ public class ResourceGenerator : IIncrementalGenerator
                     ])),
                 MethodDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("Get"))
                     .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.StaticKeyword)))
-                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator))])
+                    .WithAttributeLists([GeneratedCodeAttribute(typeof(ResourceGenerator)).AddAttributes(NonUserCodeAttribute())])
                     .WithParameterList(ParameterList(
                         [Parameter(Identifier("name")).WithType(PredefinedType(Token(SyntaxKind.StringKeyword)))]))
                     .WithExpressionBody(ArrowExpressionClause(BinaryExpression(SyntaxKind.CoalesceExpression,

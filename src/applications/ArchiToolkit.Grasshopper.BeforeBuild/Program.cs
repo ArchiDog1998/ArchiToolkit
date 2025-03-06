@@ -14,6 +14,8 @@ if (args.Length < 1)
 var folder =  args[0];
 var resxFile = new FileInfo(Path.Combine(folder, "l10n", "ArchiToolkit.Resources.resx"));
 resxFile.Directory?.Create();
+var iconFolder = new DirectoryInfo(Path.Combine(folder, "Icons"));
+iconFolder.Create();
 ResxManager.Generate(resxFile.FullName, new Dictionary<string, string>()
 {
     ["test"] = "Hello World!",

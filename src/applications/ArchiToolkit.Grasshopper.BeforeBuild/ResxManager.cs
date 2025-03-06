@@ -1,12 +1,13 @@
 ﻿using System.Xml;
+using System.Xml.Linq;
 
 namespace ArchiToolkit.Grasshopper.BeforeBuild;
 
 internal static class ResxManager
 {
-    public static void Generate(string name, Dictionary<string, string> data)
+    public static void Generate(string filePath, Dictionary<string, string> data)
     {
-        using var writer = XmlWriter.Create(name, new XmlWriterSettings
+        using var writer = XmlWriter.Create(filePath, new XmlWriterSettings
         {
             Indent = true,
             IndentChars = "\t"

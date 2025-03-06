@@ -4,6 +4,6 @@
         <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.Grasshopper.SourceGenerator\ArchiToolkit.Grasshopper.SourceGenerator.csproj" OutputItemType="analyzer" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Grasshopper\ArchiToolkit.Grasshopper.csproj" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj" OutputItemType="analyzer"  />
+        <PackageReference Include="System.Drawing.Common" />
     </ItemGroup>
-
 </Project>
