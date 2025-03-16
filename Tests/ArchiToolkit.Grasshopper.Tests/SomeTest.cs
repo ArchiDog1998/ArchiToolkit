@@ -5,6 +5,5 @@ public class SomeTest
     [Test]
     public void Test()
     {
-
     }
 }
