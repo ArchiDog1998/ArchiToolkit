@@ -2,6 +2,7 @@
 
 using ArchiToolkit.Grasshopper.BeforeBuild;
 
+return;
 if (args.Length < 1)
 {
 #if DEBUG
@@ -12,6 +13,7 @@ if (args.Length < 1)
 }
 
 var folder =  args[0];
+if (!Directory.Exists(folder)) return;
 var resxFile = new FileInfo(Path.Combine(folder, "l10n", "ArchiToolkit.Resources.resx"));
 resxFile.Directory?.Create();
 var iconFolder = new DirectoryInfo(Path.Combine(folder, "Icons"));

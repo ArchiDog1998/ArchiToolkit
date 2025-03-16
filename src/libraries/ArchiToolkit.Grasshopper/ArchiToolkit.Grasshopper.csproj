@@ -3,7 +3,7 @@
         <TargetFramework>net48</TargetFramework>
         <Title>Grasshopper</Title>
         <Description>Make your grasshopper development much more easier</Description>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>

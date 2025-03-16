@@ -7,6 +7,13 @@ internal static class ResxManager
 {
     public static void Generate(string filePath, Dictionary<string, string> data)
     {
+        if (File.Exists(filePath))
+        {
+            File.SetAttributes(filePath, File.GetAttributes(filePath) & ~FileAttributes.ReadOnly);
+        }
+
+        File.SetAttributes(filePath, FileAttributes.ReadOnly);
+
         using var writer = XmlWriter.Create(filePath, new XmlWriterSettings
         {
             Indent = true,
@@ -30,13 +37,15 @@ internal static class ResxManager
         // reader header
         writer.WriteStartElement("resheader");
         writer.WriteAttributeString("name", "reader");
-        writer.WriteElementString("value", "System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+        writer.WriteElementString("value",
+            "System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
         writer.WriteEndElement();
 
         // writer header
         writer.WriteStartElement("resheader");
         writer.WriteAttributeString("name", "writer");
-        writer.WriteElementString("value", "System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+        writer.WriteElementString("value",
+            "System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
         writer.WriteEndElement();
 
         // data element
@@ -51,5 +60,7 @@ internal static class ResxManager
 
         writer.WriteEndElement(); // root
         writer.WriteEndDocument();
+
+        File.SetAttributes(filePath, FileAttributes.ReadOnly | File.GetAttributes(filePath));
     }
 }
