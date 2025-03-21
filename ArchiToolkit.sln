@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions.Tes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{752493CD-971A-4559-B5F1-C931C2AB58BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.CppInteropGenerator", "src\applications\ArchiToolkit.CppInteropGenerator\ArchiToolkit.CppInteropGenerator.csproj", "{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions.Logging", "src\libraries\ArchiToolkit.Assertions.Logging\ArchiToolkit.Assertions.Logging.csproj", "{D22419AF-0ED1-446A-B64B-C567EA383586}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NukeBuilder", "build\NukeBuilder.csproj", "{B37146A5-7936-47DD-A517-333A4A2A8546}"
@@ -65,8 +63,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Fluent.SourceG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Fluent.Tests", "tests\ArchiToolkit.Fluent.Tests\ArchiToolkit.Fluent.Tests.csproj", "{053FB41D-9490-4C6F-9B3E-B0F1A5154A4E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CppInteropGenerator", "CppInteropGenerator", "{649BF981-27A3-4300-AEAB-E7C2D41E4090}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Grasshopper", "Grasshopper", "{23F577BA-37E9-4BF2-8957-6801EAF882EB}"
 	ProjectSection(SolutionItems) = preProject
 		src\libraries\ArchiToolkit.Grasshopper\ArchiToolkit.Grasshopper.targets = src\libraries\ArchiToolkit.Grasshopper\ArchiToolkit.Grasshopper.targets
@@ -79,8 +75,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper", 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.SourceGenerator", "src\analyzers\ArchiToolkit.Grasshopper.SourceGenerator\ArchiToolkit.Grasshopper.SourceGenerator.csproj", "{532CF3F0-48CC-4A08-BE79-7EEE5C463B44}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.Tests", "tests\ArchiToolkit.Grasshopper.Tests\ArchiToolkit.Grasshopper.Tests.csproj", "{ED2AFBFB-2405-4FE4-B6B8-4EA4D5551A59}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.Instance", "tests\ArchiToolkit.Grasshopper.Instance\ArchiToolkit.Grasshopper.Instance.csproj", "{31552682-9BEF-49E9-B683-AC3B26EBA24E}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -119,10 +113,6 @@ Global
 		{7145BF83-C901-4886-B377-BE3E02553B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7145BF83-C901-4886-B377-BE3E02553B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7145BF83-C901-4886-B377-BE3E02553B4A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D22419AF-0ED1-446A-B64B-C567EA383586}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D22419AF-0ED1-446A-B64B-C567EA383586}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D22419AF-0ED1-446A-B64B-C567EA383586}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -169,10 +159,6 @@ Global
 		{532CF3F0-48CC-4A08-BE79-7EEE5C463B44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{532CF3F0-48CC-4A08-BE79-7EEE5C463B44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{532CF3F0-48CC-4A08-BE79-7EEE5C463B44}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED2AFBFB-2405-4FE4-B6B8-4EA4D5551A59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED2AFBFB-2405-4FE4-B6B8-4EA4D5551A59}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED2AFBFB-2405-4FE4-B6B8-4EA4D5551A59}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED2AFBFB-2405-4FE4-B6B8-4EA4D5551A59}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31552682-9BEF-49E9-B683-AC3B26EBA24E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31552682-9BEF-49E9-B683-AC3B26EBA24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31552682-9BEF-49E9-B683-AC3B26EBA24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -208,12 +194,9 @@ Global
 		{3D4A7F69-466B-40FA-AC81-D4488CC007AD} = {C40CB50D-D8A5-4267-A0DB-E24911B80E5F}
 		{3490DEB1-6611-4F1B-A044-F4F92E77EFA1} = {C40CB50D-D8A5-4267-A0DB-E24911B80E5F}
 		{053FB41D-9490-4C6F-9B3E-B0F1A5154A4E} = {C40CB50D-D8A5-4267-A0DB-E24911B80E5F}
-		{649BF981-27A3-4300-AEAB-E7C2D41E4090} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
-		{5D761778-9BC5-49E2-A8E1-0E7F9F3A22DF} = {649BF981-27A3-4300-AEAB-E7C2D41E4090}
 		{23F577BA-37E9-4BF2-8957-6801EAF882EB} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 		{7B4F8193-E9A1-4B63-A3EE-9CA16079AE3B} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
 		{532CF3F0-48CC-4A08-BE79-7EEE5C463B44} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
-		{ED2AFBFB-2405-4FE4-B6B8-4EA4D5551A59} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
 		{31552682-9BEF-49E9-B683-AC3B26EBA24E} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
 		{AC304631-0DD1-40EC-85B4-224C0DDB6B1B} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
 		{F1BE5A2D-86D3-43DC-BB4E-76C14B15C7B7} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
