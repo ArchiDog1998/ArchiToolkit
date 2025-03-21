@@ -84,6 +84,15 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
+    ///    Obsolete Attribute
+    /// </summary>
+    /// <returns></returns>
+    public static AttributeSyntax ObsoleteAttribute()
+    {
+        return Attribute(IdentifierName("global::System.Obsolete"));
+    }
+
+    /// <summary>
     /// Pure attribute.
     /// </summary>
     /// <returns></returns>

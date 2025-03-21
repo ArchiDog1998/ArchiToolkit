@@ -50,6 +50,11 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             method.Assembly = assembly;
             method.GlobalBaseComponent = baseComponent;
             method.GenerateSource(context);
+
+            var exposure = method.Symbol.GetAttributes().FirstOrDefault(a =>
+                a.AttributeClass?.GetName().FullName == "global::ArchiToolkit.Grasshopper.ExposureAttribute");
+            var text = exposure?.ConstructorArguments[0].Value?.ToString();
+            builder.AppendLine(text ?? "Nothing");
         }
 
         context.AddSource("Test.cs", builder.ToString());

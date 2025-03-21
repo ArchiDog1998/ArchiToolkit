@@ -37,25 +37,26 @@ public class MethodGenerator : BasicGenerator
         }
     }
 
-    public override string ClassName => "Component_" + _name.Name;
+    protected override string ClassName => "Component_" + _name.Name;
 
     public string GlobalBaseComponent { get; set; } = null!;
 
     protected override ClassDeclarationSyntax ModifyClass(ClassDeclarationSyntax classSyntax)
     {
         var baseComponent = DocumentObjectGenerator.GetBaseComponent(_name.Symbol.GetAttributes()) ?? GlobalBaseComponent;
-        var keyName = string.IsNullOrEmpty(DocObjName) ? NameSpace + "." + ClassName : DocObjName;
+        var keyName = KeyName;
+        var keyComponent = keyName + ".Component";
         return classSyntax.WithParameterList(ParameterList())
             .WithBaseList(BaseList(
             [
                 PrimaryConstructorBaseType(IdentifierName(baseComponent))
                     .WithArgumentList(ArgumentList(
                         [
-                            GetArgumentString(keyName + ".Name"),
-                            GetArgumentString(keyName + ".Nickname"),
-                            GetArgumentString(keyName + ".Description"),
-                            GetArgumentString(keyName + ".Category"),
-                            GetArgumentString(keyName + ".Subcategory"),
+                            GetArgumentString(keyComponent + ".Name"),
+                            GetArgumentString(keyComponent + ".Nickname"),
+                            GetArgumentString(keyComponent + ".Description"),
+                            GetArgumentString("Category.XXX"),
+                            GetArgumentString("Subcategory.XXX"),
                         ]))
             ]));
     }

@@ -10,7 +10,8 @@ public class TypeGenerator : BasicGenerator
     private readonly TypeName _name;
     protected override string IdName => _name.FullName;
 
-    public override string ClassName => "Param_" + _name.Name;
+    protected override string ClassName => "Param_" + _name.Name;
+
 
     protected override ClassDeclarationSyntax ModifyClass(ClassDeclarationSyntax classSyntax)
     {
