@@ -30,8 +30,10 @@ public class MethodParamItem(
     string name,
     TypeName type,
     ParamType paramType,
+    TypeName owner,
     ImmutableArray<AttributeData> attributes)
 {
+    public readonly ParameterName? Parameter;
     public readonly string Name = name;
     public readonly TypeName TypeName = type;
     public readonly ParamType Type = paramType;
@@ -54,9 +56,41 @@ public class MethodParamItem(
         _ => Name,
     };
 
-    public MethodParamItem(ParameterName name) : this(name.Name, name.Type, GetParamType(name),
+    public MethodParamItem(ParameterName name, TypeName owner) : this(name.Name, name.Type, GetParamType(name), owner,
         name.Symbol.GetAttributes())
     {
+        Parameter = name;
+    }
+
+    public LocalDeclarationStatementSyntax GetData(int index)
+    {
+        return LocalDeclarationStatement(VariableDeclaration(IdentifierName(TypeName.FullName))
+            .WithVariables(
+            [
+                VariableDeclarator(Identifier(ParameterName)).WithInitializer(EqualsValueClause(
+                    InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("global::ArchiToolkit.Grasshopper.ActiveObjectHelper"),
+                            GenericName(Identifier("GetData" + Access)).WithTypeArgumentList(
+                                TypeArgumentList([IdentifierName(GetInnerType(TypeName.Symbol).GetName().FullName)]))))
+                        .WithArgumentList(ArgumentList(
+                        [
+                            Argument(IdentifierName("DA")),
+                            Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(index)))
+                        ]))))
+            ]));
+    }
+
+    public ExpressionStatementSyntax SetData(int index)
+    {
+        return ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                IdentifierName("global::ArchiToolkit.Grasshopper.ActiveObjectHelper"), IdentifierName("SetData")))
+            .WithArgumentList(
+                ArgumentList(
+                [
+                    Argument(IdentifierName("DA")),
+                    Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(index))),
+                    Argument(IdentifierName(ParameterName))
+                ])));
     }
 
     public FieldDeclarationSyntax Field()
@@ -67,15 +101,65 @@ public class MethodParamItem(
             .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)));
     }
 
-    public BlockSyntax IoBlock()
+    public BlockSyntax IoBlock(bool isIn)
     {
         return Block(BlockItems());
 
         IEnumerable<StatementSyntax> BlockItems()
         {
             yield return CreateParameter();
+            if (Attributes.Any(a => a.AttributeClass?.GetName().FullName
+                    is "global::ArchiToolkit.Grasshopper.HiddenAttribute"))
+            {
+                yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                    MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
+                        IdentifierName("Hidden")), LiteralExpression(SyntaxKind.TrueLiteralExpression)));
+            }
+
+            if (isIn && Attributes.Any(a => a.AttributeClass?.GetName().FullName
+                    is "global::ArchiToolkit.Grasshopper.OptionalAttribute"))
+            {
+                yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                    MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
+                        IdentifierName("Optional")), LiteralExpression(SyntaxKind.TrueLiteralExpression)));
+            }
+
+            if (isIn && Attributes.FirstOrDefault(a => a.AttributeClass?.GetName().FullName
+                             is "global::ArchiToolkit.Grasshopper.PersistentDataAttribute")
+                         is { ConstructorArguments.Length: > 0 } persistentAttribute1
+                     && persistentAttribute1.ConstructorArguments[0].Value?.ToString() is { } property1)
+            {
+                yield return PersistentData(owner.FullName, property1);
+            }
+
+            if (isIn && Attributes.FirstOrDefault(a =>
+                         {
+                             if (a.AttributeClass is not { IsGenericType : true } attr) return false;
+                             return attr.ConstructUnboundGenericType().GetName().FullName is
+                                 "global::ArchiToolkit.Grasshopper.PersistentDataAttribute<>";
+                         })
+                         is
+                         {
+                             ConstructorArguments.Length: > 0, AttributeClass.TypeArguments.Length: > 0
+                         } persistentAttribute2
+                     && persistentAttribute2.ConstructorArguments[0].Value?.ToString() is { } property2
+                     && persistentAttribute2.AttributeClass?.TypeArguments[0].GetName().FullName is { } customClass)
+            {
+                yield return PersistentData(customClass, property2);
+            }
 
             yield return AddParameter();
+        }
+
+        ExpressionStatementSyntax PersistentData(string className, string propertyName)
+        {
+            return ExpressionStatement(InvocationExpression(MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
+                    IdentifierName("SetPersistentData")))
+                .WithArgumentList(ArgumentList([
+                    Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(className),
+                        IdentifierName(propertyName)))
+                ])));
         }
 
         LocalDeclarationStatementSyntax CreateParameter()
@@ -107,11 +191,9 @@ public class MethodParamItem(
                                     var attr = a.AttributeClass;
                                     if (attr is null) return false;
                                     if (!attr.IsGenericType) return false;
-                                    if (attr.TypeArguments.Length < 1) return true;
-                                    if (attr.ConstructUnboundGenericType().GetName().FullName
-                                        is not "global::ArchiToolkit.Grasshopper.ParamTypeAttribute<>")
-                                        return false;
-                                    return true;
+                                    if (attr.TypeArguments.Length < 1) return false;
+                                    return attr.ConstructUnboundGenericType().GetName().FullName
+                                        is "global::ArchiToolkit.Grasshopper.ParamTypeAttribute<>";
                                 })?.AttributeClass?.TypeArguments[0].GetName().FullName
                                 ?? GetParamClassName(GetInnerType(TypeName.Symbol).GetName().FullName);
             return LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
@@ -125,27 +207,27 @@ public class MethodParamItem(
 
         StatementSyntax AddParameter()
         {
-
             return ExpressionStatement(InvocationExpression(MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression, IdentifierName("pManager"),
                     IdentifierName("AddParameter")))
                 .WithArgumentList(ArgumentList(
-                    [
-                        Argument(CastExpression(IdentifierName("global::Grasshopper.Kernel.IGH_Param"), IdentifierName(Identifier("param")))),
-                        MethodGenerator.GetArgumentKeyedString(Name + ".Name"),
-                        MethodGenerator.GetArgumentKeyedString(Name + ".Nickname"),
-                        MethodGenerator.GetArgumentKeyedString(Name + ".Description"),
-                        Argument(
-                            MemberAccessExpression(
-                                SyntaxKind.SimpleMemberAccessExpression,
-                                IdentifierName("global::Grasshopper.Kernel.GH_ParamAccess"),
-                                IdentifierName(Access switch
-                                {
-                                    ParamAccess.List => "list",
-                                    ParamAccess.Tree => "tree",
-                                    _ => "item",
-                                })))
-                    ])));
+                [
+                    Argument(CastExpression(IdentifierName("global::Grasshopper.Kernel.IGH_Param"),
+                        IdentifierName(Identifier("param")))),
+                    MethodGenerator.GetArgumentKeyedString("." + Name + ".Name"),
+                    MethodGenerator.GetArgumentKeyedString("." + Name + ".Nickname"),
+                    MethodGenerator.GetArgumentKeyedString("." + Name + ".Description"),
+                    Argument(
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("global::Grasshopper.Kernel.GH_ParamAccess"),
+                            IdentifierName(Access switch
+                            {
+                                ParamAccess.List => "list",
+                                ParamAccess.Tree => "tree",
+                                _ => "item",
+                            })))
+                ])));
         }
     }
 
@@ -158,7 +240,7 @@ public class MethodParamItem(
                 if (!i.IsGenericType) return false;
                 if (i.TypeArguments.Length is 0) return false;
                 return i.ConstructUnboundGenericType().GetName().FullName
-                    is "global::System.Collections.Generic.IList";
+                    is "global::System.Collections.Generic.IList<>";
             })?.TypeArguments[0] is { } listItem)
         {
             return GetInnerType(listItem);

@@ -38,15 +38,17 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         var baseComponent = GetBaseComponent(assembly.GetAttributes()) ?? "global::Grasshopper.Kernel.GH_Component";
         var baseCategory = GetBaseCategory(assembly.GetAttributes()) ?? assembly.Name;
         var baseSubcategory = GetBaseSubcategory(assembly.GetAttributes()) ?? assembly.Name;
+        var baseAttribute =GetBaseAttribute(assembly.GetAttributes());
 
         var builder = new StringBuilder();
 
         var typeAndClasses = new Dictionary<string, string>();
 
+        BasicGenerator.BaseCategory = baseCategory;
+        BasicGenerator.BaseSubcategory = baseSubcategory;
+
         foreach (var type in types)
         {
-            type.BaseCategory = baseCategory;
-            type.BaseSubcategory = baseSubcategory;
             type.GenerateSource(context);
 
             var key = type.Name.FullName;
@@ -75,6 +77,8 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         MethodParamItem.TypeDictionary = typeAndClasses;
 
+        BasicGenerator.BaseAttribute = baseAttribute;
+        MethodGenerator.GlobalBaseComponent = baseComponent;
         foreach (var pair in MethodParamItem.TypeDictionary)
         {
             builder.AppendLine(pair.Key + " : " + pair.Value);
@@ -82,9 +86,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         foreach (var method in methods)
         {
-            method.BaseCategory = baseCategory;
-            method.BaseSubcategory = baseSubcategory;
-            method.GlobalBaseComponent = baseComponent;
+
             method.GenerateSource(context);
         }
 
@@ -98,6 +100,20 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             where type.ConstructUnboundGenericType().GetName().FullName is
                 "global::ArchiToolkit.Grasshopper.BaseComponentAttribute<>"
             select type.TypeArguments[0].GetName().FullName).FirstOrDefault();
+    }
+
+    public static string? GetBaseAttribute(IEnumerable<AttributeData> attributes)
+    {
+        foreach (var attr in attributes)
+        {
+            if (attr.AttributeClass is not { } attributeClass) continue;
+            if (!attributeClass.IsGenericType) continue;
+            if (attributeClass.TypeArguments.Length < 1) continue;
+            if (attributeClass.ConstructUnboundGenericType().GetName().FullName
+                is not "global::ArchiToolkit.Grasshopper.ObjAttrAttribute<>") continue;
+            return attributeClass.TypeArguments[0].GetName().FullName;
+        }
+        return null;
     }
 
     public static string? GetBaseCategory(IEnumerable<AttributeData> attributes)

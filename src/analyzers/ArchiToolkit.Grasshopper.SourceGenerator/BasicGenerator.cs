@@ -32,8 +32,9 @@ public abstract class BasicGenerator
 
     public string KeyName => string.IsNullOrEmpty(field) ? NameSpace + "." + ToRealNameNoTags(ClassName) : field;
 
-    public string BaseCategory { get; set; } = null!;
-    public string BaseSubcategory { get; set; } = null!;
+    public static string BaseCategory { get; set; } = null!;
+    public static string BaseSubcategory { get; set; } = null!;
+    public static string? BaseAttribute { get; set; }
     public string? Category { get; set; }
     public string? Subcategory { get; set; }
 
