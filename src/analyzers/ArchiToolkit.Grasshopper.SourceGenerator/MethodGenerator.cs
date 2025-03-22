@@ -10,13 +10,13 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
 public class MethodGenerator : BasicGenerator
 {
-    private readonly MethodName _name;
+    public readonly MethodName Name;
 
     public MethodGenerator(ISymbol symbol): base(symbol)
     {
         if (symbol is not IMethodSymbol methodSymbol)
             throw new ArgumentException("Symbol is not a type method symbol");
-        _name = methodSymbol.GetName();
+        Name = methodSymbol.GetName();
     }
 
     protected override string IdName
@@ -24,7 +24,7 @@ public class MethodGenerator : BasicGenerator
         get
         {
             var builder = new StringBuilder();
-            var sig = _name.Signature;
+            var sig = Name.Signature;
             builder.Append(sig.ContainingType.GetName().FullName);
             builder.Append('.');
             builder.Append(sig.MethodName);
@@ -37,13 +37,14 @@ public class MethodGenerator : BasicGenerator
         }
     }
 
-    protected override string ClassName => "Component_" + _name.Name;
+    protected override string ClassName => "Component_" + Name.Name;
 
+    public Dictionary<string, string> TypeDictionary { get; set; } = [];
     public string GlobalBaseComponent { get; set; } = null!;
 
     protected override ClassDeclarationSyntax ModifyClass(ClassDeclarationSyntax classSyntax)
     {
-        var baseComponent = DocumentObjectGenerator.GetBaseComponent(_name.Symbol.GetAttributes()) ?? GlobalBaseComponent;
+        var baseComponent = DocumentObjectGenerator.GetBaseComponent(Name.Symbol.GetAttributes()) ?? GlobalBaseComponent;
         var keyName = KeyName;
         var keyComponent = keyName + ".Component";
         return classSyntax.WithParameterList(ParameterList())

@@ -35,19 +35,36 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         var types = arg.Items.Types;
         var methods = arg.Items.Methods;
 
-        var builder = new StringBuilder();
         var baseComponent = GetBaseComponent(assembly.GetAttributes()) ?? "global::Grasshopper.Kernel.GH_Component";
-        builder.AppendLine(baseComponent);
-
         var baseCategory = GetBaseCategory(assembly.GetAttributes()) ?? assembly.Name;
         var baseSubcategory = GetBaseSubcategory(assembly.GetAttributes()) ?? assembly.Name;
-        builder.AppendLine(baseCategory);
+
+        var builder = new StringBuilder();
+
+        var typeAndClasses = new Dictionary<string, string>();
 
         foreach (var type in types)
         {
             type.BaseCategory = baseCategory;
             type.BaseSubcategory = baseSubcategory;
             type.GenerateSource(context);
+
+            var key = type.Name.FullName;
+            var className = "global::" + type.NameSpace + "." + type.RealClassName;
+            if (!typeAndClasses.ContainsKey(key)) typeAndClasses.Add(key, className);
+            key = "global::" + type.NameSpace + "." + type.RealGooName;
+            if (!typeAndClasses.ContainsKey(key)) typeAndClasses.Add(key, className);
+        }
+
+        foreach (var item in GetAllParams(arg.Compilation.GlobalNamespace)
+                     .OrderByDescending(i => i.Score))
+        {
+            foreach (var k in item.Keys)
+            {
+                var key = k.GetName().FullName;
+                if (typeAndClasses.ContainsKey(key)) continue;
+                typeAndClasses.Add(key, item.Type.GetName().FullName);
+            }
         }
 
         foreach (var method in methods)
@@ -55,6 +72,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             method.BaseCategory = baseCategory;
             method.BaseSubcategory = baseSubcategory;
             method.GlobalBaseComponent = baseComponent;
+            method.TypeDictionary = typeAndClasses;
             method.GenerateSource(context);
         }
 
@@ -91,5 +109,31 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         }
 
         return null;
+    }
+
+    private static IEnumerable<GhParamItem> GetAllParams(INamespaceSymbol namespaceSymbol)
+    {
+        foreach (var type in GetTypesFromNamespace(namespaceSymbol))
+        {
+            if (type.IsAbstract) continue;
+            if (type.IsGenericType) continue;
+            if (type.DeclaredAccessibility is not Accessibility.Public) continue;
+            if (!type.AllInterfaces.Any(i => i.GetName().FullName is "global::Grasshopper.Kernel.IGH_Param")) continue;
+            if (type.Name.EndsWith("OBSOLETE", StringComparison.OrdinalIgnoreCase)) continue;
+            yield return new GhParamItem(type);
+        }
+    }
+
+    private static IEnumerable<INamedTypeSymbol> GetTypesFromNamespace(INamespaceSymbol namespaceSymbol)
+    {
+        return namespaceSymbol.GetTypeMembers()
+            .SelectMany(type => (IEnumerable<INamedTypeSymbol>) [type, ..GetNestedTypes(type)])
+            .Concat(namespaceSymbol.GetNamespaceMembers().SelectMany(GetTypesFromNamespace));
+    }
+
+    private static IEnumerable<INamedTypeSymbol> GetNestedTypes(INamedTypeSymbol typeSymbol)
+    {
+        return typeSymbol.GetTypeMembers()
+            .SelectMany(nestTypes => (IEnumerable<INamedTypeSymbol>) [nestTypes, ..GetNestedTypes(nestTypes)]);
     }
 }

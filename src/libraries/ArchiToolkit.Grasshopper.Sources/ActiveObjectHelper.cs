@@ -112,16 +112,36 @@ internal static class ActiveObjectHelper
 
     public static Io<T> GetDataItem<T>(IGH_DataAccess da, int index)
     {
-        var data = default(T);
-        var hasGot = da.GetData(index, ref data);
-        return new Io<T>(hasGot, index, data!);
+        if (typeof(T).IsEnum)
+        {
+            var i = 0;
+            var hasGot = da.GetData(index, ref i);
+            var data = (T)Enum.ToObject(typeof(T), i);
+            return new Io<T>(hasGot, index, data);
+        }
+        else
+        {
+            var data = default(T);
+            var hasGot = da.GetData(index, ref data);
+            return new Io<T>(hasGot, index, data!);
+        }
     }
 
     public static Io<List<T>> GetDataList<T>(IGH_DataAccess da, int index)
     {
-        List<T> data =[];
-        var hasGot = da.GetDataList(index, data);
-        return new Io<List<T>>(hasGot, index, data);
+        if (typeof(T).IsEnum)
+        {
+            List<int> data = [];
+            var hasGot = da.GetDataList(index, data);
+            return new Io<List<T>>(hasGot, index,
+                data.Select(i => (T)Enum.ToObject(typeof(T), i)).ToList());
+        }
+        else
+        {
+            List<T> data =[];
+            var hasGot = da.GetDataList(index, data);
+            return new Io<List<T>>(hasGot, index, data);
+        }
     }
 
     public static Io<GH_Structure<T>> GetDataTree<T>(IGH_DataAccess da, int index) where T : IGH_Goo
@@ -132,12 +152,26 @@ internal static class ActiveObjectHelper
 
     public static void SetData<T>(IGH_DataAccess da, int index, T data)
     {
-        da.SetData(index, data);
+        if (typeof(T).IsEnum)
+        {
+            da.SetData(index, Convert.ToInt32(data));
+        }
+        else
+        {
+            da.SetData(index, data);
+        }
     }
 
     public static void SetData<T>(IGH_DataAccess da, int index, List<T> data)
     {
-        da.SetDataList(index, data);
+        if (typeof(T).IsEnum)
+        {
+            da.SetDataList(index, data.Select(i => Convert.ToInt32(i)));
+        }
+        else
+        {
+            da.SetDataList(index, data);
+        }
     }
 
     public static void SetData(IGH_DataAccess da, int index, IGH_Structure data)

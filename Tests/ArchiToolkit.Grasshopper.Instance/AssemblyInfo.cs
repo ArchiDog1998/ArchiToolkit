@@ -2,3 +2,4 @@
 using ArchiToolkit.Grasshopper.Instance;
 
 [assembly: BaseComponent<MyBaseComponent>]
+[assembly: Category("MyTestCategory")]

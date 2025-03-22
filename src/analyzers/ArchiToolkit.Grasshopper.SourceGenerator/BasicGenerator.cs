@@ -13,19 +13,18 @@ public abstract class BasicGenerator
 {
     public readonly ISymbol Symbol;
 
-    protected string NameSpace => Symbol.ContainingNamespace.ToString();
+    public string NameSpace => Symbol.ContainingNamespace.ToString();
     protected abstract string IdName { get; }
 
     protected abstract string ClassName { get; }
 
-    public string RealClassName
+    public string RealClassName => ToRealName(ClassName);
+
+    protected string ToRealName(string name)
     {
-        get
-        {
-            var id = Id.ToString("N").Substring(0, 8);
-            var className = ClassName + "_" + id;
-            return IsObsolete ? className + "_OBSOLETE" : className;
-        }
+        var id = Id.ToString("N").Substring(0, 8);
+        name += "_" + id;
+        return IsObsolete ? name + "_OBSOLETE" : name;
     }
 
     public string KeyName => string.IsNullOrEmpty(field) ? NameSpace + "." + RealClassName : field;

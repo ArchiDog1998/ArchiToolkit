@@ -24,6 +24,21 @@ public static class RoslynExtensions
     }
 
     /// <summary>
+    /// Get the base types
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static IEnumerable<ITypeSymbol> GetBaseTypes(this ITypeSymbol type)
+    {
+        var current = type.BaseType;
+        while (current != null)
+        {
+            yield return current;
+            current = current.BaseType;
+        }
+    }
+
+    /// <summary>
     ///     Print a node to string.
     /// </summary>
     /// <param name="node"></param>
