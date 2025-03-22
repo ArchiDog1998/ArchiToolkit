@@ -10,7 +10,7 @@ public class TypeGenerator : BasicGenerator
     public readonly TypeName Name;
     protected override string IdName => Name.FullName;
 
-    protected override string ClassName => "Param_" + Name.Name;
+    public override string ClassName => "Param_" + Name.Name;
     public string RealGooName => ToRealName("GH_" + Name.Name);
 
     protected override ClassDeclarationSyntax ModifyClass(ClassDeclarationSyntax classSyntax)

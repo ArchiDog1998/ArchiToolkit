@@ -29,6 +29,7 @@ public class GhParamItem
                     case "global::Grasshopper.Kernel.Types.GH_GeometricGoo<>":
                     case "global::Grasshopper.Kernel.Types.GH_Goo<>":
                         yield return ts;
+                        yield return ts.TypeArguments[0];
                         break;
                 }
             }

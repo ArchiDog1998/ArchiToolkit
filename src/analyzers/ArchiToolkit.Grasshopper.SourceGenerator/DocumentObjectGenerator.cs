@@ -67,12 +67,24 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             }
         }
 
+        MethodGenerator.NeedIdNames = methods
+            .GroupBy(method => method.ClassName)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToArray();
+
+        MethodParamItem.TypeDictionary = typeAndClasses;
+
+        foreach (var pair in MethodParamItem.TypeDictionary)
+        {
+            builder.AppendLine(pair.Key + " : " + pair.Value);
+        }
+
         foreach (var method in methods)
         {
             method.BaseCategory = baseCategory;
             method.BaseSubcategory = baseSubcategory;
             method.GlobalBaseComponent = baseComponent;
-            method.TypeDictionary = typeAndClasses;
             method.GenerateSource(context);
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Grasshopper.Kernel.Types;
 
 namespace ArchiToolkit.Grasshopper;
 
@@ -8,4 +9,4 @@ namespace ArchiToolkit.Grasshopper;
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 [Conditional(Constant.KeepAttributes)]
-public class GeometricGooAttribute : Attribute;
+public class BaseGooAttribute<T> : Attribute where T : IGH_Goo;

@@ -13,21 +13,24 @@ public abstract class BasicGenerator
 {
     public readonly ISymbol Symbol;
 
+    protected virtual bool NeedId => false;
     public string NameSpace => Symbol.ContainingNamespace.ToString();
     protected abstract string IdName { get; }
 
-    protected abstract string ClassName { get; }
+    public abstract string ClassName { get; }
 
     public string RealClassName => ToRealName(ClassName);
 
+    private string ToRealNameNoTags(string className)
+        => NeedId ? className + "_" + Id.ToString("N").Substring(0, 8) : className;
+
     protected string ToRealName(string name)
     {
-        var id = Id.ToString("N").Substring(0, 8);
-        name += "_" + id;
+        name = ToRealNameNoTags(name);
         return IsObsolete ? name + "_OBSOLETE" : name;
     }
 
-    public string KeyName => string.IsNullOrEmpty(field) ? NameSpace + "." + RealClassName : field;
+    public string KeyName => string.IsNullOrEmpty(field) ? NameSpace + "." + ToRealNameNoTags(ClassName) : field;
 
     public string BaseCategory { get; set; } = null!;
     public string BaseSubcategory { get; set; } = null!;
@@ -86,6 +89,16 @@ public abstract class BasicGenerator
 
     public void GenerateSource(SourceProductionContext context)
     {
+        var keyField = FieldDeclaration(
+                VariableDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword))).WithVariables(
+                [
+                    VariableDeclarator(Identifier("ResourceKey")).WithInitializer(
+                        EqualsValueClause(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(KeyName))))
+                ]))
+            .WithAttributeLists([GeneratedCodeAttribute(typeof(BasicGenerator))])
+            .WithModifiers(
+                TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.ConstKeyword)));
+
         var guidProperty = PropertyDeclaration(IdentifierName("global::System.Guid"), Identifier("ComponentGuid"))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
             .WithExpressionBody(ArrowExpressionClause(ImplicitObjectCreationExpression().WithArgumentList(ArgumentList(
@@ -95,10 +108,9 @@ public abstract class BasicGenerator
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute())
             ])
-            .WithSemicolonToken(
-                Token(SyntaxKind.SemicolonToken));
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
-        var attributes = GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute());
+        var attributes = GeneratedCodeAttribute(typeof(BasicGenerator)).AddAttributes(NonUserCodeAttribute());
         if (IsObsolete)
         {
             attributes = attributes.AddAttributes(ObsoleteAttribute());
@@ -111,13 +123,14 @@ public abstract class BasicGenerator
                     InvocationExpression(
                             IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
                         .WithArgumentList(ArgumentList([
-                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(KeyName + ".png")))
+                            Argument(BinaryExpression(
+                                SyntaxKind.AddExpression,
+                                IdentifierName("ResourceKey"),LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(".png"))))
                         ]))))
             .WithAttributeLists([
-                GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute())
+                GeneratedCodeAttribute(typeof(BasicGenerator)).AddAttributes(NonUserCodeAttribute())
             ])
-            .WithSemicolonToken(
-                Token(SyntaxKind.SemicolonToken));
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
         var classSyntax = ClassDeclaration(RealClassName)
             .WithModifiers(
@@ -127,7 +140,7 @@ public abstract class BasicGenerator
                 Token(SyntaxKind.PartialKeyword)
             ])
             .WithAttributeLists([attributes])
-            .WithMembers([guidProperty, iconProperty]);
+            .WithMembers([keyField, guidProperty, iconProperty]);
 
         if (Exposure is not null && int.TryParse(Exposure, out var exposure))
         {
@@ -138,16 +151,16 @@ public abstract class BasicGenerator
                     IdentifierName("global::Grasshopper.Kernel.GH_Exposure"), ParenthesizedExpression(LiteralExpression(
                         SyntaxKind.NumericLiteralExpression, Literal(exposure))))))
                 .WithAttributeLists([
-                    GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute())
+                    GeneratedCodeAttribute(typeof(BasicGenerator)).AddAttributes(NonUserCodeAttribute())
                 ])
-                .WithSemicolonToken(
-                    Token(SyntaxKind.SemicolonToken));
+                .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+
             classSyntax = classSyntax.AddMembers([exposureProperty]);
         }
 
         var item = NamespaceDeclaration(NameSpace)
             .WithMembers([ModifyClass(classSyntax)]);
 
-        context.AddSource(Id.ToString("N") + ".g.cs", item.NodeToString());
+        context.AddSource(RealClassName + ".g.cs", item.NodeToString());
     }
 }
