@@ -55,8 +55,8 @@ public class MethodGenerator : BasicGenerator
                             GetArgumentString(keyComponent + ".Name"),
                             GetArgumentString(keyComponent + ".Nickname"),
                             GetArgumentString(keyComponent + ".Description"),
-                            GetArgumentString("Category.XXX"),
-                            GetArgumentString("Subcategory.XXX"),
+                            GetArgumentString("Category." + (Category ?? BaseCategory)),
+                            GetArgumentString("Subcategory." + (Subcategory ?? BaseSubcategory)),
                         ]))
             ]));
     }

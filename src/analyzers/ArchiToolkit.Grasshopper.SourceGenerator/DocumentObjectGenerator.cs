@@ -15,13 +15,13 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         var attributeTypes =
             context.SyntaxProvider.ForAttributeWithMetadataName("ArchiToolkit.Grasshopper.DocObjAttribute",
                 static (node, _) => node is BaseTypeDeclarationSyntax,
-                static (context, token) => new TypeGenerator(context.TargetSymbol));
+                static (context, _) => new TypeGenerator(context.TargetSymbol));
 
         var attributeMethods =
             context.SyntaxProvider.ForAttributeWithMetadataName("ArchiToolkit.Grasshopper.DocObjAttribute",
                 static (node, _) => node is BaseMethodDeclarationSyntax method &&
                                     method.Modifiers.Any(m => m.IsKind(SyntaxKind.StaticKeyword)),
-                static (context, token) => new MethodGenerator(context.TargetSymbol));
+                static (context, _) => new MethodGenerator(context.TargetSymbol));
 
         var items = attributeTypes.Collect().Combine(attributeMethods.Collect()).Combine(context.CompilationProvider);
         context.RegisterSourceOutput(items, Generate);
@@ -39,22 +39,23 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         var baseComponent = GetBaseComponent(assembly.GetAttributes()) ?? "global::Grasshopper.Kernel.GH_Component";
         builder.AppendLine(baseComponent);
 
+        var baseCategory = GetBaseCategory(assembly.GetAttributes()) ?? assembly.Name;
+        var baseSubcategory = GetBaseSubcategory(assembly.GetAttributes()) ?? assembly.Name;
+        builder.AppendLine(baseCategory);
+
         foreach (var type in types)
         {
-            type.Assembly = assembly;
-            builder.AppendLine(type.ToString());
+            type.BaseCategory = baseCategory;
+            type.BaseSubcategory = baseSubcategory;
+            type.GenerateSource(context);
         }
 
         foreach (var method in methods)
         {
-            method.Assembly = assembly;
+            method.BaseCategory = baseCategory;
+            method.BaseSubcategory = baseSubcategory;
             method.GlobalBaseComponent = baseComponent;
             method.GenerateSource(context);
-
-            var exposure = method.Symbol.GetAttributes().FirstOrDefault(a =>
-                a.AttributeClass?.GetName().FullName == "global::ArchiToolkit.Grasshopper.ExposureAttribute");
-            var text = exposure?.ConstructorArguments[0].Value?.ToString();
-            builder.AppendLine(text ?? "Nothing");
         }
 
         context.AddSource("Test.cs", builder.ToString());
@@ -67,5 +68,28 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             where type.ConstructUnboundGenericType().GetName().FullName is
                 "global::ArchiToolkit.Grasshopper.BaseComponentAttribute<>"
             select type.TypeArguments[0].GetName().FullName).FirstOrDefault();
+    }
+
+    public static string? GetBaseCategory(IEnumerable<AttributeData> attributes)
+    {
+        return GetBaseCate(attributes, "global::ArchiToolkit.Grasshopper.CategoryAttribute");
+    }
+
+    public static string? GetBaseSubcategory(IEnumerable<AttributeData> attributes)
+    {
+        return GetBaseCate(attributes, "global::ArchiToolkit.Grasshopper.SubcategoryAttribute");
+    }
+
+    private static string? GetBaseCate(IEnumerable<AttributeData> attributes, string attributeFullname)
+    {
+        foreach (var attr in attributes)
+        {
+            if (attr.AttributeClass is not { } attributeClass) continue;
+            if (attributeClass.GetName().FullName != attributeFullname) continue;
+            if (attr.ConstructorArguments.Length is 0) continue;
+            return attr.ConstructorArguments[0].Value?.ToString();
+        }
+
+        return null;
     }
 }

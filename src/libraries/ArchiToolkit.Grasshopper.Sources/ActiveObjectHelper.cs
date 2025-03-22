@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 
 namespace ArchiToolkit.Grasshopper;
@@ -86,9 +88,9 @@ internal static class ActiveObjectHelper
         }
     }
 
-    internal static MethodInfo? GetOperatorCast(Type type, Type returnType, Type paramType)
+    private static MethodInfo? GetOperatorCast(Type type, Type returnType, Type paramType)
     {
-        return type.GetAllRuntimeMethods().FirstOrDefault(m =>
+        return GetAllRuntimeMethods(type).FirstOrDefault(m =>
         {
             if (!m.IsSpecialName) return false;
             if (m.Name is not "op_Explicit" and not "op_Implicit") return false;
@@ -101,10 +103,50 @@ internal static class ActiveObjectHelper
 
             return parameters[0].ParameterType.IsAssignableFrom(paramType);
         });
+
+        static IEnumerable<MethodInfo> GetAllRuntimeMethods(Type? type)
+        {
+            return type == null ? [] : type.GetRuntimeMethods().Concat(GetAllRuntimeMethods(type.BaseType));
+        }
     }
 
-    private static IEnumerable<MethodInfo> GetAllRuntimeMethods(this Type? type)
+    public static Io<T> GetDataItem<T>(IGH_DataAccess da, int index)
     {
-        return type == null ? [] : type.GetRuntimeMethods().Concat(GetAllRuntimeMethods(type.BaseType));
+        var data = default(T);
+        var hasGot = da.GetData(index, ref data);
+        return new Io<T>(hasGot, index, data!);
+    }
+
+    public static Io<List<T>> GetDataList<T>(IGH_DataAccess da, int index)
+    {
+        List<T> data =[];
+        var hasGot = da.GetDataList(index, data);
+        return new Io<List<T>>(hasGot, index, data);
+    }
+
+    public static Io<GH_Structure<T>> GetDataTree<T>(IGH_DataAccess da, int index) where T : IGH_Goo
+    {
+        var hasGot = da.GetDataTree<T>(index, out var data);
+        return new Io<GH_Structure<T>>(hasGot, index, data);
+    }
+
+    public static void SetData<T>(IGH_DataAccess da, int index, T data)
+    {
+        da.SetData(index, data);
+    }
+
+    public static void SetData<T>(IGH_DataAccess da, int index, List<T> data)
+    {
+        da.SetDataList(index, data);
+    }
+
+    public static void SetData(IGH_DataAccess da, int index, IGH_Structure data)
+    {
+        da.SetDataTree(index, data);
+    }
+
+    public static void SetData(IGH_DataAccess da, int index, IGH_DataTree data)
+    {
+        da.SetDataTree(index, data);
     }
 }

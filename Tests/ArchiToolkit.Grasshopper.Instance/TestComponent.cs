@@ -1,5 +1,7 @@
 ﻿using Grasshopper;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
+using Rhino.Geometry;
 
 namespace ArchiToolkit.Grasshopper.Instance;
 
@@ -15,6 +17,14 @@ public sealed partial class TestComponent() : GH_Component(
     {
         // var p = (IGH_Param)Instances.ComponentServer.EmitObject(default);
         // pManager.AddIntegerParameter()
+
+        {
+            List<Arc> arcs = [new Arc()];
+            var param = new Param_Arc();
+            param.Hidden = true; // Hidden.
+            param.SetPersistentData(arcs);
+            pManager.AddParameter(param, "Input", "I", "Input", GH_ParamAccess.item);
+        }
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)

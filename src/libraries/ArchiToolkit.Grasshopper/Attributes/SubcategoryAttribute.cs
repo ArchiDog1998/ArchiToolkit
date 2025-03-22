@@ -8,5 +8,5 @@ namespace ArchiToolkit.Grasshopper;
 /// </summary>
 /// <param name="recognizeName">for localization</param>
 [Conditional(Constant.KeepAttributes)]
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Assembly)]
 public class SubcategoryAttribute(string recognizeName) : Attribute;

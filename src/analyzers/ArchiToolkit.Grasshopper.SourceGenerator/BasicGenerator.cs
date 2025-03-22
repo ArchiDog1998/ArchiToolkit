@@ -12,19 +12,32 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 public abstract class BasicGenerator
 {
     public readonly ISymbol Symbol;
-    public IAssemblySymbol Assembly { get; set; } = null!;
 
     protected string NameSpace => Symbol.ContainingNamespace.ToString();
     protected abstract string IdName { get; }
 
     protected abstract string ClassName { get; }
 
-    public string RealClassName => IsObsolete ? ClassName + "_OBSOLETE" : ClassName;
+    public string RealClassName
+    {
+        get
+        {
+            var id = Id.ToString("N").Substring(0, 8);
+            var className = ClassName + "_" + id;
+            return IsObsolete ? className + "_OBSOLETE" : className;
+        }
+    }
 
-    public string KeyName =>  string.IsNullOrEmpty(field) ? NameSpace + "." + RealClassName : field;
+    public string KeyName => string.IsNullOrEmpty(field) ? NameSpace + "." + RealClassName : field;
+
+    public string BaseCategory { get; set; } = null!;
+    public string BaseSubcategory { get; set; } = null!;
+    public string? Category { get; set; }
+    public string? Subcategory { get; set; }
 
     public string? Exposure { get; }
-    public bool IsObsolete{ get; }
+    public bool IsObsolete { get; }
+
     protected BasicGenerator(ISymbol symbol)
     {
         Symbol = symbol;
@@ -45,6 +58,15 @@ public abstract class BasicGenerator
             var exposure = symbol.GetAttributes().FirstOrDefault(a =>
                 a.AttributeClass?.GetName().FullName == "global::ArchiToolkit.Grasshopper.ExposureAttribute");
             Exposure = exposure?.ConstructorArguments[0].Value?.ToString();
+        }
+
+        var s = symbol;
+        while (s is not null)
+        {
+            var attributes = s.GetAttributes();
+            Category ??= DocumentObjectGenerator.GetBaseCategory(attributes);
+            Subcategory ??= DocumentObjectGenerator.GetBaseSubcategory(attributes);
+            s = s.ContainingSymbol;
         }
     }
 
@@ -89,7 +111,9 @@ public abstract class BasicGenerator
                 ArrowExpressionClause(
                     InvocationExpression(
                             IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
-                        .WithArgumentList(ArgumentList([Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(KeyName + ".png")))]))))
+                        .WithArgumentList(ArgumentList([
+                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(KeyName + ".png")))
+                        ]))))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute())
             ])
@@ -108,18 +132,15 @@ public abstract class BasicGenerator
 
         if (Exposure is not null && int.TryParse(Exposure, out var exposure))
         {
-            var exposureProperty = PropertyDeclaration(
-                    IdentifierName("global::Grasshopper.Kernel.GH_Exposure"),
+            var exposureProperty = PropertyDeclaration(IdentifierName("global::Grasshopper.Kernel.GH_Exposure"),
                     Identifier("Exposure"))
-                .WithModifiers(
-                    TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-                .WithExpressionBody(
-                    ArrowExpressionClause(
-                        CastExpression(
-                            IdentifierName("global::Grasshopper.Kernel.GH_Exposure"),
-                            ParenthesizedExpression( LiteralExpression(
-                                SyntaxKind.NumericLiteralExpression,
-                                Literal(exposure))))))
+                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
+                .WithExpressionBody(ArrowExpressionClause(CastExpression(
+                    IdentifierName("global::Grasshopper.Kernel.GH_Exposure"), ParenthesizedExpression(LiteralExpression(
+                        SyntaxKind.NumericLiteralExpression, Literal(exposure))))))
+                .WithAttributeLists([
+                    GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute())
+                ])
                 .WithSemicolonToken(
                     Token(SyntaxKind.SemicolonToken));
             classSyntax = classSyntax.AddMembers([exposureProperty]);
