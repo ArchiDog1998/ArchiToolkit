@@ -13,84 +13,84 @@
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
 	<data name="ArchiToolkit.Grasshopper.Instance.Param_ExampleTypes.TypeName" xml:space="preserve">
-		<value>Hello</value>
+		<value>ExampleTypes</value>
 	</data>
 	<data name="ArchiToolkit.Grasshopper.Instance.Param_ExampleTypes.TypeDescription" xml:space="preserve">
-		<value>Hello</value>
+		<value>ExampleTypes</value>
 	</data>
 	<data name="ArchiToolkit.Grasshopper.Instance.Param_ExampleTypes.Name" xml:space="preserve">
-		<value>Hello</value>
+		<value>ExampleTypes</value>
 	</data>
 	<data name="ArchiToolkit.Grasshopper.Instance.Param_ExampleTypes.Nickname" xml:space="preserve">
-		<value>Hello</value>
+		<value>ExampleTypes</value>
 	</data>
 	<data name="ArchiToolkit.Grasshopper.Instance.Param_ExampleTypes.Description" xml:space="preserve">
-		<value>Hello</value>
+		<value>ExampleTypes</value>
 	</data>
 	<data name="Category.MyTestCategory" xml:space="preserve">
-		<value>Hello</value>
+		<value>MyTestCategory</value>
 	</data>
 	<data name="Subcategory.Parameter" xml:space="preserve">
-		<value>Hello</value>
+		<value>Parameter</value>
 	</data>
 	<data name="Your Name.i.Name" xml:space="preserve">
-		<value>Hello</value>
+		<value>Input</value>
 	</data>
 	<data name="Your Name.i.Nickname" xml:space="preserve">
-		<value>Hello</value>
+		<value>I</value>
 	</data>
 	<data name="Your Name.i.Description" xml:space="preserve">
-		<value>Hello</value>
+		<value>An input</value>
 	</data>
 	<data name="Your Name.test.Name" xml:space="preserve">
-		<value>Hello</value>
+		<value>test</value>
 	</data>
 	<data name="Your Name.test.Nickname" xml:space="preserve">
-		<value>Hello</value>
+		<value>test</value>
 	</data>
 	<data name="Your Name.test.Description" xml:space="preserve">
-		<value>Hello</value>
+		<value>test</value>
 	</data>
 	<data name="Your Name.tree.Name" xml:space="preserve">
-		<value>Hello</value>
+		<value>tree</value>
 	</data>
 	<data name="Your Name.tree.Nickname" xml:space="preserve">
-		<value>Hello</value>
+		<value>tree</value>
 	</data>
 	<data name="Your Name.tree.Description" xml:space="preserve">
-		<value>Hello</value>
+		<value>tree</value>
 	</data>
 	<data name="Your Name.data.Name" xml:space="preserve">
-		<value>Hello</value>
+		<value>data</value>
 	</data>
 	<data name="Your Name.data.Nickname" xml:space="preserve">
-		<value>Hello</value>
+		<value>data</value>
 	</data>
 	<data name="Your Name.data.Description" xml:space="preserve">
-		<value>Hello</value>
+		<value>data</value>
 	</data>
 	<data name="Your Name.result.Name" xml:space="preserve">
-		<value>Hello</value>
+		<value>Result</value>
 	</data>
 	<data name="Your Name.result.Nickname" xml:space="preserve">
-		<value>Hello</value>
+		<value>r</value>
 	</data>
 	<data name="Your Name.result.Description" xml:space="preserve">
-		<value>Hello</value>
+		<value>Some interesting result</value>
 	</data>
 	<data name="Your Name.Component.Name" xml:space="preserve">
-		<value>Hello</value>
+		<value>Name</value>
 	</data>
 	<data name="Your Name.Component.Nickname" xml:space="preserve">
-		<value>Hello</value>
+		<value>Nickname</value>
 	</data>
 	<data name="Your Name.Component.Description" xml:space="preserve">
-		<value>Hello</value>
+		<value>Description</value>
 	</data>
 	<data name="Category.Cate" xml:space="preserve">
-		<value>Hello</value>
+		<value>Cate</value>
 	</data>
 	<data name="Subcategory.SubTest" xml:space="preserve">
-		<value>Hello</value>
+		<value>SubTest</value>
 	</data>
 </root>

@@ -14,6 +14,7 @@ public static class ExampleComponents
     [Exposure(GH_Exposure.quarternary)]
     [ObjNames("Name", "Nickname", "Description")]
     [DocObj("Your Name")]
+    [return: ObjNames("Result", "r", "Some interesting result")]
     public static List<int> TestClass(
         IGH_Component component,
         IGH_DataAccess da,

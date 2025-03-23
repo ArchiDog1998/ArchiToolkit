@@ -6,8 +6,16 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="System.Runtime.CompilerServices.Unsafe"/>
         <None Include="..\..\analyzers\ArchiToolkit.InterpolatedParser.SourceGenerator\bin\$(Configuration)\netstandard2.0\ArchiToolkit.InterpolatedParser.SourceGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
         <None Include="..\..\libraries\ArchiToolkit.RoslynHelper\bin\$(Configuration)\netstandard2.0\ArchiToolkit.RoslynHelper.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0"/>
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0"/>
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0"/>
     </ItemGroup>
 </Project>
