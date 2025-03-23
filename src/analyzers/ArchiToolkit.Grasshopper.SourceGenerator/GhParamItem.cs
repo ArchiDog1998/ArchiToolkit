@@ -5,9 +5,24 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
 public class GhParamItem
 {
-    public readonly INamedTypeSymbol Type;
     private readonly ITypeSymbol? _gooType;
+    public readonly INamedTypeSymbol Type;
     private int? _score;
+
+    public GhParamItem(INamedTypeSymbol type)
+    {
+        Type = type;
+        foreach (var t in type.GetBaseTypesAndThis())
+        {
+            if (t is not INamedTypeSymbol ts) continue;
+            if (!ts.IsGenericType) continue;
+            if (ts.ConstructUnboundGenericType().GetName().FullName
+                is not "global::Grasshopper.Kernel.GH_Param<>") continue;
+            _gooType = ts.TypeArguments[0];
+            break;
+        }
+    }
+
     public int Score => _score ??= ScoreParam();
 
     public IEnumerable<ITypeSymbol> Keys
@@ -35,38 +50,17 @@ public class GhParamItem
             }
         }
     }
-    public GhParamItem(INamedTypeSymbol type)
-    {
-        Type = type;
-        foreach (var t in type.GetBaseTypesAndThis())
-        {
-            if (t is not INamedTypeSymbol ts)continue;
-            if (!ts.IsGenericType) continue;
-            if (ts.ConstructUnboundGenericType().GetName().FullName
-                is not "global::Grasshopper.Kernel.GH_Param<>") continue;
-            _gooType = ts.TypeArguments[0];
-            break;
-        }
-    }
 
     private int ScoreParam()
     {
         var score = 0;
         if (IsGenericType("global::Grasshopper.Kernel.GH_PersistentGeometryParam<>"))
-        {
             score += 20;
-
-        }
-        else if (IsGenericType("global::Grasshopper.Kernel.GH_PersistentParam<>"))
-        {
-            score += 10;
-        }
+        else if (IsGenericType("global::Grasshopper.Kernel.GH_PersistentParam<>")) score += 10;
 
         if (_gooType is not null
             && _gooType.Name.Split('_').Last().Equals(Type.Name.Split('_').Last(), StringComparison.OrdinalIgnoreCase))
-        {
             score += 5;
-        }
 
         return score;
 

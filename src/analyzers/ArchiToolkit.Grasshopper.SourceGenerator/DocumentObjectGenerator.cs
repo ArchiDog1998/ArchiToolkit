@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using ArchiToolkit.RoslynHelper.Extensions;
 using ArchiToolkit.RoslynHelper.Names;
 using Microsoft.CodeAnalysis;
@@ -64,13 +63,11 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         foreach (var item in GetAllParams(arg.Compilation.GlobalNamespace)
                      .OrderByDescending(i => i.Score))
+        foreach (var k in item.Keys)
         {
-            foreach (var k in item.Keys)
-            {
-                var key = k.GetName().FullName;
-                if (typeAndClasses.ContainsKey(key)) continue;
-                typeAndClasses.Add(key, item.Type.GetName().FullName);
-            }
+            var key = k.GetName().FullName;
+            if (typeAndClasses.ContainsKey(key)) continue;
+            typeAndClasses.Add(key, item.Type.GetName().FullName);
         }
 
         MethodGenerator.NeedIdNames = methods
@@ -84,10 +81,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         BasicGenerator.BaseAttribute = baseAttribute;
         MethodGenerator.GlobalBaseComponent = baseComponent!;
 
-        foreach (var method in methods)
-        {
-            method.GenerateSource(context);
-        }
+        foreach (var method in methods) method.GenerateSource(context);
 
         if (GetCsprojDirectory(assembly) is { } dir)
         {
@@ -115,7 +109,6 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         directory = Path.Combine(directory, "Icons");
         if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
         foreach (var file in Directory.EnumerateFiles(directory, "*.png"))
-        {
             try
             {
                 var fileInfo = new FileInfo(file);
@@ -126,8 +119,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             {
                 // ignored
             }
-        }
-        
+
         var assembly = typeof(DocumentObjectGenerator).Assembly;
         foreach (var icon in BasicGenerator.Icons)
         {
@@ -173,9 +165,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         while (directory is not null
                && !directory.EnumerateFiles("*.csproj").Any())
-        {
             directory = directory.Parent;
-        }
 
         return directory;
     }

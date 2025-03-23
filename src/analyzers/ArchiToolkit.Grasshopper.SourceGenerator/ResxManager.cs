@@ -9,9 +9,7 @@ internal static class ResxManager
     public static void Generate(string filePath, Dictionary<string, string> data)
     {
         if (File.Exists(filePath))
-        {
             File.SetAttributes(filePath, File.GetAttributes(filePath) & ~FileAttributes.ReadOnly);
-        }
 
         using var writer = XmlWriter.Create(filePath, new XmlWriterSettings
         {

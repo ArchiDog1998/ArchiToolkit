@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+﻿using System.Reflection;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
@@ -12,17 +11,12 @@ internal static class ActiveObjectHelper
     {
         var sType = source.GetType();
 
-        if (CastLocal(source, out value))
-        {
-            return true;
-        }
+        if (CastLocal(source, out value)) return true;
 
         if (source is IGH_Goo
             && sType.GetRuntimeProperty("Value") is { } property
             && property.GetValue(source) is { } v)
-        {
             return CastLocal(v, out value);
-        }
 
         return false;
 
@@ -51,15 +45,11 @@ internal static class ActiveObjectHelper
     {
         if (value is null) return false;
         if (CastLocal(value, typeof(TQ), out var q))
-        {
             target = (TQ)q;
-        }
         else if (target is IGH_Goo
                  && typeof(TQ).GetRuntimeProperty("Value") is { } property
                  && CastLocal(value, property.PropertyType, out var propValue))
-        {
             property.SetValue(propValue, value);
-        }
 
         return false;
 
@@ -133,7 +123,7 @@ internal static class ActiveObjectHelper
         }
         else
         {
-            List<T> data =[];
+            List<T> data = [];
             var hasGot = da.GetDataList(index, data);
             return new Io<List<T>>(hasGot, index, data);
         }
@@ -148,25 +138,17 @@ internal static class ActiveObjectHelper
     public static void SetData<T>(IGH_DataAccess da, int index, T data)
     {
         if (typeof(T).IsEnum)
-        {
             da.SetData(index, Convert.ToInt32(data));
-        }
         else
-        {
             da.SetData(index, data);
-        }
     }
 
     public static void SetData<T>(IGH_DataAccess da, int index, List<T> data)
     {
         if (typeof(T).IsEnum)
-        {
             da.SetDataList(index, data.Select(i => Convert.ToInt32(i)));
-        }
         else
-        {
             da.SetDataList(index, data);
-        }
     }
 
     public static void SetData(IGH_DataAccess da, int index, IGH_Structure data)

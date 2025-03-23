@@ -11,6 +11,14 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 public class TypeGenerator : BasicGenerator
 {
     public readonly TypeName Name;
+
+    public TypeGenerator(ISymbol symbol) : base(symbol)
+    {
+        if (symbol is not ITypeSymbol typeSymbol)
+            throw new ArgumentException("Symbol is not a type symbol");
+        Name = typeSymbol.GetName();
+    }
+
     protected override string IdName => Name.FullName;
 
     public override string ClassName => "Param_" + Name.Name;
@@ -188,7 +196,7 @@ public class TypeGenerator : BasicGenerator
                         Argument(GetArgumentKeyedString(".Nickname")),
                         Argument(GetArgumentKeyedString(".Description")),
                         Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory))),
-                        Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? "Parameter"))),
+                        Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? "Parameter")))
                     ])))
                 .WithAttributeLists([
                     GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
@@ -312,7 +320,6 @@ public class TypeGenerator : BasicGenerator
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
         );
         if (DocumentObjectGenerator.GetBaseAttribute(Name.Symbol.GetAttributes()) is { } attributeName)
-        {
             classSyntax = classSyntax.AddMembers(MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)),
                     Identifier("CreateAttributes"))
                 .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
@@ -323,15 +330,7 @@ public class TypeGenerator : BasicGenerator
                     SyntaxKind.SimpleAssignmentExpression, IdentifierName("m_attributes"),
                     ObjectCreationExpression(IdentifierName(attributeName))
                         .WithArgumentList(ArgumentList([Argument(ThisExpression())])))))));
-        }
 
         return classSyntax;
-    }
-
-    public TypeGenerator(ISymbol symbol) : base(symbol)
-    {
-        if (symbol is not ITypeSymbol typeSymbol)
-            throw new ArgumentException("Symbol is not a type symbol");
-        Name = typeSymbol.GetName();
     }
 }

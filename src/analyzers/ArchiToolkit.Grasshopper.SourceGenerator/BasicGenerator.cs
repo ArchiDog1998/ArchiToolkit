@@ -13,36 +13,6 @@ public abstract class BasicGenerator
 {
     public readonly ISymbol Symbol;
 
-    protected virtual bool NeedId => false;
-    public string NameSpace => Symbol.ContainingNamespace.ToString();
-    protected abstract string IdName { get; }
-
-    public abstract string ClassName { get; }
-
-    public string RealClassName => ToRealName(ClassName);
-
-    protected abstract char IconType { get; }
-
-    private string ToRealNameNoTags(string className)
-        => NeedId ? className + "_" + Id.ToString("N").Substring(0, 8) : className;
-
-    protected string ToRealName(string name)
-    {
-        name = ToRealNameNoTags(name);
-        return IsObsolete ? name + "_OBSOLETE" : name;
-    }
-
-    public string KeyName => string.IsNullOrEmpty(field) ? NameSpace + "." + ToRealNameNoTags(ClassName) : field;
-
-    public static string BaseCategory { get; set; } = null!;
-    public static string BaseSubcategory { get; set; } = null!;
-    public static string? BaseAttribute { get; set; }
-    public string? Category { get; set; }
-    public string? Subcategory { get; set; }
-
-    public string? Exposure { get; }
-    public bool IsObsolete { get; }
-
     protected BasicGenerator(ISymbol symbol)
     {
         Symbol = symbol;
@@ -75,7 +45,42 @@ public abstract class BasicGenerator
         }
     }
 
+    protected virtual bool NeedId => false;
+    public string NameSpace => Symbol.ContainingNamespace.ToString();
+    protected abstract string IdName { get; }
+
+    public abstract string ClassName { get; }
+
+    public string RealClassName => ToRealName(ClassName);
+
+    protected abstract char IconType { get; }
+
+    public string KeyName => string.IsNullOrEmpty(field) ? NameSpace + "." + ToRealNameNoTags(ClassName) : field;
+
+    public static string BaseCategory { get; set; } = null!;
+    public static string BaseSubcategory { get; set; } = null!;
+    public static string? BaseAttribute { get; set; }
+    public string? Category { get; set; }
+    public string? Subcategory { get; set; }
+
+    public string? Exposure { get; }
+    public bool IsObsolete { get; }
+
     public Guid Id => StringToGuid(IdName);
+
+    internal static List<string> Icons { get; } = [];
+    internal static Dictionary<string, string> Translations { get; } = [];
+
+    private string ToRealNameNoTags(string className)
+    {
+        return NeedId ? className + "_" + Id.ToString("N").Substring(0, 8) : className;
+    }
+
+    protected string ToRealName(string name)
+    {
+        name = ToRealNameNoTags(name);
+        return IsObsolete ? name + "_OBSOLETE" : name;
+    }
 
     private static Guid StringToGuid(string input)
     {
@@ -86,7 +91,10 @@ public abstract class BasicGenerator
         return new Guid(guidBytes); // Use the first 16 bytes
     }
 
-    public sealed override string ToString() => IdName;
+    public sealed override string ToString()
+    {
+        return IdName;
+    }
 
     protected abstract ClassDeclarationSyntax ModifyClass(ClassDeclarationSyntax classSyntax);
 
@@ -114,31 +122,19 @@ public abstract class BasicGenerator
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
         var attributes = GeneratedCodeAttribute(typeof(BasicGenerator)).AddAttributes(NonUserCodeAttribute());
-        if (IsObsolete)
-        {
-            attributes = attributes.AddAttributes(ObsoleteAttribute());
-        }
+        if (IsObsolete) attributes = attributes.AddAttributes(ObsoleteAttribute());
 
         var iconProperty = PropertyDeclaration(IdentifierName("global::System.Drawing.Bitmap"), Identifier("Icon"))
             .WithModifiers([Token(SyntaxKind.ProtectedKeyword), Token(SyntaxKind.OverrideKeyword)])
-            .WithExpressionBody(
-                ArrowExpressionClause(
-                    InvocationExpression(
-                            IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
-                        .WithArgumentList(ArgumentList([
-                            Argument(
-                                BinaryExpression(
-                                    SyntaxKind.AddExpression,
-                                    BinaryExpression(
-                                        SyntaxKind.AddExpression,
-                                        LiteralExpression(
-                                            SyntaxKind.StringLiteralExpression,
-                                            Literal(Symbol.ContainingAssembly.Name + ".Icons.")),
-                                        IdentifierName("ResourceKey")),
-                                    LiteralExpression(
-                                        SyntaxKind.StringLiteralExpression,
-                                        Literal(".png")))),
-                        ]))))
+            .WithExpressionBody(ArrowExpressionClause(InvocationExpression(
+                    IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
+                .WithArgumentList(ArgumentList([
+                    Argument(BinaryExpression(SyntaxKind.AddExpression,
+                        BinaryExpression(SyntaxKind.AddExpression, LiteralExpression(SyntaxKind.StringLiteralExpression,
+                                Literal(Symbol.ContainingAssembly.Name + ".Icons.")),
+                            IdentifierName("ResourceKey")),
+                        LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(".png"))))
+                ]))))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(BasicGenerator)).AddAttributes(NonUserCodeAttribute())
             ])
@@ -167,7 +163,7 @@ public abstract class BasicGenerator
                 ])
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
-            classSyntax = classSyntax.AddMembers([exposureProperty]);
+            classSyntax = classSyntax.AddMembers(exposureProperty);
         }
 
         var item = NamespaceDeclaration(NameSpace)
@@ -176,9 +172,6 @@ public abstract class BasicGenerator
         context.AddSource(RealClassName + ".g.cs", item.NodeToString());
         Icons.Add(IconType + KeyName);
     }
-
-    internal static List<string> Icons { get; } = [];
-    internal static Dictionary<string, string> Translations { get; } = [];
 
     public static InvocationExpressionSyntax GetArgumentRawString(string key, string value = "Hello")
     {

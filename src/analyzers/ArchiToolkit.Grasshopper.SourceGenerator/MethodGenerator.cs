@@ -11,12 +11,9 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
 public class MethodGenerator : BasicGenerator
 {
-    public static string[] NeedIdNames { get; set; } = [];
-
-    public readonly MethodName Name;
     private readonly List<MethodParamItem> _parameters;
 
-    protected override bool NeedId => NeedIdNames.Contains(ClassName);
+    public readonly MethodName Name;
 
     public MethodGenerator(ISymbol symbol) : base(symbol)
     {
@@ -26,13 +23,16 @@ public class MethodGenerator : BasicGenerator
         var owner = Name.ContainingType;
         var items = Name.Parameters.Select(p => new MethodParamItem(this, p, owner));
         if (methodSymbol.ReturnType.SpecialType is not SpecialType.System_Void)
-        {
-            items = items.Append(new MethodParamItem(this, "result", methodSymbol.ReturnType.GetName(), ParamType.Out, owner,
+            items = items.Append(new MethodParamItem(this, "result", methodSymbol.ReturnType.GetName(), ParamType.Out,
+                owner,
                 methodSymbol.GetReturnTypeAttributes()));
-        }
 
         _parameters = items.ToList();
     }
+
+    public static string[] NeedIdNames { get; set; } = [];
+
+    protected override bool NeedId => NeedIdNames.Contains(ClassName);
 
     protected override string IdName
     {
@@ -186,7 +186,7 @@ public class MethodGenerator : BasicGenerator
                         Argument(GetArgumentKeyedString(".Component.Nickname")),
                         Argument(GetArgumentKeyedString(".Component.Description")),
                         Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory))),
-                        Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory))),
+                        Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory)))
                     ]))
             ]))
             .AddMembers(
@@ -199,13 +199,12 @@ public class MethodGenerator : BasicGenerator
                 outputMethod,
                 computeMethod,
                 readMethod,
-                writeMethod,
+                writeMethod
             ]);
 
 
         if ((DocumentObjectGenerator.GetBaseAttribute(Name.Symbol.GetAttributes())
              ?? BaseAttribute) is { } attributeName)
-        {
             classSyntax = classSyntax.AddMembers(MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)),
                     Identifier("CreateAttributes"))
                 .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
@@ -216,7 +215,6 @@ public class MethodGenerator : BasicGenerator
                     SyntaxKind.SimpleAssignmentExpression, IdentifierName("m_attributes"),
                     ObjectCreationExpression(IdentifierName(attributeName))
                         .WithArgumentList(ArgumentList([Argument(ThisExpression())])))))));
-        }
 
         return classSyntax;
     }

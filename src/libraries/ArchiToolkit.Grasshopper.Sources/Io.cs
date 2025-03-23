@@ -1,23 +1,23 @@
 ﻿namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// For the case you want more data
+///     For the case you want more data
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public readonly struct Io<T>
 {
     /// <summary>
-    /// If it was got.
+    ///     If it was got.
     /// </summary>
     public bool HasGot { get; }
 
     /// <summary>
-    /// The index in the param.
+    ///     The index in the param.
     /// </summary>
     public int Index { get; }
 
     /// <summary>
-    /// The value of it
+    ///     The value of it
     /// </summary>
     public T Value { get; }
 
@@ -28,5 +28,8 @@ public readonly struct Io<T>
         Value = value;
     }
 
-    public static implicit operator T(Io<T> t) => t.Value;
+    public static implicit operator T(Io<T> t)
+    {
+        return t.Value;
+    }
 }
