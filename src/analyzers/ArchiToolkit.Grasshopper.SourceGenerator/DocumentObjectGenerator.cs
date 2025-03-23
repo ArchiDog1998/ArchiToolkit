@@ -246,4 +246,20 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         return typeSymbol.GetTypeMembers()
             .SelectMany(nestTypes => (IEnumerable<INamedTypeSymbol>) [nestTypes, ..GetNestedTypes(nestTypes)]);
     }
+
+    public static void GetObjNames(IEnumerable<AttributeData> attributes, ref string name, ref string nickname,
+        ref string description)
+    {
+        if (attributes
+                .FirstOrDefault(a => a.AttributeClass?.GetName().FullName
+                    is "global::ArchiToolkit.Grasshopper.ObjNamesAttribute") is not
+            { ConstructorArguments.Length: 3 } attr) return;
+
+        var relay = attr.ConstructorArguments[0].Value?.ToString();
+        if (!string.IsNullOrEmpty(relay)) name = relay!;
+        relay = attr.ConstructorArguments[1].Value?.ToString();
+        if (!string.IsNullOrEmpty(relay)) nickname = relay!;
+        relay = attr.ConstructorArguments[2].Value?.ToString();
+        if (!string.IsNullOrEmpty(relay)) description = relay!;
+    }
 }

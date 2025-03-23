@@ -227,6 +227,8 @@ public class MethodParamItem(
 
         StatementSyntax AddParameter()
         {
+            string name = Name, nickname = Name, description = Name;
+            DocumentObjectGenerator.GetObjNames(Attributes, ref name, ref nickname, ref description);
             return ExpressionStatement(InvocationExpression(MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression, IdentifierName("pManager"),
                     IdentifierName("AddParameter")))
@@ -234,9 +236,9 @@ public class MethodParamItem(
                 [
                     Argument(CastExpression(IdentifierName("global::Grasshopper.Kernel.IGH_Param"),
                         IdentifierName(Identifier("param")))),
-                    Argument(generator.GetArgumentKeyedString("." + Name + ".Name")),
-                    Argument(generator.GetArgumentKeyedString("." + Name + ".Nickname")),
-                    Argument(generator.GetArgumentKeyedString("." + Name + ".Description")),
+                    Argument(generator.GetArgumentKeyedString("." + Name + ".Name", name)),
+                    Argument(generator.GetArgumentKeyedString("." + Name + ".Nickname", nickname)),
+                    Argument(generator.GetArgumentKeyedString("." + Name + ".Description", description)),
                     Argument(
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,

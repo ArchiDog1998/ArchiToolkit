@@ -116,7 +116,7 @@ public class TypeGenerator : BasicGenerator
 
                 PropertyDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("TypeName"))
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-                    .WithExpressionBody(ArrowExpressionClause(GetArgumentKeyedString(".TypeName")))
+                    .WithExpressionBody(ArrowExpressionClause(GetArgumentKeyedString(".TypeName", Name.Name)))
                     .WithAttributeLists([
                         GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
                     ])
@@ -124,7 +124,7 @@ public class TypeGenerator : BasicGenerator
 
                 PropertyDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("TypeDescription"))
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-                    .WithExpressionBody(ArrowExpressionClause(GetArgumentKeyedString(".TypeDescription")))
+                    .WithExpressionBody(ArrowExpressionClause(GetArgumentKeyedString(".TypeDescription", Name.Name)))
                     .WithAttributeLists([
                         GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
                     ])
@@ -187,16 +187,21 @@ public class TypeGenerator : BasicGenerator
                             ]))))))
             ]);
 
+        string name = Symbol.Name, nickname = Symbol.Name, description = Symbol.Name;
+        DocumentObjectGenerator.GetObjNames(Name.Symbol.GetAttributes(), ref name, ref nickname, ref description);
+
         classSyntax = classSyntax.AddMembers(gooClass,
             ConstructorDeclaration(Identifier(RealClassName)).WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
                 .WithInitializer(ConstructorInitializer(SyntaxKind.ThisConstructorInitializer,
                     ArgumentList(
                     [
-                        Argument(GetArgumentKeyedString(".Name")),
-                        Argument(GetArgumentKeyedString(".Nickname")),
-                        Argument(GetArgumentKeyedString(".Description")),
-                        Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory))),
-                        Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? "Parameter")))
+                        Argument(GetArgumentKeyedString(".Name", name)),
+                        Argument(GetArgumentKeyedString(".Nickname", nickname)),
+                        Argument(GetArgumentKeyedString(".Description", description)),
+                        Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory),
+                            Category ?? BaseCategory)),
+                        Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? "Parameter"),
+                            Subcategory ?? "Parameter"))
                     ])))
                 .WithAttributeLists([
                     GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())

@@ -173,13 +173,13 @@ public abstract class BasicGenerator
         Icons.Add(IconType + KeyName);
     }
 
-    public static InvocationExpressionSyntax GetArgumentRawString(string key, string value = "Hello")
+    public static InvocationExpressionSyntax GetArgumentRawString(string key, string value)
     {
         Translations[key] = value;
         return GetArgumentString(Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key))));
     }
 
-    public InvocationExpressionSyntax GetArgumentKeyedString(string key, string value = "Hello")
+    public InvocationExpressionSyntax GetArgumentKeyedString(string key, string value)
     {
         Translations[KeyName + key] = value;
         return GetArgumentString(Argument(BinaryExpression(SyntaxKind.AddExpression,
