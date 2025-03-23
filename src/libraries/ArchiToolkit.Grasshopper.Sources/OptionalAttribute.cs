@@ -1,5 +1,6 @@
 ﻿// ReSharper disable RedundantUsingDirective
 using System;
+using System.Diagnostics;
 
 namespace ArchiToolkit.Grasshopper;
 
@@ -7,4 +8,5 @@ namespace ArchiToolkit.Grasshopper;
 /// Optional input
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
+[Conditional(Constant.KeepAttributes)]
 internal class OptionalAttribute : Attribute;

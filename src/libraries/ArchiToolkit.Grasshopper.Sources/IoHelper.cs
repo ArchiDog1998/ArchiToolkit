@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿// ReSharper disable RedundantUsingDirective
+using System;
+using System.Drawing;
 using GH_IO.Serialization;
 using GH_IO.Types;
 

@@ -33,6 +33,30 @@
 	<data name="Subcategory.Parameter" xml:space="preserve">
 		<value>Parameter</value>
 	</data>
+	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.A" xml:space="preserve">
+		<value>A</value>
+	</data>
+	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.B" xml:space="preserve">
+		<value>B</value>
+	</data>
+	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.C" xml:space="preserve">
+		<value>C</value>
+	</data>
+	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.D" xml:space="preserve">
+		<value>D</value>
+	</data>
+	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.E" xml:space="preserve">
+		<value>E</value>
+	</data>
+	<data name="Your Name.e.Name" xml:space="preserve">
+		<value>OK</value>
+	</data>
+	<data name="Your Name.e.Nickname" xml:space="preserve">
+		<value>B</value>
+	</data>
+	<data name="Your Name.e.Description" xml:space="preserve">
+		<value>C</value>
+	</data>
 	<data name="Your Name.i.Name" xml:space="preserve">
 		<value>Input</value>
 	</data>

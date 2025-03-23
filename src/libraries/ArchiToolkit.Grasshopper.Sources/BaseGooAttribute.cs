@@ -1,5 +1,6 @@
 ﻿// ReSharper disable RedundantUsingDirective
 using System;
+using System.Diagnostics;
 using Grasshopper.Kernel.Types;
 
 namespace ArchiToolkit.Grasshopper;
@@ -9,4 +10,5 @@ namespace ArchiToolkit.Grasshopper;
 /// Please use <see cref="DocObjAttribute"/> first.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+[Conditional(Constant.KeepAttributes)]
 internal class BaseGooAttribute<T> : Attribute where T : IGH_Goo;

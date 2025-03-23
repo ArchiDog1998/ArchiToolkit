@@ -1,5 +1,6 @@
 ﻿// ReSharper disable RedundantUsingDirective
 using System;
+using System.Diagnostics;
 using Grasshopper.Kernel;
 #pragma warning disable CS9113 // Parameter is unread.
 
@@ -10,4 +11,5 @@ namespace ArchiToolkit.Grasshopper;
 /// </summary>
 /// <param name="exposure"></param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method)]
+[Conditional(Constant.KeepAttributes)]
 internal class ExposureAttribute(GH_Exposure exposure) : Attribute;

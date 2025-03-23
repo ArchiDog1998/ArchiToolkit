@@ -1,5 +1,7 @@
 ﻿// ReSharper disable RedundantUsingDirective
 using System;
+using System.Diagnostics;
+
 #pragma warning disable CS9113 // Parameter is unread.
 
 namespace ArchiToolkit.Grasshopper;
@@ -9,6 +11,7 @@ namespace ArchiToolkit.Grasshopper;
 /// </summary>
 /// <param name="propertyName"></param>
 [AttributeUsage(AttributeTargets.Parameter)]
+[Conditional(Constant.KeepAttributes)]
 internal class PersistentDataAttribute(string propertyName) : Attribute;
 
 /// <summary>
@@ -17,4 +20,5 @@ internal class PersistentDataAttribute(string propertyName) : Attribute;
 /// <param name="propertyName"><inheritdoc cref="PersistentDataAttribute"/></param>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Parameter)]
+[Conditional(Constant.KeepAttributes)]
 internal class PersistentDataAttribute<T>(string propertyName) : Attribute;
