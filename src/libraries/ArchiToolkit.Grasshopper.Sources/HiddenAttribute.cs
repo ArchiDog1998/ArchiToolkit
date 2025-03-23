@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿// ReSharper disable RedundantUsingDirective
+using System;
 
 namespace ArchiToolkit.Grasshopper;
 
@@ -6,5 +7,4 @@ namespace ArchiToolkit.Grasshopper;
 /// Hidden attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
-[Conditional(Constant.KeepAttributes)]
-public class HiddenAttribute : Attribute;
+internal class HiddenAttribute : Attribute;

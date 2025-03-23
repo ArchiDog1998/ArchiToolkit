@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿// ReSharper disable RedundantUsingDirective
+using System;
 using Grasshopper.Kernel;
 // ReSharper disable UnusedTypeParameter
 
@@ -9,6 +10,5 @@ namespace ArchiToolkit.Grasshopper;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Assembly)]
-[Conditional(Constant.KeepAttributes)]
-public class ObjAttrAttribute<T> : Attribute
+internal class ObjAttrAttribute<T> : Attribute
     where T : IGH_Attributes;

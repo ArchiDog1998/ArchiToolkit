@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿// ReSharper disable RedundantUsingDirective
+using System;
 #pragma warning disable CS9113 // Parameter is unread.
 
 namespace ArchiToolkit.Grasshopper;
@@ -7,6 +8,5 @@ namespace ArchiToolkit.Grasshopper;
 /// The subcategory of it.
 /// </summary>
 /// <param name="recognizeName">for localization</param>
-[Conditional(Constant.KeepAttributes)]
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Assembly)]
-public class SubcategoryAttribute(string recognizeName) : Attribute;
+internal class SubcategoryAttribute(string recognizeName) : Attribute;

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿// ReSharper disable RedundantUsingDirective
+using System;
 #pragma warning disable CS9113 // Parameter is unread.
 
 namespace ArchiToolkit.Grasshopper;
@@ -8,5 +9,4 @@ namespace ArchiToolkit.Grasshopper;
 /// </summary>
 /// <param name="saveToFile">if it should be saved into the file</param>
 [AttributeUsage(AttributeTargets.Parameter)]
-[Conditional(Constant.KeepAttributes)]
-public class ObjFieldAttribute(bool saveToFile = false) : Attribute;
+internal class ObjFieldAttribute(bool saveToFile = false) : Attribute;

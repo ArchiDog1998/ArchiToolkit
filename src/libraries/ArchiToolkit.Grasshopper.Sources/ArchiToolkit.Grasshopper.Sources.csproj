@@ -3,6 +3,7 @@
         <TargetFramework>net48</TargetFramework>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <RootNamespace>ArchiToolkit.Grasshopper</RootNamespace>
+        <EnableGlobalUsing>false</EnableGlobalUsing>
     </PropertyGroup>
     <ItemGroup>
       <PackageReference Include="Grasshopper" />

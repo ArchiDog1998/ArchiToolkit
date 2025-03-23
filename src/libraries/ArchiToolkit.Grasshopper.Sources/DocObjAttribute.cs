@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿// ReSharper disable RedundantUsingDirective
+using System;
 
 #pragma warning disable CS9113 // Parameter is unread.
 
@@ -10,5 +11,4 @@ namespace ArchiToolkit.Grasshopper;
 /// <param name="recognizeName">for localization</param>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.ReturnValue
 | AttributeTargets.Class | AttributeTargets.Struct)]
-[Conditional(Constant.KeepAttributes)]
-public class DocObjAttribute(string recognizeName = "") : Attribute;
+internal class DocObjAttribute(string recognizeName = "") : Attribute;
