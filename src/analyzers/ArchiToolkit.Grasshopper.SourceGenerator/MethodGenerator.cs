@@ -54,7 +54,7 @@ public class MethodGenerator : BasicGenerator
 
     public override string ClassName => "Component_" + Name.Name;
 
-    public static string GlobalBaseComponent { get; set; } = null!;
+    public static ITypeSymbol GlobalBaseComponent { get; set; } = null!;
 
     protected override ClassDeclarationSyntax ModifyClass(ClassDeclarationSyntax classSyntax)
     {
@@ -130,10 +130,55 @@ public class MethodGenerator : BasicGenerator
                     .._parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.SetData(i))
                 ]));
 
+        var readMethod = MethodDeclaration(PredefinedType(Token(SyntaxKind.BoolKeyword)), Identifier("Read"))
+            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
+            .WithParameterList(ParameterList([
+                Parameter(Identifier("reader")).WithType(
+                    IdentifierName("global::GH_IO.Serialization.GH_IReader"))
+            ]))
+            .WithAttributeLists([
+                GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
+            ])
+            .WithBody(Block((IEnumerable<StatementSyntax>)
+            [
+                .._parameters
+                    .Where(p => p.Type is ParamType.Field && p.Io)
+                    .Select(p => p.ReadData()),
+                ReturnStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                        BaseExpression(), IdentifierName("Read")))
+                    .WithArgumentList(ArgumentList([Argument(IdentifierName("reader"))])))
+            ]));
+
+        var writeMethod = MethodDeclaration(PredefinedType(Token(SyntaxKind.BoolKeyword)), Identifier("Write"))
+            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
+            .WithParameterList(ParameterList([
+                Parameter(Identifier("writer")).WithType(
+                    IdentifierName("global::GH_IO.Serialization.GH_IWriter"))
+            ]))
+            .WithAttributeLists([
+                GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
+            ])
+            .WithBody(Block((IEnumerable<StatementSyntax>)
+            [
+                .._parameters
+                    .Where(p => p.Type is ParamType.Field && p.Io)
+                    .Select(p => p.WriteData()),
+                ReturnStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                        BaseExpression(), IdentifierName("Write")))
+                    .WithArgumentList(ArgumentList([Argument(IdentifierName("writer"))])))
+            ]));
+
+        var addedMembers = baseComponent
+            .GetBaseTypesAndThis()
+            .SelectMany(t => t.GetMembers())
+            .Where(m => m.DeclaredAccessibility is not Accessibility.Private and not Accessibility.ProtectedAndInternal)
+            .Select(i => i.Name)
+            .ToArray();
+
         classSyntax = classSyntax.WithParameterList(ParameterList())
             .WithBaseList(BaseList(
             [
-                PrimaryConstructorBaseType(IdentifierName(baseComponent))
+                PrimaryConstructorBaseType(IdentifierName(baseComponent.GetName().FullName))
                     .WithArgumentList(ArgumentList(
                     [
                         GetArgumentKeyedString(".Component.Name"),
@@ -145,10 +190,15 @@ public class MethodGenerator : BasicGenerator
             ]))
             .AddMembers(
             [
-                .._parameters.Where(p => p.Type is ParamType.Field).Select(p => p.Field()),
+                .._parameters
+                    .Where(p => p.Type is ParamType.Field)
+                    .Where(p => !addedMembers.Contains(p.Name))
+                    .Select(p => p.Field()),
                 inputMethod,
                 outputMethod,
                 computeMethod,
+                readMethod,
+                writeMethod,
             ]);
 
 

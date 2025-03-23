@@ -1,4 +1,5 @@
-﻿using Grasshopper.Kernel;
+﻿using GH_IO.Serialization;
+using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Types;
@@ -29,5 +30,16 @@ public static class ExampleComponents
 
         return [];
         //var a = ArchiToolkit_Resources.example;
+    }
+}
+
+partial class Component_TestClass
+{
+    private int _test;
+
+    public override bool Write(GH_IWriter writer)
+    {
+        IoHelper.Write(writer, "_test", _test);
+        return base.Write(writer);
     }
 }

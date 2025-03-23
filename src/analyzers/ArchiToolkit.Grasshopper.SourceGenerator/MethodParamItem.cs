@@ -31,8 +31,10 @@ public class MethodParamItem(
     TypeName type,
     ParamType paramType,
     TypeName owner,
-    ImmutableArray<AttributeData> attributes)
+    ImmutableArray<AttributeData> attributes,
+    bool io = false)
 {
+    public readonly bool Io = io;
     public readonly ParameterName? Parameter;
     public readonly string Name = name;
     public readonly TypeName TypeName = type;
@@ -56,8 +58,9 @@ public class MethodParamItem(
         _ => Name,
     };
 
-    public MethodParamItem(ParameterName name, TypeName owner) : this(name.Name, name.Type, GetParamType(name), owner,
-        name.Symbol.GetAttributes())
+    public MethodParamItem(ParameterName name, TypeName owner) : this(name.Name, name.Type,
+        GetParamType(name, out var io), owner,
+        name.Symbol.GetAttributes(), io)
     {
         Parameter = name;
     }
@@ -99,6 +102,30 @@ public class MethodParamItem(
                 .WithVariables([VariableDeclarator(Identifier(ParameterName))]))
             .WithAttributeLists([GeneratedCodeAttribute(typeof(MethodParamItem))])
             .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword)));
+    }
+
+    public ExpressionStatementSyntax ReadData()
+    {
+        return ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                IdentifierName("global::ArchiToolkit.Grasshopper.IoHelper"), IdentifierName("Read")))
+            .WithArgumentList(ArgumentList(
+            [
+                Argument(IdentifierName("reader")),
+                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(ParameterName))),
+                Argument(IdentifierName(ParameterName)).WithRefOrOutKeyword(Token(SyntaxKind.RefKeyword))
+            ])));
+    }
+
+    public ExpressionStatementSyntax WriteData()
+    {
+        return ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                IdentifierName("global::ArchiToolkit.Grasshopper.IoHelper"), IdentifierName("Write")))
+            .WithArgumentList(ArgumentList(
+            [
+                Argument(IdentifierName("writer")),
+                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(ParameterName))),
+                Argument(IdentifierName(ParameterName))
+            ])));
     }
 
     public BlockSyntax IoBlock(bool isIn)
@@ -262,16 +289,18 @@ public class MethodParamItem(
     }
 
 
-    private static ParamType GetParamType(ParameterName name)
+    private static ParamType GetParamType(ParameterName name, out bool io)
     {
         ParamType paramType = 0;
         var typeSymbol = name.Type.Symbol;
-        if (name.Symbol.GetAttributes().Any(a => a.AttributeClass?.GetName().FullName
-                is "global::ArchiToolkit.Grasshopper.ObjFieldAttribute"))
+        if (name.Symbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.GetName().FullName
+                is "global::ArchiToolkit.Grasshopper.ObjFieldAttribute") is { } fieldAttribute)
         {
+            io = (bool?)fieldAttribute.ConstructorArguments.FirstOrDefault().Value ?? false;
             return ParamType.Field;
         }
 
+        io = false;
         foreach (var type in typeSymbol.AllInterfaces.Append(typeSymbol))
         {
             switch (type.GetName().FullName)

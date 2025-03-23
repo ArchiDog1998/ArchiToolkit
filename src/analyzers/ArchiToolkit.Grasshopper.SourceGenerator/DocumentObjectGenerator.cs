@@ -35,7 +35,8 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         var types = arg.Items.Types;
         var methods = arg.Items.Methods;
 
-        var baseComponent = GetBaseComponent(assembly.GetAttributes()) ?? "global::Grasshopper.Kernel.GH_Component";
+        var baseComponent = GetBaseComponent(assembly.GetAttributes())
+                            ?? arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.GH_Component");
         var baseCategory = GetBaseCategory(assembly.GetAttributes()) ?? assembly.Name;
         var baseSubcategory = GetBaseSubcategory(assembly.GetAttributes()) ?? assembly.Name;
         var baseAttribute =GetBaseAttribute(assembly.GetAttributes());
@@ -93,13 +94,13 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         context.AddSource("Test.cs", builder.ToString());
     }
 
-    public static string? GetBaseComponent(IEnumerable<AttributeData> attributes)
+    public static ITypeSymbol? GetBaseComponent(IEnumerable<AttributeData> attributes)
     {
         return (from type in attributes.Select(attribute => attribute.AttributeClass).OfType<INamedTypeSymbol>()
             where type.IsGenericType
             where type.ConstructUnboundGenericType().GetName().FullName is
                 "global::ArchiToolkit.Grasshopper.BaseComponentAttribute<>"
-            select type.TypeArguments[0].GetName().FullName).FirstOrDefault();
+            select type.TypeArguments[0]).FirstOrDefault();
     }
 
     public static string? GetBaseAttribute(IEnumerable<AttributeData> attributes)
