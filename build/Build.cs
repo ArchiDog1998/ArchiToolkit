@@ -58,8 +58,7 @@ partial class Build : NukeBuild
         {
             DotNetTasks.DotNetBuild(s => s
                 .SetProjectFile(Solution)
-                .SetConfiguration(Configuration.Release)
-                .EnableNoRestore());
+                .SetConfiguration(Configuration.Release));
         });
 
     Target Test => d => d
