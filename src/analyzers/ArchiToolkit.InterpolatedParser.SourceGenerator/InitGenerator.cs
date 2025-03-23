@@ -15,6 +15,8 @@ public class InitGenerator : IIncrementalGenerator
         var assembly = typeof(InitGenerator).Assembly;
         foreach (var name in assembly.GetManifestResourceNames())
         {
+            if (!name.EndsWith(".cs")) continue;
+
             using var stream = assembly.GetManifestResourceStream(name);
             if (stream == null) continue;
 
