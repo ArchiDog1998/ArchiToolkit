@@ -61,8 +61,9 @@ public class MethodParamItem(
         _ => Name
     };
 
-    protected string GetParamClassName(string typeName)
+    protected string GetParamClassName(TypeName name)
     {
+        var typeName = name.Symbol.TypeKind is TypeKind.Enum ? "int" : name.FullName;
         return TypeDictionary.TryGetValue(typeName, out var className)
             ? className
             : "global::Grasshopper.Kernel.Parameters.Param_GenericObject";
@@ -170,6 +171,23 @@ public class MethodParamItem(
                      && persistentAttribute2.AttributeClass?.TypeArguments[0].GetName().FullName is { } customClass)
                 yield return PersistentData(customClass, property2);
 
+            if (isIn && GetInnerType(TypeName.Symbol) is { TypeKind: TypeKind.Enum } enumType)
+            {
+
+                foreach (var fieldSymbol in enumType.GetMembers().OfType<IFieldSymbol>().Where(s => s.IsConst))
+                {
+                    yield return ExpressionStatement(InvocationExpression(MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
+                            IdentifierName("AddNamedValue")))
+                        .WithArgumentList(
+                            ArgumentList(
+                            [
+                                Argument(BasicGenerator.GetArgumentRawString(enumType.GetName().FullName + "." + fieldSymbol.Name, fieldSymbol.Name)),
+                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(Convert.ToInt32(fieldSymbol.ConstantValue))))
+                            ])));
+                }
+            }
+
             yield return AddParameter();
         }
 
@@ -215,7 +233,7 @@ public class MethodParamItem(
                                     return attr.ConstructUnboundGenericType().GetName().FullName
                                         is "global::ArchiToolkit.Grasshopper.ParamTypeAttribute<>";
                                 })?.AttributeClass?.TypeArguments[0].GetName().FullName
-                                ?? GetParamClassName(GetInnerType(TypeName.Symbol).GetName().FullName);
+                                ?? GetParamClassName(GetInnerType(TypeName.Symbol).GetName());
             return LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
                 .WithVariables([
                     VariableDeclarator(Identifier("param"))

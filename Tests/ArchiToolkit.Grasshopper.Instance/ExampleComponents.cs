@@ -7,6 +7,11 @@ using Rhino.Geometry;
 
 namespace ArchiToolkit.Grasshopper.Instance;
 
+public enum Ex
+{
+    A, B, C, D, E
+}
+
 [Category("Cate")]
 public static class ExampleComponents
 {
@@ -18,6 +23,7 @@ public static class ExampleComponents
     public static List<int> TestClass(
         IGH_Component component,
         IGH_DataAccess da,
+        [ObjNames("OK", "B", "C" )]Ex e,
         [Hidden,ObjNames("Input", "I", "An input")]ref Arc i,
         [ObjField(true)]ref int myData,
         List<int> test,
@@ -30,6 +36,7 @@ public static class ExampleComponents
         }
 
         return [];
+
         //var a = ArchiToolkit_Resources.example;
     }
 }
