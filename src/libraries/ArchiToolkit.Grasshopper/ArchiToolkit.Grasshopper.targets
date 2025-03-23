@@ -1,12 +1,4 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <BeforeBuildPath>$(MSBuildThisFileDirectory)..\tools\ArchiToolkit.Grasshopper.BeforeBuild.exe</BeforeBuildPath>
-    </PropertyGroup>
-
-    <Target Name="RunExeBeforeBuild" BeforeTargets="Build">
-        <Exec Command="&quot;$(BeforeBuildPath)&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
-    </Target>
-
     <PropertyGroup Condition="'$(KeepArchiToolkitAttributes)' == 'true'">
         <DefineConstants>$(DefineConstants);KEEP_ARCHITOOLKIT_ATTRIBUTES</DefineConstants> <!-- Define the symbol if true -->
     </PropertyGroup>

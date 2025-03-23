@@ -15,10 +15,6 @@
         <PackageReference Include="Grasshopper"/>
     </ItemGroup>
 
-    <Target Name="RunExeBeforeBuild" BeforeTargets="BeforeBuild">
-        <Exec Command="&quot;..\..\src\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\ArchiToolkit.Grasshopper.BeforeBuild.exe&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
-    </Target>
-
     <ItemGroup>
         <EmbeddedResource Include="Icons/*.png"/>
     </ItemGroup>

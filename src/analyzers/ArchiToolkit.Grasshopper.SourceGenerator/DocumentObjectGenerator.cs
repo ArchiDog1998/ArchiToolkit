@@ -127,8 +127,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
                 // ignored
             }
         }
-
-
+        
         var assembly = typeof(DocumentObjectGenerator).Assembly;
         foreach (var icon in BasicGenerator.Icons)
         {

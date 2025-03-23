@@ -33,58 +33,58 @@
 	<data name="Subcategory.Parameter" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.i.Name" xml:space="preserve">
+	<data name="Your Name.i.Name" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.i.Nickname" xml:space="preserve">
+	<data name="Your Name.i.Nickname" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.i.Description" xml:space="preserve">
+	<data name="Your Name.i.Description" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.test.Name" xml:space="preserve">
+	<data name="Your Name.test.Name" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.test.Nickname" xml:space="preserve">
+	<data name="Your Name.test.Nickname" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.test.Description" xml:space="preserve">
+	<data name="Your Name.test.Description" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.tree.Name" xml:space="preserve">
+	<data name="Your Name.tree.Name" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.tree.Nickname" xml:space="preserve">
+	<data name="Your Name.tree.Nickname" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.tree.Description" xml:space="preserve">
+	<data name="Your Name.tree.Description" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.data.Name" xml:space="preserve">
+	<data name="Your Name.data.Name" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.data.Nickname" xml:space="preserve">
+	<data name="Your Name.data.Nickname" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.data.Description" xml:space="preserve">
+	<data name="Your Name.data.Description" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.result.Name" xml:space="preserve">
+	<data name="Your Name.result.Name" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.result.Nickname" xml:space="preserve">
+	<data name="Your Name.result.Nickname" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.result.Description" xml:space="preserve">
+	<data name="Your Name.result.Description" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.Component.Name" xml:space="preserve">
+	<data name="Your Name.Component.Name" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.Component.Nickname" xml:space="preserve">
+	<data name="Your Name.Component.Nickname" xml:space="preserve">
 		<value>Hello</value>
 	</data>
-	<data name="AnotherName.Component.Description" xml:space="preserve">
+	<data name="Your Name.Component.Description" xml:space="preserve">
 		<value>Hello</value>
 	</data>
 	<data name="Category.Cate" xml:space="preserve">
