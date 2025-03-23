@@ -241,9 +241,9 @@ public class MethodParamItem(
                 [
                     Argument(CastExpression(IdentifierName("global::Grasshopper.Kernel.IGH_Param"),
                         IdentifierName(Identifier("param")))),
-                    MethodGenerator.GetArgumentKeyedString("." + Name + ".Name"),
-                    MethodGenerator.GetArgumentKeyedString("." + Name + ".Nickname"),
-                    MethodGenerator.GetArgumentKeyedString("." + Name + ".Description"),
+                    Argument(BasicGenerator.GetArgumentKeyedString("." + Name + ".Name")),
+                    Argument(BasicGenerator.GetArgumentKeyedString("." + Name + ".Nickname")),
+                    Argument(BasicGenerator.GetArgumentKeyedString("." + Name + ".Description")),
                     Argument(
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,

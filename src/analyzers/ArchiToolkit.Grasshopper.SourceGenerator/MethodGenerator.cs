@@ -181,11 +181,11 @@ public class MethodGenerator : BasicGenerator
                 PrimaryConstructorBaseType(IdentifierName(baseComponent.GetName().FullName))
                     .WithArgumentList(ArgumentList(
                     [
-                        GetArgumentKeyedString(".Component.Name"),
-                        GetArgumentKeyedString(".Component.Nickname"),
-                        GetArgumentKeyedString(".Component.Description"),
-                        GetArgumentRawString("Category." + (Category ?? BaseCategory)),
-                        GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory)),
+                        Argument(GetArgumentKeyedString(".Name")),
+                        Argument(GetArgumentKeyedString(".Nickname")),
+                        Argument(GetArgumentKeyedString(".Description")),
+                        Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory))),
+                        Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory))),
                     ]))
             ]))
             .AddMembers(
@@ -218,23 +218,5 @@ public class MethodGenerator : BasicGenerator
         }
 
         return classSyntax;
-    }
-
-    private static ArgumentSyntax GetArgumentRawString(string key)
-    {
-        return GetArgumentString(Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key))));
-    }
-
-    public static ArgumentSyntax GetArgumentKeyedString(string key)
-    {
-        return GetArgumentString(Argument(BinaryExpression(SyntaxKind.AddExpression,
-            IdentifierName("ResourceKey"), LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key)))));
-    }
-
-    private static ArgumentSyntax GetArgumentString(ArgumentSyntax argument)
-    {
-        return Argument(InvocationExpression(
-                IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.Get"))
-            .WithArgumentList(ArgumentList([argument])));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Text;
 using ArchiToolkit.RoslynHelper.Extensions;
+using ArchiToolkit.RoslynHelper.Names;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -39,15 +40,13 @@ public class DocumentObjectGenerator : IIncrementalGenerator
                             ?? arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.GH_Component");
         var baseCategory = GetBaseCategory(assembly.GetAttributes()) ?? assembly.Name;
         var baseSubcategory = GetBaseSubcategory(assembly.GetAttributes()) ?? assembly.Name;
-        var baseAttribute =GetBaseAttribute(assembly.GetAttributes());
-
-        var builder = new StringBuilder();
+        var baseAttribute = GetBaseAttribute(assembly.GetAttributes());
 
         var typeAndClasses = new Dictionary<string, string>();
 
         BasicGenerator.BaseCategory = baseCategory;
         BasicGenerator.BaseSubcategory = baseSubcategory;
-
+        TypeGenerator.BaseGoo = arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.Types.GH_Goo`1")!;
         foreach (var type in types)
         {
             type.GenerateSource(context);
@@ -55,7 +54,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             var key = type.Name.FullName;
             var className = "global::" + type.NameSpace + "." + type.RealClassName;
             if (!typeAndClasses.ContainsKey(key)) typeAndClasses.Add(key, className);
-            key = "global::" + type.NameSpace + "." + type.RealGooName;
+            key = className + ".Goo";
             if (!typeAndClasses.ContainsKey(key)) typeAndClasses.Add(key, className);
         }
 
@@ -79,19 +78,12 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         MethodParamItem.TypeDictionary = typeAndClasses;
 
         BasicGenerator.BaseAttribute = baseAttribute;
-        MethodGenerator.GlobalBaseComponent = baseComponent;
-        foreach (var pair in MethodParamItem.TypeDictionary)
-        {
-            builder.AppendLine(pair.Key + " : " + pair.Value);
-        }
+        MethodGenerator.GlobalBaseComponent = baseComponent!;
 
         foreach (var method in methods)
         {
-
             method.GenerateSource(context);
         }
-
-        context.AddSource("Test.cs", builder.ToString());
     }
 
     public static ITypeSymbol? GetBaseComponent(IEnumerable<AttributeData> attributes)
@@ -105,15 +97,20 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
     public static string? GetBaseAttribute(IEnumerable<AttributeData> attributes)
     {
+        return GetTypeAttribute(attributes, "global::ArchiToolkit.Grasshopper.ObjAttrAttribute<>")?.FullName;
+    }
+
+    public static TypeName? GetTypeAttribute(IEnumerable<AttributeData> attributes, string name)
+    {
         foreach (var attr in attributes)
         {
             if (attr.AttributeClass is not { } attributeClass) continue;
             if (!attributeClass.IsGenericType) continue;
             if (attributeClass.TypeArguments.Length < 1) continue;
-            if (attributeClass.ConstructUnboundGenericType().GetName().FullName
-                is not "global::ArchiToolkit.Grasshopper.ObjAttrAttribute<>") continue;
-            return attributeClass.TypeArguments[0].GetName().FullName;
+            if (attributeClass.ConstructUnboundGenericType().GetName().FullName != name) continue;
+            return attributeClass.TypeArguments[0].GetName();
         }
+
         return null;
     }
 

@@ -164,4 +164,22 @@ public abstract class BasicGenerator
 
         context.AddSource(RealClassName + ".g.cs", item.NodeToString());
     }
+
+    public static InvocationExpressionSyntax GetArgumentRawString(string key)
+    {
+        return GetArgumentString(Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key))));
+    }
+
+    public static InvocationExpressionSyntax GetArgumentKeyedString(string key)
+    {
+        return GetArgumentString(Argument(BinaryExpression(SyntaxKind.AddExpression,
+            IdentifierName("ResourceKey"), LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key)))));
+    }
+
+    private static InvocationExpressionSyntax GetArgumentString(ArgumentSyntax argument)
+    {
+        return InvocationExpression(
+                IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.Get"))
+            .WithArgumentList(ArgumentList([argument]));
+    }
 }

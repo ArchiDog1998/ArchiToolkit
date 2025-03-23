@@ -8,11 +8,6 @@ namespace ArchiToolkit.Grasshopper;
 
 internal static class ActiveObjectHelper
 {
-    public static string ToGooString<T>(this T value)
-    {
-        return value?.ToString() ?? "<null>";
-    }
-
     public static bool CastFrom<T>(object source, out T value)
     {
         var sType = source.GetType();
