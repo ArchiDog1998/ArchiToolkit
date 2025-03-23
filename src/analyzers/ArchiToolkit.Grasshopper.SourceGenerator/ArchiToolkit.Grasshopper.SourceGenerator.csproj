@@ -6,4 +6,8 @@
                           Visible="false"/>
         <ProjectReference Include="..\..\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Icons/*.png"/>
+    </ItemGroup>
 </Project>

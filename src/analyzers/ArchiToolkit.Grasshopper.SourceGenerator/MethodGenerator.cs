@@ -24,10 +24,10 @@ public class MethodGenerator : BasicGenerator
             throw new ArgumentException("Symbol is not a type method symbol");
         Name = methodSymbol.GetName();
         var owner = Name.ContainingType;
-        var items = Name.Parameters.Select(p => new MethodParamItem(p, owner));
+        var items = Name.Parameters.Select(p => new MethodParamItem(this, p, owner));
         if (methodSymbol.ReturnType.SpecialType is not SpecialType.System_Void)
         {
-            items = items.Append(new MethodParamItem("result", methodSymbol.ReturnType.GetName(), ParamType.Out, owner,
+            items = items.Append(new MethodParamItem(this, "result", methodSymbol.ReturnType.GetName(), ParamType.Out, owner,
                 methodSymbol.GetReturnTypeAttributes()));
         }
 
@@ -53,6 +53,7 @@ public class MethodGenerator : BasicGenerator
     }
 
     public override string ClassName => "Component_" + Name.Name;
+    protected override char IconType => 'C';
 
     public static ITypeSymbol GlobalBaseComponent { get; set; } = null!;
 
@@ -181,9 +182,9 @@ public class MethodGenerator : BasicGenerator
                 PrimaryConstructorBaseType(IdentifierName(baseComponent.GetName().FullName))
                     .WithArgumentList(ArgumentList(
                     [
-                        Argument(GetArgumentKeyedString(".Name")),
-                        Argument(GetArgumentKeyedString(".Nickname")),
-                        Argument(GetArgumentKeyedString(".Description")),
+                        Argument(GetArgumentKeyedString(".Component.Name")),
+                        Argument(GetArgumentKeyedString(".Component.Nickname")),
+                        Argument(GetArgumentKeyedString(".Component.Description")),
                         Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory))),
                         Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory))),
                     ]))

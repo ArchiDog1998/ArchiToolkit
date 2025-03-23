@@ -21,6 +21,8 @@ public abstract class BasicGenerator
 
     public string RealClassName => ToRealName(ClassName);
 
+    protected abstract char IconType { get; }
+
     private string ToRealNameNoTags(string className)
         => NeedId ? className + "_" + Id.ToString("N").Substring(0, 8) : className;
 
@@ -124,9 +126,18 @@ public abstract class BasicGenerator
                     InvocationExpression(
                             IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
                         .WithArgumentList(ArgumentList([
-                            Argument(BinaryExpression(
-                                SyntaxKind.AddExpression,
-                                IdentifierName("ResourceKey"),LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(".png"))))
+                            Argument(
+                                BinaryExpression(
+                                    SyntaxKind.AddExpression,
+                                    BinaryExpression(
+                                        SyntaxKind.AddExpression,
+                                        LiteralExpression(
+                                            SyntaxKind.StringLiteralExpression,
+                                            Literal(Symbol.ContainingAssembly.Name + ".Icons.")),
+                                        IdentifierName("ResourceKey")),
+                                    LiteralExpression(
+                                        SyntaxKind.StringLiteralExpression,
+                                        Literal(".png")))),
                         ]))))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(BasicGenerator)).AddAttributes(NonUserCodeAttribute())
@@ -163,15 +174,21 @@ public abstract class BasicGenerator
             .WithMembers([ModifyClass(classSyntax)]);
 
         context.AddSource(RealClassName + ".g.cs", item.NodeToString());
+        Icons.Add(IconType + KeyName);
     }
 
-    public static InvocationExpressionSyntax GetArgumentRawString(string key)
+    internal static List<string> Icons { get; } = [];
+    internal static Dictionary<string, string> Translations { get; } = [];
+
+    public static InvocationExpressionSyntax GetArgumentRawString(string key, string value = "Hello")
     {
+        Translations[key] = value;
         return GetArgumentString(Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key))));
     }
 
-    public static InvocationExpressionSyntax GetArgumentKeyedString(string key)
+    public InvocationExpressionSyntax GetArgumentKeyedString(string key, string value = "Hello")
     {
+        Translations[KeyName + key] = value;
         return GetArgumentString(Argument(BinaryExpression(SyntaxKind.AddExpression,
             IdentifierName("ResourceKey"), LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key)))));
     }

@@ -14,6 +14,7 @@ public class TypeGenerator : BasicGenerator
     protected override string IdName => Name.FullName;
 
     public override string ClassName => "Param_" + Name.Name;
+    protected override char IconType => 'P';
 
     public static ITypeSymbol BaseGoo { get; set; } = null!;
 
@@ -183,9 +184,9 @@ public class TypeGenerator : BasicGenerator
                 .WithInitializer(ConstructorInitializer(SyntaxKind.ThisConstructorInitializer,
                     ArgumentList(
                     [
-                        Argument(GetArgumentKeyedString(".Component.Name")),
-                        Argument(GetArgumentKeyedString(".Component.Nickname")),
-                        Argument(GetArgumentKeyedString(".Component.Description")),
+                        Argument(GetArgumentKeyedString(".Name")),
+                        Argument(GetArgumentKeyedString(".Nickname")),
+                        Argument(GetArgumentKeyedString(".Description")),
                         Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory))),
                         Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? "Parameter"))),
                     ])))

@@ -13,8 +13,6 @@
         <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\ArchiToolkit.Grasshopper.BeforeBuild.exe" Pack="true" PackagePath="tools" Visible="false"/>
         <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\ArchiToolkit.Grasshopper.BeforeBuild.dll" Pack="true" PackagePath="tools" Visible="false"/>
         <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\ArchiToolkit.Grasshopper.BeforeBuild.runtimeconfig.json" Pack="true" PackagePath="tools" Visible="false"/>
-<!--        <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\Miscosoft.CodeAnalysis.dll" Pack="true" PackagePath="tools" Visible="false"/>-->
-<!--        <None Include="..\..\applications\ArchiToolkit.Grasshopper.BeforeBuild\bin\$(Configuration)\net9.0\Miscosoft.CodeAnalysis.CSharp.dll" Pack="true" PackagePath="tools" Visible="false"/>-->
         <PackageReference Include="Grasshopper" PrivateAssets="all"/>
     </ItemGroup>
 </Project>

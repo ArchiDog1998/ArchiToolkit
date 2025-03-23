@@ -1,8 +1,9 @@
-﻿using System.Xml;
-using System.Xml.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Xml;
 
-namespace ArchiToolkit.Grasshopper.BeforeBuild;
+namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
+[SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers")]
 internal static class ResxManager
 {
     public static void Generate(string filePath, Dictionary<string, string> data)
@@ -11,8 +12,6 @@ internal static class ResxManager
         {
             File.SetAttributes(filePath, File.GetAttributes(filePath) & ~FileAttributes.ReadOnly);
         }
-
-        File.SetAttributes(filePath, FileAttributes.ReadOnly);
 
         using var writer = XmlWriter.Create(filePath, new XmlWriterSettings
         {

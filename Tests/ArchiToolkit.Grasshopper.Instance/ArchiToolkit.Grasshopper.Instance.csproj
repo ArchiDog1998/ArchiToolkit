@@ -22,8 +22,4 @@
     <ItemGroup>
         <EmbeddedResource Include="Icons/*.png"/>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="l10n\" />
-    </ItemGroup>
 </Project>

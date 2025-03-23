@@ -27,6 +27,7 @@ public enum ParamAccess : byte
 }
 
 public class MethodParamItem(
+    MethodGenerator generator,
     string name,
     TypeName type,
     ParamType paramType,
@@ -58,7 +59,8 @@ public class MethodParamItem(
         _ => Name,
     };
 
-    public MethodParamItem(ParameterName name, TypeName owner) : this(name.Name, name.Type,
+    public MethodParamItem(MethodGenerator generator,ParameterName name, TypeName owner)
+        : this(generator, name.Name, name.Type,
         GetParamType(name, out var io), owner,
         name.Symbol.GetAttributes(), io)
     {
@@ -241,9 +243,9 @@ public class MethodParamItem(
                 [
                     Argument(CastExpression(IdentifierName("global::Grasshopper.Kernel.IGH_Param"),
                         IdentifierName(Identifier("param")))),
-                    Argument(BasicGenerator.GetArgumentKeyedString("." + Name + ".Name")),
-                    Argument(BasicGenerator.GetArgumentKeyedString("." + Name + ".Nickname")),
-                    Argument(BasicGenerator.GetArgumentKeyedString("." + Name + ".Description")),
+                    Argument(generator.GetArgumentKeyedString("." + Name + ".Name")),
+                    Argument(generator.GetArgumentKeyedString("." + Name + ".Nickname")),
+                    Argument(generator.GetArgumentKeyedString("." + Name + ".Description")),
                     Argument(
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using ArchiToolkit.RoslynHelper.Extensions;
 using ArchiToolkit.RoslynHelper.Names;
@@ -9,6 +10,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
+[SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers")]
 public class DocumentObjectGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -44,6 +46,8 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         var typeAndClasses = new Dictionary<string, string>();
 
+        BasicGenerator.Translations.Clear();
+        BasicGenerator.Icons.Clear();
         BasicGenerator.BaseCategory = baseCategory;
         BasicGenerator.BaseSubcategory = baseSubcategory;
         TypeGenerator.BaseGoo = arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.Types.GH_Goo`1")!;
@@ -84,6 +88,97 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         {
             method.GenerateSource(context);
         }
+
+        if (GetCsprojDirectory(assembly) is { } dir)
+        {
+            GenerateTranslations(dir.FullName);
+            GenerateIcons(dir.FullName);
+        }
+    }
+
+    private static void GenerateTranslations(string directory)
+    {
+        directory = Path.Combine(directory, "l10n");
+        if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+        try
+        {
+            ResxManager.Generate(Path.Combine(directory, "ArchiToolkit.Resources.resx"), BasicGenerator.Translations);
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    private static void GenerateIcons(string directory)
+    {
+        directory = Path.Combine(directory, "Icons");
+        if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+        foreach (var file in Directory.EnumerateFiles(directory, "*.png"))
+        {
+            try
+            {
+                var fileInfo = new FileInfo(file);
+                if (fileInfo.Length != 120) continue;
+                fileInfo.Delete();
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+
+        var assembly = typeof(DocumentObjectGenerator).Assembly;
+        foreach (var icon in BasicGenerator.Icons)
+        {
+            var iconType = icon[0];
+            var fileName = Path.Combine(directory, string.Concat(icon.Substring(1), ".png"));
+            if (File.Exists(fileName)) continue;
+            try
+            {
+                using var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+                switch (iconType)
+                {
+                    case 'P':
+                        assembly.GetManifestResourceStream("ArchiToolkit.Grasshopper.SourceGenerator.Icons.Red.png")
+                            ?.CopyTo(fileStream);
+                        break;
+                    case 'C':
+                        assembly.GetManifestResourceStream("ArchiToolkit.Grasshopper.SourceGenerator.Icons.Blue.png")
+                            ?.CopyTo(fileStream);
+                        break;
+                    default:
+                        assembly.GetManifestResourceStream("ArchiToolkit.Grasshopper.SourceGenerator.Icons.White.png")
+                            ?.CopyTo(fileStream);
+                        break;
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+    }
+
+    private static DirectoryInfo? GetCsprojDirectory(IAssemblySymbol assembly)
+    {
+        var fileCs = assembly.Locations
+            .Where(l => l.Kind is LocationKind.SourceFile)
+            .Select(i => i.GetLineSpan().Path)
+            .FirstOrDefault(File.Exists);
+
+        if (string.IsNullOrEmpty(fileCs)) return null;
+
+        var directory = new FileInfo(fileCs).Directory;
+
+        while (directory is not null
+               && !directory.EnumerateFiles("*.csproj").Any())
+        {
+            directory = directory.Parent;
+        }
+
+        return directory;
     }
 
     public static ITypeSymbol? GetBaseComponent(IEnumerable<AttributeData> attributes)
