@@ -86,6 +86,7 @@ For changing the Exposure, please add the `ExposureAttribute` on it.
 public class Test
 {
     [Exposure(GH_Exposure.secondary)]
+    [DocObj]
     public static int Add(int x, int y) => x + y;
 }
 ```
@@ -186,6 +187,16 @@ If you wanna your geometry is hidden, just add `HiddenAttribute` on it.
 public class Test
 {
     public static int Add([Hidden]Arc arc, int y) => (int)arc.Radius + y;
+}
+```
+##### Field
+For the case you want the parameter is a field in the component, you can use the attribute `ObjFieldAttribute`.
+You can also change the config about should it `saveToFile`.
+```c#
+public class Test
+{
+    [DocObj]
+    public static int Add([ObjField(true)]int x, int y)=> x + y;
 }
 ```
 ### Parameter

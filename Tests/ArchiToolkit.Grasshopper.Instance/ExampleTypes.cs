@@ -1,8 +1,15 @@
-﻿using Grasshopper.Kernel.Types;
+﻿using ArchiToolkit.Grasshopper;
+using ArchiToolkit.Grasshopper.Instance;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
+[assembly: DocObj<AnotherType>()]
 
 namespace ArchiToolkit.Grasshopper.Instance;
 
+public class AnotherType;
+
+[Exposure(GH_Exposure.quarternary)]
 [BaseGoo<GH_GeometricGoo<MyType>>]
 [DocObj]
 public class MyType

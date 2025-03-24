@@ -34,7 +34,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             Compilation Compilation) arg)
     {
         var assembly = arg.Compilation.Assembly;
-        var types = arg.Items.Types;
+        var types = arg.Items.Types.Concat(GetTypeGenerators(assembly.GetAttributes()));
         var methods = arg.Items.Methods;
 
         var baseComponent = GetBaseComponent(assembly.GetAttributes())
@@ -177,6 +177,20 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             where type.ConstructUnboundGenericType().GetName().FullName is
                 "global::ArchiToolkit.Grasshopper.BaseComponentAttribute<>"
             select type.TypeArguments[0]).FirstOrDefault();
+    }
+
+    private static IEnumerable<TypeGenerator> GetTypeGenerators(IEnumerable<AttributeData> attributes)
+    {
+        return attributes
+            .Where(attribute => attribute.AttributeClass is { IsGenericType: true } type
+                                && type.ConstructUnboundGenericType().GetName().FullName is
+                                    "global::ArchiToolkit.Grasshopper.DocObjAttribute<>")
+
+            .Select(attr => new TypeGenerator(attr.AttributeClass!.TypeArguments[0])
+            {
+                KeyName = attr.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? string.Empty,
+                Exposure = "-1",
+            });
     }
 
     public static string? GetBaseAttribute(IEnumerable<AttributeData> attributes)

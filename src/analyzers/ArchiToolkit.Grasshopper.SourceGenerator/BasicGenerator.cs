@@ -16,9 +16,9 @@ public abstract class BasicGenerator
     protected BasicGenerator(ISymbol symbol)
     {
         Symbol = symbol;
-        var docObj = symbol.GetAttributes().First(a =>
+        var docObj = symbol.GetAttributes().FirstOrDefault(a =>
             a.AttributeClass?.GetName().FullName == "global::ArchiToolkit.Grasshopper.DocObjAttribute");
-        var keyName = docObj.ConstructorArguments.Length > 0 ? docObj.ConstructorArguments[0].Value?.ToString() : null;
+        var keyName = docObj?.ConstructorArguments.Length > 0 ? docObj.ConstructorArguments[0].Value?.ToString() : null;
         KeyName = keyName ?? string.Empty;
 
         if (symbol.GetAttributes().Any(a =>
@@ -55,7 +55,11 @@ public abstract class BasicGenerator
 
     protected abstract char IconType { get; }
 
-    public string KeyName => string.IsNullOrEmpty(field) ? NameSpace + "." + ToRealNameNoTags(ClassName) : field;
+    public string KeyName
+    {
+        get => string.IsNullOrEmpty(field) ? NameSpace + "." + ToRealNameNoTags(ClassName) : field;
+        set;
+    }
 
     public static string BaseCategory { get; set; } = null!;
     public static string BaseSubcategory { get; set; } = null!;
@@ -63,7 +67,7 @@ public abstract class BasicGenerator
     public string? Category { get; set; }
     public string? Subcategory { get; set; }
 
-    public string? Exposure { get; }
+    public string? Exposure { get; set; }
     public bool IsObsolete { get; }
 
     public Guid Id => StringToGuid(IdName);
