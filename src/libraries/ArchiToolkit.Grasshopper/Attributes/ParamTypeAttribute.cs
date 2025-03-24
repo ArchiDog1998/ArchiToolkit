@@ -1,6 +1,7 @@
 ﻿// ReSharper disable RedundantUsingDirective
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Grasshopper.Kernel;
 // ReSharper disable UnusedTypeParameter
 #pragma warning disable CS9113 // Parameter is unread.
@@ -13,7 +14,7 @@ namespace ArchiToolkit.Grasshopper;
 /// <param name="id"></param>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 [Conditional(Constant.KeepAttributes)]
-public class ParamTypeAttribute(string id): Attribute;
+public class ParamTypeAttribute([StringSyntax(StringSyntaxAttribute.GuidFormat)]string id): Attribute;
 
 /// <summary>
 /// You can specify the param here.

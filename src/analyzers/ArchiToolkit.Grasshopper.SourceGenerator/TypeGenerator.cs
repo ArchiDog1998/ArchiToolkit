@@ -38,14 +38,14 @@ public class TypeGenerator : BasicGenerator
             ]));
         var basicGoo = (INamedTypeSymbol)(DocumentObjectGenerator.GetTypeAttribute(Name.Symbol.GetAttributes(),
                                               "global::ArchiToolkit.Grasshopper.BaseGooAttribute<>")?.Symbol
-                                          ?? BaseGoo);
+                                          ?? ((INamedTypeSymbol)BaseGoo).Construct(Name.Symbol));
 
         var gooClass = ClassDeclaration("Goo").WithModifiers(
                 TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.SealedKeyword),
                     Token(SyntaxKind.PartialKeyword)))
             .WithBaseList(BaseList([
                 SimpleBaseType(
-                    IdentifierName(basicGoo.Construct(Name.Symbol).GetName().FullName))
+                    IdentifierName(basicGoo.GetName().FullName))
             ]))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())

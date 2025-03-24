@@ -2,3 +2,233 @@
 
 This is designed for simplify your way of developing plugins in Grasshopper. 
 It is more clean and efficient compared to [SimpleGrasshopper](https://github.com/ArchiDog1998/SimpleGrasshopper).
+So almost all features are similar to SimpleGrasshopper.
+
+This tool is using [Roslyn](https://github.com/dotnet/roslyn) to help you coding when you are coding.
+
+## Quick Start
+Install the ArchiToolkit.Grasshopper and then make sure that your LangVersion is `latest`. At the moment, my Visual 
+Studio is at the version `17.13.4`.
+
+```html
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ArchiToolkit.Grasshopper" Version="0.9.10" />
+  </ItemGroup>
+```
+
+## How to use
+### Component
+All the components are methods. to simplify creating these things, a `static` method is a component! 
+To let it know which method should be the component, please tag it with `DocObjAttribute`.
+```c#
+public class Test
+{
+    [DocObj]
+    public static int Add(int x, int y) => x + y;
+}
+```
+
+Now, you'll see a component in GH!
+
+![image-20250324110314135](assets/image-20250324110314135.png)
+
+The parameters can be in, out, or ref
+
+Please notice that, the Source generator will automatically generate the `ArchiToolkit.Resources.resx` file and the 
+icons.png located in `Icons` Folder. Here are the structure.
+
+- Icons
+  - MyGrasshopperAssembly1.Component_Add.png
+  - XXX.png
+  - ...
+- l10n
+  - ArchiToolkit.Resources.resx
+
+In `ArchiToolkit.Resources.resx`, you can't modify it! but you can add your own languages to it, so it is how we do 
+with l10n.
+
+You can't modify the pngs when your IDE is open, so please turn your IDE off when you want to modify the png.
+And the png is the icons in the grasshopper.
+
+#### General Infos
+This is the general infos that almost all items can be used with.
+##### Category and Subcategory
+You can add the attribute `CategoryAttirbute` and `SubcategoryAttribute` to control them.
+Only the `closest` attribute to the `DocObj` will affect.
+```c#
+[Category("MyCategory")]
+public class Test
+{
+    [Subcategory("SubCate")]
+    [DocObj]
+    public static int Add(int x, int y) => x + y;
+}
+```
+##### Default Name/NickName/Description
+For adding the name or nickname or description on the Document object, you can add the attribute `ObjNamesAttribute`.
+```c#
+public class Test
+{
+    [ObjNames("Addition", "Add", "Normal adding")]
+    [DocObj]
+    [return: ObjNames("Result", "r", "Description of the result.")]
+    public static int Add(
+        [ObjNames("X", "x", "Description of x")]int 
+        x, int y) => x + y;
+}
+```
+##### Exposure
+For changing the Exposure, please add the `ExposureAttribute` on it.
+```c#
+public class Test
+{
+    [Exposure(GH_Exposure.secondary)]
+    public static int Add(int x, int y) => x + y;
+}
+```
+##### Obsolete
+Of course, ObsoleteAttribute can be used on.
+```c#
+public class Test
+{
+    [Obsolete]
+    [DocObj]
+    public static int Add(int x, int y) => x + y;
+}
+```
+##### Attributes
+You can add your custom attributes on your object by using `ObjAttrAttribute<>`.
+```c#
+file class MyAttribute(IGH_Component component) 
+    : GH_ComponentAttributes(component);
+
+public class Test
+{
+    [ObjAttr<MyAttribute>]
+    [DocObj]
+    public static int Add(int x, int y) => x + y;
+}
+```
+#### Component Infos
+For some cases, you may want to add more information for this component.
+##### Component
+If you want to add your own base component, do it with `BaseComponentAttribute<>`.
+```c#
+file abstract class MyComponent(string name, string nickname, string description, string category, string subCategory) 
+    : GH_Component(name, nickname, description, category, subCategory)
+{
+}
+
+public class Test
+{
+    [BaseComponent<MyComponent>]
+    [DocObj]
+    public static int Add(int x, int y) => x + y;
+}
+```
+#### Parameter Infos
+This is for the parameters info, so you can add your own things.
+##### Get Component or Data Access
+You can get the IGH_DataAccess or IGH_Component just by adding it into your parameters
+```c#
+public class Test
+{
+    [DocObj]
+    public static int Add(IGH_DataAccess access, IGH_Component component, int x, int y) => x + y;
+}
+```
+##### Parameter Type
+You can specify the parameter type by using the attribute `ParamTypeAttribute`.
+You can specify the type or the guid. But it is better to do it with type by the generic one.
+```c#
+public class Test
+{
+    [DocObj]
+    public static int Add([ParamType<Param_Integer>]int x, [ParamType("{2E3AB970-8545-46bb-836C-1C11E5610BCE}")]int y) => x + y;
+}
+```
+
+##### Persistent Data
+For the persistent data, you need to add the attribute `PersistentDataAttribute` on the parameter.
+
+```c#
+public class Others
+{
+    internal static int yDefault = 1;
+}
+
+public class Test
+{
+    internal static int xDefault = 0;
+    [DocObj]
+    public static int Add(
+        [PersistentData(nameof(xDefault))]int x,
+        [PersistentData<Others>(nameof(Others.yDefault))] int y)
+        => x + y;
+}
+```
+##### Optional
+Optional the data by the attribute `OptionalAttribute`.
+```c#
+public class Test
+{
+    [DocObj]
+    public static int Add(int x, [Optional]int y) => x + y;
+}
+```
+
+##### Hidden
+If you wanna your geometry is hidden, just add `HiddenAttribute` on it.
+```c#
+public class Test
+{
+    public static int Add([Hidden]Arc arc, int y) => (int)arc.Radius + y;
+}
+```
+### Parameter
+You can also add `DocObjAttribute` on the type to create a new parameter.
+```c#
+[DocObj]
+public class MyType;
+```
+#### Base Goo
+You can specify the Goo type by using `BaseGooAttribute`.
+Just notice that don't forget to using `partial` key word to implement your type. 
+```c#
+[BaseGoo<GH_GeometricGoo<MyType>>]
+[DocObj]
+public class MyType;
+
+partial class Param_MyType
+{
+    partial class Goo
+    {
+        public override IGH_GeometricGoo DuplicateGeometry()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override BoundingBox GetBoundingBox(Transform xform)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IGH_GeometricGoo Transform(Transform xform)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IGH_GeometricGoo Morph(SpaceMorph xmorph)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override BoundingBox Boundingbox => default;
+    }
+}
+```
+#### More features
+Waiting for more features.
