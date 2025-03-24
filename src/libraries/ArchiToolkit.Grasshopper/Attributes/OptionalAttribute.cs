@@ -9,4 +9,4 @@ namespace ArchiToolkit.Grasshopper;
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional(Constant.KeepAttributes)]
-internal class OptionalAttribute : Attribute;
+public class OptionalAttribute : Attribute;

@@ -13,7 +13,7 @@ namespace ArchiToolkit.Grasshopper;
 /// <param name="id"></param>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 [Conditional(Constant.KeepAttributes)]
-internal class ParamTypeAttribute(string id): Attribute;
+public class ParamTypeAttribute(string id): Attribute;
 
 /// <summary>
 /// You can specify the param here.
@@ -21,4 +21,4 @@ internal class ParamTypeAttribute(string id): Attribute;
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 [Conditional(Constant.KeepAttributes)]
-internal class ParamTypeAttribute<T>: Attribute where T: IGH_Param;
+public class ParamTypeAttribute<T>: Attribute where T: IGH_Param;

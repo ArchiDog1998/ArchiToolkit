@@ -11,4 +11,4 @@ namespace ArchiToolkit.Grasshopper;
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 [Conditional(Constant.KeepAttributes)]
-internal class BaseGooAttribute<T> : Attribute where T : IGH_Goo;
+public class BaseGooAttribute<T> : Attribute where T : IGH_Goo;

@@ -9,4 +9,4 @@ namespace ArchiToolkit.Grasshopper;
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 [Conditional(Constant.KeepAttributes)]
-internal class HiddenAttribute : Attribute;
+public class HiddenAttribute : Attribute;

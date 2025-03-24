@@ -12,4 +12,4 @@ namespace ArchiToolkit.Grasshopper;
 /// <param name="exposure"></param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method)]
 [Conditional(Constant.KeepAttributes)]
-internal class ExposureAttribute(GH_Exposure exposure) : Attribute;
+public class ExposureAttribute(GH_Exposure exposure) : Attribute;

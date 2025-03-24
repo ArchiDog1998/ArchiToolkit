@@ -12,4 +12,4 @@ namespace ArchiToolkit.Grasshopper;
 /// <param name="recognizeName">for localization</param>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Struct)]
 [Conditional(Constant.KeepAttributes)]
-internal class DocObjAttribute(string recognizeName = "") : Attribute;
+public class DocObjAttribute(string recognizeName = "") : Attribute;

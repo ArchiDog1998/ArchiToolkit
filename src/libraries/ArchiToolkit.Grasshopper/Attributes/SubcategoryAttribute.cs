@@ -12,4 +12,4 @@ namespace ArchiToolkit.Grasshopper;
 /// <param name="recognizeName">for localization</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Assembly)]
 [Conditional(Constant.KeepAttributes)]
-internal class SubcategoryAttribute(string recognizeName) : Attribute;
+public class SubcategoryAttribute(string recognizeName) : Attribute;

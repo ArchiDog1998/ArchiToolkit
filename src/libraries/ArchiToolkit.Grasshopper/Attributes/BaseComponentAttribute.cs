@@ -11,5 +11,5 @@ namespace ArchiToolkit.Grasshopper;
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Assembly)]
 [Conditional(Constant.KeepAttributes)]
-internal class BaseComponentAttribute<T> : Attribute
+public class BaseComponentAttribute<T> : Attribute
     where T : IGH_Component;

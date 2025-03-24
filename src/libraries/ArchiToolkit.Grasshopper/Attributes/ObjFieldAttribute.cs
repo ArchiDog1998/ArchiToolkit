@@ -12,4 +12,4 @@ namespace ArchiToolkit.Grasshopper;
 /// <param name="saveToFile">if it should be saved into the file</param>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional(Constant.KeepAttributes)]
-internal class ObjFieldAttribute(bool saveToFile = false) : Attribute;
+public class ObjFieldAttribute(bool saveToFile = false) : Attribute;

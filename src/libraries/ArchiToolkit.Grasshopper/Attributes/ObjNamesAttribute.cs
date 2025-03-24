@@ -14,4 +14,4 @@ namespace ArchiToolkit.Grasshopper;
 /// <param name="description"></param>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 [Conditional(Constant.KeepAttributes)]
-internal class ObjNamesAttribute(string name, string nickName, string description) : Attribute;
+public class ObjNamesAttribute(string name, string nickName, string description) : Attribute;

@@ -12,7 +12,7 @@ namespace ArchiToolkit.Grasshopper;
 /// <param name="propertyName"></param>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional(Constant.KeepAttributes)]
-internal class PersistentDataAttribute(string propertyName) : Attribute;
+public class PersistentDataAttribute(string propertyName) : Attribute;
 
 /// <summary>
 /// <inheritdoc cref="PersistentDataAttribute"/>
@@ -21,4 +21,4 @@ internal class PersistentDataAttribute(string propertyName) : Attribute;
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional(Constant.KeepAttributes)]
-internal class PersistentDataAttribute<T>(string propertyName) : Attribute;
+public class PersistentDataAttribute<T>(string propertyName) : Attribute;
