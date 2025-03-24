@@ -176,18 +176,15 @@ public class MethodGenerator : BasicGenerator
             .Select(i => i.Name)
             .ToArray();
 
-        string name = Symbol.Name, nickname = Symbol.Name, description = Symbol.Name;
-        DocumentObjectGenerator.GetObjNames(Name.Symbol.GetAttributes(), ref name, ref nickname, ref description);
-
         classSyntax = classSyntax.WithParameterList(ParameterList())
             .WithBaseList(BaseList(
             [
                 PrimaryConstructorBaseType(IdentifierName(baseComponent.GetName().FullName))
                     .WithArgumentList(ArgumentList(
                     [
-                        Argument(GetArgumentKeyedString(".Component.Name", name)),
-                        Argument(GetArgumentKeyedString(".Component.Nickname", nickname)),
-                        Argument(GetArgumentKeyedString(".Component.Description", description)),
+                        Argument(GetArgumentKeyedString(".Component.Name", ObjName)),
+                        Argument(GetArgumentKeyedString(".Component.Nickname", ObjNickname)),
+                        Argument(GetArgumentKeyedString(".Component.Description", ObjDescription)),
                         Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory), (Category ?? BaseCategory))),
                         Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory), (Subcategory ?? BaseSubcategory)))
                     ]))

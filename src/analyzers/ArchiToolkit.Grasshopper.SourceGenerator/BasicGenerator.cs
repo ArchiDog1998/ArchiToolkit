@@ -13,9 +13,12 @@ public abstract class BasicGenerator
 {
     public readonly ISymbol Symbol;
 
+    public string ObjName, ObjNickname, ObjDescription;
     protected BasicGenerator(ISymbol symbol)
     {
         Symbol = symbol;
+        ObjName = ObjNickname = ObjDescription = Symbol.Name;
+        DocumentObjectGenerator.GetObjNames(Symbol.GetAttributes(), ref ObjName, ref ObjNickname, ref ObjDescription);
         var docObj = symbol.GetAttributes().FirstOrDefault(a =>
             a.AttributeClass?.GetName().FullName == "global::ArchiToolkit.Grasshopper.DocObjAttribute");
         var keyName = docObj?.ConstructorArguments.Length > 0 ? docObj.ConstructorArguments[0].Value?.ToString() : null;

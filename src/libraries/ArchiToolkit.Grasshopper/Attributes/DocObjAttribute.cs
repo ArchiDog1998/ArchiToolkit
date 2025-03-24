@@ -21,4 +21,10 @@ public class DocObjAttribute(string recognizeName = "") : Attribute;
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Assembly)]
 [Conditional(Constant.KeepAttributes)]
-public class DocObjAttribute<T>(string recognizeName = "") : Attribute;
+public class DocObjAttribute<T>(
+    string recognizeName = "",
+    string name = "",
+    string nickName = "",
+    string description = "",
+    string typeName = "",
+    string typeDescription = "") : Attribute;

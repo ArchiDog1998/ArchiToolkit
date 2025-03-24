@@ -189,6 +189,16 @@ public class Test
     public static int Add([Hidden]Arc arc, int y) => (int)arc.Radius + y;
 }
 ```
+##### Data Access
+for the Data access, List<> means list access, GH_Structure<> means tree access.
+Io is a special type which can get the Index, HasGot and the Value.
+```c#
+public class Test
+{
+    [DocObj]
+    public static int Add(Io<List<int>> x, int y) => x.Index + y;
+}
+```
 ##### Field
 For the case you want the parameter is a field in the component, you can use the attribute `ObjFieldAttribute`.
 You can also change the config about should it `saveToFile`.

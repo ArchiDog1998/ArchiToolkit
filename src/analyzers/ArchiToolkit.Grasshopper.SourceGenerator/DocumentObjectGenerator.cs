@@ -186,11 +186,27 @@ public class DocumentObjectGenerator : IIncrementalGenerator
                                 && type.ConstructUnboundGenericType().GetName().FullName is
                                     "global::ArchiToolkit.Grasshopper.DocObjAttribute<>")
 
-            .Select(attr => new TypeGenerator(attr.AttributeClass!.TypeArguments[0])
+            .Select(attr =>
             {
-                KeyName = attr.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? string.Empty,
-                Exposure = "-1",
+                var result = new TypeGenerator(attr.AttributeClass!.TypeArguments[0])
+                {
+                    Exposure = "-1",
+                };
+                ApplyString(attr, 0, s => result.KeyName = s);
+                ApplyString(attr, 1, s => result.ObjName = s);
+                ApplyString(attr, 2, s => result.ObjNickname = s);
+                ApplyString(attr, 3, s => result.ObjDescription = s);
+                ApplyString(attr, 4, s => result.ObjTypeName = s);
+                ApplyString(attr, 5, s => result.ObjTypeDescription = s);
+                return result;
             });
+    }
+
+    private static void ApplyString(AttributeData attr, int index, Action<string> append)
+    {
+        var str = attr.ConstructorArguments.ElementAtOrDefault(index).Value?.ToString() ?? string.Empty;
+        if (string.IsNullOrEmpty(str)) return;
+        append(str);
     }
 
     public static string? GetBaseAttribute(IEnumerable<AttributeData> attributes)

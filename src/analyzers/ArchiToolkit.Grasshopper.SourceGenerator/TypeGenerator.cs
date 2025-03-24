@@ -10,6 +10,7 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
 public class TypeGenerator : BasicGenerator
 {
+    public string ObjTypeName, ObjTypeDescription;
     public readonly TypeName Name;
 
     public TypeGenerator(ISymbol symbol) : base(symbol)
@@ -17,6 +18,21 @@ public class TypeGenerator : BasicGenerator
         if (symbol is not ITypeSymbol typeSymbol)
             throw new ArgumentException("Symbol is not a type symbol");
         Name = typeSymbol.GetName();
+        ObjTypeName = ObjTypeDescription = Name.Name;
+        GetObjNames(Symbol.GetAttributes(), ref ObjTypeName, ref ObjTypeDescription);
+    }
+
+    private static void GetObjNames(IEnumerable<AttributeData> attributes, ref string name, ref string description)
+    {
+        if (attributes
+                .FirstOrDefault(a => a.AttributeClass?.GetName().FullName
+                    is "global::ArchiToolkit.Grasshopper.TypeDescAttribute") is not
+            { ConstructorArguments.Length: 2 } attr) return;
+
+        var relay = attr.ConstructorArguments[0].Value?.ToString();
+        if (!string.IsNullOrEmpty(relay)) name = relay!;
+        relay = attr.ConstructorArguments[1].Value?.ToString();
+        if (!string.IsNullOrEmpty(relay)) description = relay!;
     }
 
     protected override string IdName => Name.FullName;
@@ -116,7 +132,7 @@ public class TypeGenerator : BasicGenerator
 
                 PropertyDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("TypeName"))
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-                    .WithExpressionBody(ArrowExpressionClause(GetArgumentKeyedString(".TypeName", Name.Name)))
+                    .WithExpressionBody(ArrowExpressionClause(GetArgumentKeyedString(".TypeName", ObjTypeName)))
                     .WithAttributeLists([
                         GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
                     ])
@@ -124,7 +140,7 @@ public class TypeGenerator : BasicGenerator
 
                 PropertyDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("TypeDescription"))
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-                    .WithExpressionBody(ArrowExpressionClause(GetArgumentKeyedString(".TypeDescription", Name.Name)))
+                    .WithExpressionBody(ArrowExpressionClause(GetArgumentKeyedString(".TypeDescription", ObjTypeDescription)))
                     .WithAttributeLists([
                         GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
                     ])
@@ -187,17 +203,14 @@ public class TypeGenerator : BasicGenerator
                             ]))))))
             ]);
 
-        string name = Symbol.Name, nickname = Symbol.Name, description = Symbol.Name;
-        DocumentObjectGenerator.GetObjNames(Name.Symbol.GetAttributes(), ref name, ref nickname, ref description);
-
         classSyntax = classSyntax.AddMembers(gooClass,
             ConstructorDeclaration(Identifier(RealClassName)).WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
                 .WithInitializer(ConstructorInitializer(SyntaxKind.ThisConstructorInitializer,
                     ArgumentList(
                     [
-                        Argument(GetArgumentKeyedString(".Name", name)),
-                        Argument(GetArgumentKeyedString(".Nickname", nickname)),
-                        Argument(GetArgumentKeyedString(".Description", description)),
+                        Argument(GetArgumentKeyedString(".Name", ObjName)),
+                        Argument(GetArgumentKeyedString(".Nickname", ObjNickname)),
+                        Argument(GetArgumentKeyedString(".Description", ObjDescription)),
                         Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory),
                             Category ?? BaseCategory)),
                         Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? "Parameter"),
