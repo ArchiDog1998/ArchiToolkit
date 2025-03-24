@@ -47,6 +47,8 @@ public class MethodGenerator : BasicGenerator
             builder.Append(sig.TypeArgumentsCount);
             builder.Append('(');
             builder.Append(string.Join(", ", sig.ParameterTypes.Select(type => type.GetName().FullName)));
+            builder.Append(")(");
+            builder.Append(string.Join(", ", sig.RefKinds.Select(type => type.ToString())));
             builder.Append(')');
             return builder.ToString();
         }
