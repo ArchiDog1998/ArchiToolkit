@@ -3,12 +3,13 @@ using ArchiToolkit.Grasshopper.Instance;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
-[assembly: DocObj<AnotherType>()]
+[assembly: DocObj<AnotherType>(name: "What a type")]
 
 namespace ArchiToolkit.Grasshopper.Instance;
 
 public class AnotherType;
 
+[TypeDesc("A Type", "An interesting Type")]
 [Exposure(GH_Exposure.quarternary)]
 [BaseGoo<GH_GeometricGoo<MyType>>]
 [DocObj]

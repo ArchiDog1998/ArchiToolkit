@@ -176,7 +176,7 @@ public abstract class BasicGenerator
         var item = NamespaceDeclaration(NameSpace)
             .WithMembers([ModifyClass(classSyntax)]);
 
-        context.AddSource(RealClassName + ".g.cs", item.NodeToString());
+        context.AddSource(NameSpace + "." + RealClassName + ".g.cs", item.NodeToString());
         Icons.Add(IconType + KeyName);
     }
 
