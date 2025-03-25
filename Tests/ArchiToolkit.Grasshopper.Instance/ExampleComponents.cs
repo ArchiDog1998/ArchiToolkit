@@ -1,4 +1,5 @@
-﻿using Grasshopper.Kernel;
+﻿using System.Runtime.InteropServices;
+using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Types;
@@ -11,10 +12,10 @@ public enum Ex
     A, B, C, D, E
 }
 
-
 [Category("Cate")]
 public static class ExampleComponents
 {
+    [ObjGuid("692328E7-D68C-4248-B5E0-8879DFEA97B4")]
     [Subcategory("SubTest")]
     [Exposure(GH_Exposure.quarternary)]
     [ObjNames("Name", "Nickname", "Description")]

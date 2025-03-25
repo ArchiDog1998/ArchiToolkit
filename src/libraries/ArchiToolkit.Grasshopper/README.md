@@ -113,6 +113,16 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+##### Guid
+You can set the custom ComponentGuid by using the attribute `ObjGuidAttribute`.
+```c#
+public class Test
+{
+    [ObjGuid("71156816-F2C5-46B0-B6D9-E71F28CDF7A4")]
+    [DocObj]
+    public static int Add(int x, int y) => x + y;
+}
+```
 #### Component Infos
 For some cases, you may want to add more information for this component.
 ##### Component

@@ -24,6 +24,21 @@ public abstract class BasicGenerator
         var keyName = docObj?.ConstructorArguments.Length > 0 ? docObj.ConstructorArguments[0].Value?.ToString() : null;
         KeyName = keyName ?? string.Empty;
 
+        if (Symbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.GetName().FullName
+                    is "global::ArchiToolkit.Grasshopper.ObjGuidAttribute") is
+            { ConstructorArguments.Length: 1 } attr
+            && attr.ConstructorArguments[0].Value?.ToString() is { } guid)
+        {
+            try
+            {
+                _guid = new Guid(guid);
+            }
+            catch
+            {
+                _guid = null;
+            }
+        }
+
         if (symbol.GetAttributes().Any(a =>
                 a.AttributeClass?.GetName().FullName == "global::System.ObsoleteAttribute"))
         {
@@ -73,7 +88,8 @@ public abstract class BasicGenerator
     public string? Exposure { get; set; }
     public bool IsObsolete { get; }
 
-    public Guid Id => StringToGuid(IdName);
+    private readonly Guid? _guid;
+    public Guid Id => _guid ?? StringToGuid(IdName);
 
     internal static List<string> Icons { get; } = [];
     internal static Dictionary<string, string> Translations { get; } = [];
