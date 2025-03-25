@@ -22,20 +22,22 @@ public static class ExampleComponents
     [DocObj("Your Name")]
     [return: ObjNames("Result", "r", "Some interesting result")]
     public static List<int> TestClass(
-        IGH_Component component,
+        GH_Component component,
         IGH_DataAccess da,
         [Optional][ObjNames("OK", "B", "C" )]Ex e,
         [Optional][Hidden,ObjNames("Input", "I", "An input")]ref Arc i,
         [Optional][ObjField(true)]ref int myData,
         [Optional]List<int> test,
-        [Optional,ParamType<Param_Integer>]ref Io<GH_Structure<GH_Integer>> tree,
+        [ParamTag(ParamTagType.Principal | ParamTagType.Flatten), Optional,ParamType<Param_Integer>]ref Io<GH_Structure<GH_Integer>> tree,
         out GH_Structure<GH_Number> numbers)
     {
         numbers = new GH_Structure<GH_Number>();
         numbers.Append(new GH_Number(1));
 
         return [];
-
-        //var a = ArchiToolkit_Resources.example;
     }
+}
+
+partial class Component_TestClass
+{
 }

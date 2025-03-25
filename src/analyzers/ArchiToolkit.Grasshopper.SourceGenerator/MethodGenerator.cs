@@ -74,7 +74,7 @@ public class MethodGenerator : BasicGenerator
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
             ])
-            .WithBody(Block(_parameters.Where(p => p.Type.HasFlag(ParamType.In)).Select(p => p.IoBlock(true))));
+            .WithBody(Block(_parameters.Where(p => p.Type.HasFlag(ParamType.In)).Select((p, i)  => p.IoBlock(true, i))));
 
         var outputMethod = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)),
                 Identifier("RegisterOutputParams"))
@@ -86,7 +86,7 @@ public class MethodGenerator : BasicGenerator
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
             ])
-            .WithBody(Block(_parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select(p => p.IoBlock(false))));
+            .WithBody(Block(_parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.IoBlock(false, i))));
 
         var invocation = InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                 IdentifierName(Name.ContainingType.FullName), IdentifierName(Name.Name)))

@@ -218,6 +218,15 @@ public class Test
     public static int Add(Io<List<int>> x, int y) => x.Index + y;
 }
 ```
+##### Tags
+For the case that you want to add the parameter with tags, you can add the attribute `ParamTagAttribute`.
+```c#
+public class Test
+{
+    [DocObj]
+    public static int Add([ParamTag(ParamTagType.Principal | ParamTagType.Flatten)]int x, int y)=> x + y;
+}
+```
 ##### Field
 For the case you want the parameter is a field in the component, you can use the attribute `ObjFieldAttribute`.
 You can also change the config about should it `saveToFile`.

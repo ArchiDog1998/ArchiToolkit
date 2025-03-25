@@ -91,13 +91,14 @@ public class MethodParamItem(
     {
         var convertType = GetTypeWithoutIo(TypeName.Symbol).GetName().FullName;
         return ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                IdentifierName("global::ArchiToolkit.Grasshopper.ActiveObjectHelper"), IdentifierName("SetData" + Access)))
+                IdentifierName("global::ArchiToolkit.Grasshopper.ActiveObjectHelper"),
+                IdentifierName("SetData" + Access)))
             .WithArgumentList(
                 ArgumentList(
                 [
                     Argument(IdentifierName("DA")),
                     Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(index))),
-                    Argument( CastExpression(IdentifierName(convertType),IdentifierName(ParameterName)))
+                    Argument(CastExpression(IdentifierName(convertType), IdentifierName(ParameterName)))
                 ])));
     }
 
@@ -133,7 +134,7 @@ public class MethodParamItem(
             ])));
     }
 
-    public BlockSyntax IoBlock(bool isIn)
+    public BlockSyntax IoBlock(bool isIn, int index)
     {
         return Block(BlockItems());
 
@@ -145,6 +146,55 @@ public class MethodParamItem(
                 yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
                     MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
                         IdentifierName("Hidden")), LiteralExpression(SyntaxKind.TrueLiteralExpression)));
+
+            if (Attributes.FirstOrDefault(a => a.AttributeClass?.GetName().FullName
+                        is "global::ArchiToolkit.Grasshopper.ParamTagAttribute")
+                    is { ConstructorArguments.Length: > 0 } tagAttr
+                && tagAttr.ConstructorArguments[0].Value is byte b)
+            {
+                if (HasFlag(1 << 0) && isIn) // Principal
+                {
+                    yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                        IdentifierName("PrincipalParameterIndex"), LiteralExpression(
+                            SyntaxKind.NumericLiteralExpression,
+                            Literal(index))));
+                }
+
+                if (HasFlag(1 << 1)) // Reverse
+                {
+                    yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                        MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
+                            IdentifierName("Reverse")), LiteralExpression(SyntaxKind.TrueLiteralExpression)));
+                }
+
+                if (HasFlag(1 << 2)) // Flatten
+                {
+                    yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                        MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("param"), IdentifierName("DataMapping")),
+                        MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("global::Grasshopper.Kernel.GH_DataMapping"), IdentifierName("Flatten"))));
+                }
+
+                if (HasFlag(1 << 3)) // Graft
+                {
+                    yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                        MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("param"), IdentifierName("DataMapping")),
+                        MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("global::Grasshopper.Kernel.GH_DataMapping"), IdentifierName("Graft"))));
+                }
+
+                if (HasFlag(1 << 4)) // Simplify
+                {
+                    yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                        MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
+                            IdentifierName("Simplify")), LiteralExpression(SyntaxKind.TrueLiteralExpression)));
+                }
+
+                bool HasFlag(byte flag) => (b & flag) == flag;
+            }
+
 
             if (isIn && Attributes.Any(a => a.AttributeClass?.GetName().FullName
                     is "global::ArchiToolkit.Grasshopper.OptionalAttribute"))
@@ -172,9 +222,8 @@ public class MethodParamItem(
                      && persistentAttribute2.AttributeClass?.TypeArguments[0].GetName().FullName is { } customClass)
                 yield return PersistentData(customClass, property2);
 
-            if (isIn && GetInnerType(TypeName.Symbol) is { TypeKind: TypeKind.Enum } enumType)
+            if (GetInnerType(TypeName.Symbol) is { TypeKind: TypeKind.Enum } enumType)
             {
-
                 foreach (var fieldSymbol in enumType.GetMembers().OfType<IFieldSymbol>().Where(s => s.IsConst))
                 {
                     yield return ExpressionStatement(InvocationExpression(MemberAccessExpression(
@@ -183,8 +232,10 @@ public class MethodParamItem(
                         .WithArgumentList(
                             ArgumentList(
                             [
-                                Argument(BasicGenerator.GetArgumentRawString(enumType.GetName().FullNameNoGlobal + "." + fieldSymbol.Name, fieldSymbol.Name)),
-                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(Convert.ToInt32(fieldSymbol.ConstantValue))))
+                                Argument(BasicGenerator.GetArgumentRawString(
+                                    enumType.GetName().FullNameNoGlobal + "." + fieldSymbol.Name, fieldSymbol.Name)),
+                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression,
+                                    Literal(Convert.ToInt32(fieldSymbol.ConstantValue))))
                             ])));
                 }
             }
