@@ -1,15 +1,16 @@
-﻿// ReSharper disable RedundantUsingDirective
-using System;
-using System.Diagnostics;
-
+﻿using System.Diagnostics;
+using Grasshopper.Kernel;
 #pragma warning disable CS9113 // Parameter is unread.
 
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// The subcategory of it.
+/// Set the <see cref="GH_InstanceDescription.SubCategory"/> of it.
 /// </summary>
-/// <param name="recognizeName">for localization</param>
+/// <remarks>
+/// <para><b>⚠ NOTICE:</b> If you want to make a default <see cref="GH_InstanceDescription.SubCategory"/>, please use it on the assembly. </para>
+/// </remarks>
+/// <param name="recognizeName">The key for localization, leave it for auto-generation.</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Assembly)]
 [Conditional(Constant.KeepAttributes)]
 public class SubcategoryAttribute(string recognizeName) : Attribute;

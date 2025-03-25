@@ -1,15 +1,16 @@
-﻿// ReSharper disable RedundantUsingDirective
-using System;
-using System.Diagnostics;
-
+﻿using System.Diagnostics;
+using Grasshopper.Kernel;
 #pragma warning disable CS9113 // Parameter is unread.
 
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// The category of it.
+/// Set the <see cref="GH_InstanceDescription.Category"/> of it.
 /// </summary>
-/// <param name="recognizeName"></param>
+/// <remarks>
+/// <para><b>⚠ NOTICE:</b> If you want to make a default <see cref="GH_InstanceDescription.Category"/>, please use it on the assembly. </para>
+/// </remarks>
+/// <param name="recognizeName">The key for localization, leave it for auto-generation.</param>
 [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method)]
 [Conditional(Constant.KeepAttributes)]
 public class CategoryAttribute(string recognizeName) : Attribute;

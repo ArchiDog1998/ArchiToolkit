@@ -251,5 +251,18 @@ partial class Param_MyType
     }
 }
 ```
-#### More features
-Waiting for more features.
+#### Type Name & Description
+To Add your own type name and type description, you can add the attribute `TypeDescAttribute`.
+```c#
+[TypeDesc("Type Name", "Type Description")]
+[DocObj]
+public class MyType;
+```
+#### Global Type
+For the case you want to generate the parameters from other libraries, you can use the attribute `DocObj` on the 
+assembly to do this.
+```c#
+[assembly: DocObj<RemoteType>]
+
+public class RemoteType;
+```
