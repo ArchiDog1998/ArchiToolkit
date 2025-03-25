@@ -89,14 +89,15 @@ public class MethodParamItem(
 
     public ExpressionStatementSyntax SetData(int index)
     {
+        var convertType = GetTypeWithoutIo(TypeName.Symbol).GetName().FullName;
         return ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                IdentifierName("global::ArchiToolkit.Grasshopper.ActiveObjectHelper"), IdentifierName("SetData")))
+                IdentifierName("global::ArchiToolkit.Grasshopper.ActiveObjectHelper"), IdentifierName("SetData" + Access)))
             .WithArgumentList(
                 ArgumentList(
                 [
                     Argument(IdentifierName("DA")),
                     Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(index))),
-                    Argument(IdentifierName(ParameterName))
+                    Argument( CastExpression(IdentifierName(convertType),IdentifierName(ParameterName)))
                 ])));
     }
 
@@ -326,12 +327,18 @@ public class MethodParamItem(
         return paramType;
     }
 
-    private static ParamAccess GetParamAccess(ITypeSymbol typeSymbol)
+    private static ITypeSymbol GetTypeWithoutIo(ITypeSymbol typeSymbol)
     {
         if (typeSymbol is INamedTypeSymbol { IsGenericType: true, TypeArguments.Length: 1 } namedTypeSymbol
             && namedTypeSymbol.ConstructUnboundGenericType().GetName().FullName ==
             "global::ArchiToolkit.Grasshopper.Io<>")
-            typeSymbol = namedTypeSymbol.TypeArguments[0];
+            return namedTypeSymbol.TypeArguments[0];
+        return typeSymbol;
+    }
+
+    private static ParamAccess GetParamAccess(ITypeSymbol typeSymbol)
+    {
+        typeSymbol = GetTypeWithoutIo(typeSymbol);
 
         foreach (var type in typeSymbol.AllInterfaces.Append(typeSymbol))
             switch (type.GetName().FullName)

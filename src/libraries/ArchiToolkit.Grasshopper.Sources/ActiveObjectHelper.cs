@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
@@ -140,7 +141,7 @@ internal static class ActiveObjectHelper
         return new Io<GH_Structure<T>>(hasGot, index, data);
     }
 
-    public static void SetData<T>(IGH_DataAccess da, int index, T data)
+    public static void SetDataItem<T>(IGH_DataAccess da, int index, T data)
     {
         if (typeof(T).IsEnum)
             da.SetData(index, Convert.ToInt32(data));
@@ -148,7 +149,7 @@ internal static class ActiveObjectHelper
             da.SetData(index, data);
     }
 
-    public static void SetData<T>(IGH_DataAccess da, int index, List<T> data)
+    public static void SetDataList<T>(IGH_DataAccess da, int index, List<T> data)
     {
         if (typeof(T).IsEnum)
             da.SetDataList(index, data.Select(i => Convert.ToInt32(i)));
@@ -156,12 +157,12 @@ internal static class ActiveObjectHelper
             da.SetDataList(index, data);
     }
 
-    public static void SetData(IGH_DataAccess da, int index, IGH_Structure data)
+    public static void SetDataTree(IGH_DataAccess da, int index, IGH_Structure data)
     {
         da.SetDataTree(index, data);
     }
 
-    public static void SetData(IGH_DataAccess da, int index, IGH_DataTree data)
+    public static void SetDataTree(IGH_DataAccess da, int index, IGH_DataTree data)
     {
         da.SetDataTree(index, data);
     }

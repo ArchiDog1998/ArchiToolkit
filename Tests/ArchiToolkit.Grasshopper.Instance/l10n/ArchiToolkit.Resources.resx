@@ -99,14 +99,14 @@
 	<data name="Your Name.tree.Description" xml:space="preserve">
 		<value>tree</value>
 	</data>
-	<data name="Your Name.data.Name" xml:space="preserve">
-		<value>data</value>
+	<data name="Your Name.numbers.Name" xml:space="preserve">
+		<value>numbers</value>
 	</data>
-	<data name="Your Name.data.Nickname" xml:space="preserve">
-		<value>data</value>
+	<data name="Your Name.numbers.Nickname" xml:space="preserve">
+		<value>numbers</value>
 	</data>
-	<data name="Your Name.data.Description" xml:space="preserve">
-		<value>data</value>
+	<data name="Your Name.numbers.Description" xml:space="preserve">
+		<value>numbers</value>
 	</data>
 	<data name="Your Name.result.Name" xml:space="preserve">
 		<value>Result</value>

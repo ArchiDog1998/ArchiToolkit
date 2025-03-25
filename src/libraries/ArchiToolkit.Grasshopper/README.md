@@ -47,11 +47,15 @@ icons.png located in `Icons` Folder. Here are the structure.
 - l10n
   - ArchiToolkit.Resources.resx
 
-In `ArchiToolkit.Resources.resx`, you can't modify it! but you can add your own languages to it, so it is how we do 
-with l10n.
+> [!NOTE]
+>
+> In `ArchiToolkit.Resources.resx`, you can't modify it! but you can add your own languages to it, so it is how we do 
+> with l10n.
 
-You can't modify the pngs when your IDE is open, so please turn your IDE off when you want to modify the png.
-And the png is the icons in the grasshopper.
+> [!WARNING]
+>
+> You can't modify the pngs when your IDE is open, so please turn your IDE off when you want to modify the png.
+> And the png is the icons in the grasshopper.
 
 #### General Infos
 This is the general infos that almost all items can be used with.
@@ -275,4 +279,27 @@ assembly to do this.
 [assembly: DocObj<RemoteType>]
 
 public class RemoteType;
+```
+#### IGH_PreviewData & IGH_BakeAwareData
+If you want your param can be previewed or can be baked, just let your class or struct implement the interface 
+`IGH_PreviewData` or `IGH_BakeAwareData`.
+```c#
+[DocObj]
+public class MyType : IGH_PreviewData, IGH_BakeAwareData
+{
+    public void DrawViewportWires(GH_PreviewWireArgs args)
+    {
+    }
+
+    public void DrawViewportMeshes(GH_PreviewMeshArgs args)
+    {
+    }
+
+    public BoundingBox ClippingBox => BoundingBox.Unset;
+    public bool BakeGeometry(RhinoDoc doc, ObjectAttributes att, out Guid obj_guid)
+    {
+        obj_guid = Guid.Empty;
+        return false;
+    }
+}
 ```

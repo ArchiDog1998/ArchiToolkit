@@ -24,17 +24,15 @@ public static class ExampleComponents
     public static List<int> TestClass(
         IGH_Component component,
         IGH_DataAccess da,
-        [ObjNames("OK", "B", "C" )]Ex e,
-        [Hidden,ObjNames("Input", "I", "An input")]ref Arc i,
-        [ObjField(true)]ref int myData,
-        List<int> test,
+        [Optional][ObjNames("OK", "B", "C" )]Ex e,
+        [Optional][Hidden,ObjNames("Input", "I", "An input")]ref Arc i,
+        [Optional][ObjField(true)]ref int myData,
+        [Optional]List<int> test,
         [Optional,ParamType<Param_Integer>]ref Io<GH_Structure<GH_Integer>> tree,
-        Io<double> data)
+        out GH_Structure<GH_Number> numbers)
     {
-        if (data.HasGot)
-        {
-            var a = data.Value;
-        }
+        numbers = new GH_Structure<GH_Number>();
+        numbers.Append(new GH_Number(1));
 
         return [];
 
