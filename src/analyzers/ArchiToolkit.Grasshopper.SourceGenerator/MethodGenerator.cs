@@ -187,7 +187,7 @@ public class MethodGenerator : BasicGenerator
                         Argument(GetArgumentKeyedString(".Component.Name", ObjName)),
                         Argument(GetArgumentKeyedString(".Component.Nickname", ObjNickname)),
                         Argument(GetArgumentKeyedString(".Component.Description", ObjDescription)),
-                        Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory), (Category ?? BaseCategory))),
+                        Argument(GetArgumentCategory(Category)),
                         Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory), (Subcategory ?? BaseSubcategory)))
                     ]))
             ]))

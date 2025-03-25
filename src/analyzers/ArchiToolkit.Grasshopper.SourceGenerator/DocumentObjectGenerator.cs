@@ -5,6 +5,8 @@ using ArchiToolkit.RoslynHelper.Names;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static ArchiToolkit.RoslynHelper.Extensions.SyntaxExtensions;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
@@ -47,6 +49,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         BasicGenerator.Translations.Clear();
         BasicGenerator.Icons.Clear();
+        BasicGenerator.Categories.Clear();
         BasicGenerator.BaseCategory = baseCategory;
         BasicGenerator.BaseSubcategory = baseSubcategory;
         TypeGenerator.BaseGoo = arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.Types.GH_Goo`1")!;
@@ -88,6 +91,51 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             GenerateTranslations(dir.FullName);
             GenerateIcons(dir.FullName);
         }
+
+        AddAssemblyPriority(context, assembly, BasicGenerator.Categories);
+    }
+
+    private static void AddAssemblyPriority(SourceProductionContext context,IAssemblySymbol assembly, IEnumerable<string> icons)
+    {
+        var node = NamespaceDeclaration(assembly.Name).WithMembers([ClassDeclaration("AssemblyPriority")
+            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.PartialKeyword)))
+            .WithBaseList(BaseList([SimpleBaseType(IdentifierName("global::Grasshopper.Kernel.GH_AssemblyPriority"))]))
+            .WithAttributeLists([
+                GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute())
+            ])
+            .WithMembers(
+            [
+                MethodDeclaration(IdentifierName("global::Grasshopper.Kernel.GH_LoadingInstruction"),
+                        Identifier("PriorityLoad"))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
+                    .WithBody(Block((IEnumerable<StatementSyntax>)
+                    [
+                        ..icons.Select(i => AddIcon(assembly.Name, i)),
+                        ReturnStatement(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("global::Grasshopper.Kernel.GH_LoadingInstruction"),
+                            IdentifierName("Proceed")))
+                    ]))
+            ])]);
+
+        context.AddSource("AssemblyPriority.g.cs", node.NodeToString());
+    }
+
+    private static StatementSyntax AddIcon(string assemblyName, string icon)
+    {
+        return ExpressionStatement(
+            InvocationExpression(IdentifierName("global::Grasshopper.Instances.ComponentServer.AddCategoryIcon"))
+                .WithArgumentList(
+                    ArgumentList(
+                    [
+                        Argument(BasicGenerator.GetArgumentString(
+                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(icon))))),
+                        Argument(InvocationExpression(
+                                    IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
+                                .WithArgumentList(ArgumentList([Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(assemblyName + ".Icons." + icon + ".png")))])))
+                    ])));
     }
 
     private static void GenerateTranslations(string directory)
@@ -139,6 +187,10 @@ public class DocumentObjectGenerator : IIncrementalGenerator
                         assembly.GetManifestResourceStream("ArchiToolkit.Grasshopper.SourceGenerator.Icons.Blue.png")
                             ?.CopyTo(fileStream);
                         break;
+                    case 'c':
+                        assembly.GetManifestResourceStream("ArchiToolkit.Grasshopper.SourceGenerator.Icons.Green.png")
+                            ?.CopyTo(fileStream);
+                        break;
                     default:
                         assembly.GetManifestResourceStream("ArchiToolkit.Grasshopper.SourceGenerator.Icons.White.png")
                             ?.CopyTo(fileStream);
@@ -185,7 +237,6 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             .Where(attribute => attribute.AttributeClass is { IsGenericType: true } type
                                 && type.ConstructUnboundGenericType().GetName().FullName is
                                     "global::ArchiToolkit.Grasshopper.DocObjAttribute<>")
-
             .Select(attr =>
             {
                 var result = new TypeGenerator(attr.AttributeClass!.TypeArguments[0])

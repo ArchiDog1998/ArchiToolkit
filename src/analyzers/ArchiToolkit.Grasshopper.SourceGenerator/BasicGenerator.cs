@@ -91,7 +91,8 @@ public abstract class BasicGenerator
     private readonly Guid? _guid;
     public Guid Id => _guid ?? StringToGuid(IdName);
 
-    internal static List<string> Icons { get; } = [];
+    internal static HashSet<string> Icons { get; } = [];
+    internal static HashSet<string> Categories { get; } = [];
     internal static Dictionary<string, string> Translations { get; } = [];
 
     private string ToRealNameNoTags(string className)
@@ -196,6 +197,15 @@ public abstract class BasicGenerator
         Icons.Add(IconType + KeyName);
     }
 
+    public static InvocationExpressionSyntax GetArgumentCategory(string? category)
+    {
+        category ??= BaseCategory;
+        var key = "Category." + category;
+        Categories.Add(key);
+        Icons.Add("c" + key);
+        return GetArgumentRawString(key, category);
+    }
+
     public static InvocationExpressionSyntax GetArgumentRawString(string key, string value)
     {
         Translations[key] = value;
@@ -209,7 +219,7 @@ public abstract class BasicGenerator
             IdentifierName("ResourceKey"), LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key)))));
     }
 
-    private static InvocationExpressionSyntax GetArgumentString(ArgumentSyntax argument)
+    public static InvocationExpressionSyntax GetArgumentString(ArgumentSyntax argument)
     {
         return InvocationExpression(
                 IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.Get"))

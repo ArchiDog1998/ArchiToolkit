@@ -208,8 +208,7 @@ public class TypeGenerator : BasicGenerator
                         Argument(GetArgumentKeyedString(".Name", ObjName)),
                         Argument(GetArgumentKeyedString(".Nickname", ObjNickname)),
                         Argument(GetArgumentKeyedString(".Description", ObjDescription)),
-                        Argument(GetArgumentRawString("Category." + (Category ?? BaseCategory),
-                            Category ?? BaseCategory)),
+                        Argument(GetArgumentCategory(Category)),
                         Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? "Parameter"),
                             Subcategory ?? "Parameter"))
                     ])))

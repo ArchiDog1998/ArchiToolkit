@@ -7,11 +7,11 @@ using Grasshopper.Kernel;
 [assembly: Category("MyTestCategory")]
 [assembly: ObjAttr<CustomAttribute>]
 
-public partial class AssemblyPriority : GH_AssemblyPriority
-{
-    public override GH_LoadingInstruction PriorityLoad()
-    {
-        Instances.ComponentServer.AddCategoryIcon("Test", null);
-        return GH_LoadingInstruction.Proceed;
-    }
-}
+// public partial class AssemblyPriority : GH_AssemblyPriority
+// {
+//     public override GH_LoadingInstruction PriorityLoad()
+//     {
+//         Instances.ComponentServer.AddCategoryIcon(ArchiToolkitResources.Get("Yes"), ArchiToolkitResources.GetIcon("Yes.png"));
+//         return GH_LoadingInstruction.Proceed;
+//     }
+// }
