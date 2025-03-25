@@ -92,50 +92,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             GenerateIcons(dir.FullName);
         }
 
-        AddAssemblyPriority(context, assembly, BasicGenerator.Categories);
-    }
-
-    private static void AddAssemblyPriority(SourceProductionContext context,IAssemblySymbol assembly, IEnumerable<string> icons)
-    {
-        var node = NamespaceDeclaration(assembly.Name).WithMembers([ClassDeclaration("AssemblyPriority")
-            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.PartialKeyword)))
-            .WithBaseList(BaseList([SimpleBaseType(IdentifierName("global::Grasshopper.Kernel.GH_AssemblyPriority"))]))
-            .WithAttributeLists([
-                GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute())
-            ])
-            .WithMembers(
-            [
-                MethodDeclaration(IdentifierName("global::Grasshopper.Kernel.GH_LoadingInstruction"),
-                        Identifier("PriorityLoad"))
-                    .WithAttributeLists([
-                        GeneratedCodeAttribute(typeof(DocumentObjectGenerator)).AddAttributes(NonUserCodeAttribute())
-                    ])
-                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-                    .WithBody(Block((IEnumerable<StatementSyntax>)
-                    [
-                        ..icons.Select(i => AddIcon(assembly.Name, i)),
-                        ReturnStatement(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                            IdentifierName("global::Grasshopper.Kernel.GH_LoadingInstruction"),
-                            IdentifierName("Proceed")))
-                    ]))
-            ])]);
-
-        context.AddSource("AssemblyPriority.g.cs", node.NodeToString());
-    }
-
-    private static StatementSyntax AddIcon(string assemblyName, string icon)
-    {
-        return ExpressionStatement(
-            InvocationExpression(IdentifierName("global::Grasshopper.Instances.ComponentServer.AddCategoryIcon"))
-                .WithArgumentList(
-                    ArgumentList(
-                    [
-                        Argument(BasicGenerator.GetArgumentString(
-                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(icon))))),
-                        Argument(InvocationExpression(
-                                    IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
-                                .WithArgumentList(ArgumentList([Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(assemblyName + ".Icons." + icon + ".png")))])))
-                    ])));
+        CategoryGenerator.GenerateIcons(context, assembly, BasicGenerator.Categories);
     }
 
     private static void GenerateTranslations(string directory)
