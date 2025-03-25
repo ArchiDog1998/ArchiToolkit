@@ -6,6 +6,7 @@ using System.Reflection;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
+using Rhino.Geometry;
 
 namespace ArchiToolkit.Grasshopper;
 
@@ -163,5 +164,17 @@ internal static class ActiveObjectHelper
     public static void SetData(IGH_DataAccess da, int index, IGH_DataTree data)
     {
         da.SetDataTree(index, data);
+    }
+
+    public static BoundingBox GetClippingBox<T>(GH_Structure<T> data) where T : IGH_Goo, IGH_PreviewData
+    {
+        if (data.IsEmpty) return BoundingBox.Empty;
+        var box = BoundingBox.Unset;
+        foreach (var nonNull in data.NonNulls)
+        {
+            if (!nonNull.IsValid) continue;
+            box.Union(nonNull.ClippingBox);
+        }
+        return box;
     }
 }

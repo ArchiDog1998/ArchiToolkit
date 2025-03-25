@@ -44,14 +44,11 @@ public class TypeGenerator : BasicGenerator
 
     protected override ClassDeclarationSyntax ModifyClass(ClassDeclarationSyntax classSyntax)
     {
-        classSyntax = classSyntax.WithBaseList(
-            BaseList([
-                SimpleBaseType(GenericName(Identifier("global::Grasshopper.Kernel.GH_PersistentParam"))
-                    .WithTypeArgumentList(TypeArgumentList([
-                        QualifiedName(
-                            IdentifierName(RealClassName), IdentifierName("Goo"))
-                    ])))
-            ]));
+        List<SimpleBaseTypeSyntax> baseTypes = [SimpleBaseType(GenericName(Identifier("global::Grasshopper.Kernel.GH_PersistentParam"))
+                .WithTypeArgumentList(TypeArgumentList([
+                    QualifiedName(
+                        IdentifierName(RealClassName), IdentifierName("Goo"))])))];
+
         var basicGoo = (INamedTypeSymbol)(DocumentObjectGenerator.GetTypeAttribute(Name.Symbol.GetAttributes(),
                                               "global::ArchiToolkit.Grasshopper.BaseGooAttribute<>")?.Symbol
                                           ?? ((INamedTypeSymbol)BaseGoo).Construct(Name.Symbol));
@@ -60,8 +57,7 @@ public class TypeGenerator : BasicGenerator
                 TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.SealedKeyword),
                     Token(SyntaxKind.PartialKeyword)))
             .WithBaseList(BaseList([
-                SimpleBaseType(
-                    IdentifierName(basicGoo.GetName().FullName))
+                SimpleBaseType(IdentifierName(basicGoo.GetName().FullName))
             ]))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
@@ -140,7 +136,8 @@ public class TypeGenerator : BasicGenerator
 
                 PropertyDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("TypeDescription"))
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-                    .WithExpressionBody(ArrowExpressionClause(GetArgumentKeyedString(".TypeDescription", ObjTypeDescription)))
+                    .WithExpressionBody(
+                        ArrowExpressionClause(GetArgumentKeyedString(".TypeDescription", ObjTypeDescription)))
                     .WithAttributeLists([
                         GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
                     ])
@@ -337,6 +334,7 @@ public class TypeGenerator : BasicGenerator
                 ]))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
         );
+
         if (DocumentObjectGenerator.GetBaseAttribute(Name.Symbol.GetAttributes()) is { } attributeName)
             classSyntax = classSyntax.AddMembers(MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)),
                     Identifier("CreateAttributes"))
@@ -349,6 +347,234 @@ public class TypeGenerator : BasicGenerator
                     ObjectCreationExpression(IdentifierName(attributeName))
                         .WithArgumentList(ArgumentList([Argument(ThisExpression())])))))));
 
-        return classSyntax;
+        if (Name.Symbol.AllInterfaces.Any(i => i.GetName().FullName
+                is "global::Grasshopper.Kernel.IGH_PreviewData"))
+        {
+            baseTypes.Add(SimpleBaseType(IdentifierName("global::Grasshopper.Kernel.IGH_PreviewObject")));
+            var gooClassPreview = ClassDeclaration("Goo").WithModifiers(TokenList(Token(SyntaxKind.PartialKeyword)))
+                .WithBaseList(BaseList([SimpleBaseType(IdentifierName("global::Grasshopper.Kernel.IGH_PreviewData"))]))
+                .WithMembers(
+                [
+                    PropertyDeclaration(IdentifierName("global::Rhino.Geometry.BoundingBox"), Identifier("ClippingBox"))
+                        .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                        .WithExpressionBody(ArrowExpressionClause(
+                            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("Value"), IdentifierName("ClippingBox"))))
+                        .WithAttributeLists([
+                            GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                        ])
+                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                    MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("DrawViewportWires"))
+                        .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                        .WithParameterList(ParameterList(
+                        [
+                            Parameter(Identifier("args"))
+                                .WithType(IdentifierName("global::Grasshopper.Kernel.GH_PreviewWireArgs"))
+                        ]))
+                        .WithExpressionBody(ArrowExpressionClause(
+                            InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("Value"), IdentifierName("DrawViewportWires")))
+                                .WithArgumentList(ArgumentList([Argument(IdentifierName("args"))]))))
+                        .WithAttributeLists([
+                            GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                        ])
+                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                    MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("DrawViewportMeshes"))
+                        .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                        .WithParameterList(ParameterList(
+                        [
+                            Parameter(Identifier("args"))
+                                .WithType(IdentifierName("global::Grasshopper.Kernel.GH_PreviewMeshArgs"))
+                        ]))
+                        .WithExpressionBody(ArrowExpressionClause(InvocationExpression(
+                                MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("Value"), IdentifierName("DrawViewportMeshes")))
+                            .WithArgumentList(ArgumentList([Argument(IdentifierName("args"))]))))
+                        .WithAttributeLists([
+                            GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                        ])
+                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                ]);
+
+            classSyntax = classSyntax.AddMembers(gooClassPreview,
+                PropertyDeclaration(PredefinedType(Token(SyntaxKind.BoolKeyword)),
+                        Identifier("Hidden")).WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithAccessorList(AccessorList(
+                    [
+                        AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                        AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                    ]))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ]),
+                PropertyDeclaration(PredefinedType(Token(SyntaxKind.BoolKeyword)), Identifier("IsPreviewCapable"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithExpressionBody(ArrowExpressionClause(LiteralExpression(SyntaxKind.TrueLiteralExpression)))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                PropertyDeclaration(IdentifierName("global::Rhino.Geometry.BoundingBox"), Identifier("ClippingBox"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithExpressionBody(ArrowExpressionClause(
+                        InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("global::ArchiToolkit.Grasshopper.ActiveObjectHelper"),
+                                IdentifierName("GetClippingBox")))
+                            .WithArgumentList(ArgumentList([Argument(IdentifierName("m_data"))]))))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("DrawViewportWires"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithParameterList(ParameterList(
+                    [
+                        Parameter(Identifier("args")).WithType(
+                            IdentifierName("global::Grasshopper.Kernel.IGH_PreviewArgs"))
+                    ]))
+                    .WithExpressionBody(ArrowExpressionClause(
+                        InvocationExpression(IdentifierName("Preview_DrawWires"))
+                            .WithArgumentList(ArgumentList([Argument(IdentifierName("args"))]))))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("DrawViewportMeshes"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithParameterList(ParameterList(
+                    [
+                        Parameter(Identifier("args")).WithType(
+                            IdentifierName("global::Grasshopper.Kernel.IGH_PreviewArgs"))
+                    ]))
+                    .WithExpressionBody(ArrowExpressionClause(
+                        InvocationExpression(IdentifierName("Preview_DrawMeshes"))
+                            .WithArgumentList(ArgumentList([Argument(IdentifierName("args"))]))))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+            );
+        }
+
+        if (Name.Symbol.AllInterfaces.Any(i => i.GetName().FullName
+                is "global::Grasshopper.Kernel.IGH_BakeAwareData"))
+        {
+            baseTypes.Add(SimpleBaseType(IdentifierName("global::Grasshopper.Kernel.IGH_BakeAwareObject")));
+            var gooClassBake = ClassDeclaration("Goo").WithModifiers(TokenList(Token(SyntaxKind.PartialKeyword)))
+                .WithBaseList(
+                    BaseList([SimpleBaseType(IdentifierName("global::Grasshopper.Kernel.IGH_BakeAwareData"))]))
+                .WithMembers(
+                [
+                    MethodDeclaration(PredefinedType(Token(SyntaxKind.BoolKeyword)), Identifier("BakeGeometry"))
+                        .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                        .WithParameterList(
+                            ParameterList(
+                            [
+                                Parameter(Identifier("doc"))
+                                    .WithType(IdentifierName("global::Rhino.RhinoDoc")),
+                                Parameter(Identifier("att"))
+                                    .WithType(IdentifierName("global::Rhino.DocObjects.ObjectAttributes")),
+                                Parameter(Identifier("obj_guid"))
+                                    .WithModifiers(TokenList(Token(SyntaxKind.OutKeyword)))
+                                    .WithType(IdentifierName("global::System.Guid"))
+                            ]))
+                        .WithExpressionBody(ArrowExpressionClause(
+                            InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("Value"), IdentifierName("BakeGeometry")))
+                                .WithArgumentList(ArgumentList(
+                                [
+                                    Argument(IdentifierName("doc")),
+                                    Argument(IdentifierName("att")),
+                                    Argument(IdentifierName("obj_guid"))
+                                        .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword))
+                                ]))))
+                        .WithAttributeLists([
+                            GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                        ])
+                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                ]);
+
+            classSyntax = classSyntax.AddMembers(gooClassBake,
+                PropertyDeclaration(PredefinedType(Token(SyntaxKind.BoolKeyword)), Identifier("IsBakeCapable"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithExpressionBody(ArrowExpressionClause(
+                        PrefixUnaryExpression(SyntaxKind.LogicalNotExpression,
+                            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("m_data"), IdentifierName("IsEmpty")))))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("BakeGeometry"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithParameterList(
+                        ParameterList(
+                        [
+                            Parameter(Identifier("doc")).WithType(
+                                IdentifierName("global::Rhino.RhinoDoc")),
+                            Parameter(Identifier("obj_ids"))
+                                .WithType(GenericName(Identifier("global::System.Collections.Generic.List"))
+                                    .WithTypeArgumentList(TypeArgumentList([IdentifierName("global::System.Guid")])))
+                        ]))
+                    .WithExpressionBody(ArrowExpressionClause(InvocationExpression(IdentifierName("BakeGeometry"))
+                        .WithArgumentList(
+                            ArgumentList(
+                            [
+                                Argument(IdentifierName("doc")),
+                                Argument(PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression,
+                                    LiteralExpression(SyntaxKind.NullLiteralExpression))),
+                                Argument(IdentifierName("obj_ids"))
+                            ]))))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("BakeGeometry"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithParameterList(ParameterList(
+                    [
+                        Parameter(Identifier("doc"))
+                            .WithType(IdentifierName("global::Rhino.RhinoDoc")),
+                        Parameter(Identifier("att"))
+                            .WithType(IdentifierName("global::Rhino.DocObjects.ObjectAttributes")),
+                        Parameter(Identifier("obj_ids"))
+                            .WithType(GenericName(Identifier("global::System.Collections.Generic.List"))
+                                .WithTypeArgumentList(TypeArgumentList([IdentifierName("global::System.Guid")])))
+                    ]))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithBody(Block(
+                        LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
+                            .WithVariables(
+                            [
+                                VariableDeclarator(Identifier("utility"))
+                                    .WithInitializer(EqualsValueClause(ObjectCreationExpression(
+                                            IdentifierName("global::Grasshopper.Kernel.GH_BakeUtility"))
+                                        .WithArgumentList(ArgumentList(
+                                            [Argument(InvocationExpression(IdentifierName("OnPingDocument")))]))))
+                            ])),
+                        ExpressionStatement(InvocationExpression(
+                                MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("utility"), IdentifierName("BakeObjects")))
+                            .WithArgumentList(ArgumentList(
+                            [
+                                Argument(IdentifierName("m_data")),
+                                Argument(IdentifierName("att")),
+                                Argument(IdentifierName("doc"))
+                            ]))),
+                        ExpressionStatement(InvocationExpression(MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("obj_ids"), IdentifierName("AddRange")))
+                            .WithArgumentList(ArgumentList(
+                            [
+                                Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("utility"), IdentifierName("BakedIds")))
+                            ])))))
+            );
+        }
+        return classSyntax.WithBaseList(BaseList([..baseTypes]));
     }
 }

@@ -2,6 +2,8 @@
 using ArchiToolkit.Grasshopper.Instance;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
+using Rhino;
+using Rhino.DocObjects;
 using Rhino.Geometry;
 [assembly: DocObj<AnotherType>(name: "What a type")]
 
@@ -11,37 +13,21 @@ public class AnotherType;
 
 [TypeDesc("A Type", "An interesting Type")]
 [Exposure(GH_Exposure.quarternary)]
-[BaseGoo<GH_GeometricGoo<MyType>>]
 [DocObj]
-public class MyType
+public class MyType : IGH_PreviewData, IGH_BakeAwareData
 {
-    
-}
-
-partial class Param_MyType
-{
-    partial class Goo
+    public void DrawViewportWires(GH_PreviewWireArgs args)
     {
-        public override IGH_GeometricGoo DuplicateGeometry()
-        {
-            throw new NotImplementedException();
-        }
+    }
 
-        public override BoundingBox GetBoundingBox(Transform xform)
-        {
-            throw new NotImplementedException();
-        }
+    public void DrawViewportMeshes(GH_PreviewMeshArgs args)
+    {
+    }
 
-        public override IGH_GeometricGoo Transform(Transform xform)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IGH_GeometricGoo Morph(SpaceMorph xmorph)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override BoundingBox Boundingbox => default;
+    public BoundingBox ClippingBox => BoundingBox.Unset;
+    public bool BakeGeometry(RhinoDoc doc, ObjectAttributes att, out Guid obj_guid)
+    {
+        obj_guid = Guid.Empty;
+        return false;
     }
 }
