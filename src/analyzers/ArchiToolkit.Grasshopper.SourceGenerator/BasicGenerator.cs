@@ -197,13 +197,27 @@ public abstract class BasicGenerator
         Icons.Add(IconType + KeyName);
     }
 
+    public static Dictionary<string, CateInfo> CategoryInfos { get; set; } = [];
     public static InvocationExpressionSyntax GetArgumentCategory(string? category)
     {
+        var cateKey = category ?? string.Empty;
+        if (!CategoryInfos.TryGetValue(cateKey, out var info)) info = new CateInfo();
+
         category ??= BaseCategory;
         var key = "Category." + category;
         Categories.Add(key);
         Icons.Add("c" + key);
+        Translations[key + ".ShortName"] = string.IsNullOrEmpty(info.ShortName) ? ToShort(category) : info.ShortName;
+        Translations[key + ".SymbolName"] = info.SymbolName is null ? char.ToUpper(category[0]).ToString() : info.SymbolName.ToString();
+
         return GetArgumentRawString(key, category);
+
+        static string ToShort(string str)
+        {
+            var shorter = str.Where((c, i) => i == 0 || char.IsUpper(c)).ToArray();
+            if (shorter.Any()) return new string(shorter).ToUpper();
+            return char.ToUpper(str[0]).ToString();
+        }
     }
 
     public static InvocationExpressionSyntax GetArgumentRawString(string key, string value)

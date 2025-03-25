@@ -5,10 +5,15 @@ using ArchiToolkit.RoslynHelper.Names;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static ArchiToolkit.RoslynHelper.Extensions.SyntaxExtensions;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace ArchiToolkit.Grasshopper.SourceGenerator;
+
+public class  CateInfo
+{
+    public string ShortName { get; set; } = string.Empty;
+    public char? SymbolName { get; set; } = null;
+}
+
 
 [Generator(LanguageNames.CSharp)]
 [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers")]
@@ -53,6 +58,8 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         BasicGenerator.BaseCategory = baseCategory;
         BasicGenerator.BaseSubcategory = baseSubcategory;
         TypeGenerator.BaseGoo = arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.Types.GH_Goo`1")!;
+        BasicGenerator.CategoryInfos = GetCategoryInfos(assembly.GetAttributes());
+
         foreach (var type in types)
         {
             type.GenerateSource(context);
@@ -92,7 +99,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             GenerateIcons(dir.FullName);
         }
 
-        CategoryGenerator.GenerateIcons(context, assembly, BasicGenerator.Categories);
+        CategoryGenerator.GenerateCategories(context, assembly, BasicGenerator.Categories);
     }
 
     private static void GenerateTranslations(string directory)
@@ -257,6 +264,25 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         }
 
         return null;
+    }
+
+    private static Dictionary<string, CateInfo> GetCategoryInfos(IEnumerable<AttributeData> attributes)
+    {
+        var categories = new Dictionary<string, CateInfo>();
+
+        foreach (var attr in attributes)
+        {
+            if (attr.AttributeClass is not { } attributeClass) continue;
+            if (attributeClass.GetName().FullName is not "global::ArchiToolkit.Grasshopper.CategoryInfoAttribute") continue;
+            if (attr.ConstructorArguments.Length is 0) continue;
+
+            var key = attr.ConstructorArguments[0].Value?.ToString() ?? string.Empty;
+            if (!categories.TryGetValue(key, out var info)) categories[key] = info = new CateInfo();
+            if (attr.ConstructorArguments[1].Value?.ToString() is { Length: > 0 } shortName) info.ShortName = shortName;
+            if (attr.ConstructorArguments[2].Value?.ToString() is { Length: > 0 } symbolName
+                && symbolName[0] is not char.MinValue) info.SymbolName = symbolName[0];
+        }
+        return categories;
     }
 
     private static IEnumerable<GhParamItem> GetAllParams(INamespaceSymbol namespaceSymbol)

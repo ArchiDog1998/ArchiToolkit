@@ -183,7 +183,7 @@ public class MethodParamItem(
                         .WithArgumentList(
                             ArgumentList(
                             [
-                                Argument(BasicGenerator.GetArgumentRawString(enumType.GetName().FullName + "." + fieldSymbol.Name, fieldSymbol.Name)),
+                                Argument(BasicGenerator.GetArgumentRawString(enumType.GetName().FullNameNoGlobal + "." + fieldSymbol.Name, fieldSymbol.Name)),
                                 Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(Convert.ToInt32(fieldSymbol.ConstantValue))))
                             ])));
                 }

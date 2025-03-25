@@ -94,6 +94,11 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+##### Category Information
+If you want to set the category's Short Name or Symbol name, pelase use the attribute `CategoryInfoAttribute` on the assembly.
+```c#
+[assembly: CategoryInfo(null, "Short Name", 'S')]
+```
 ##### Obsolete
 Of course, ObsoleteAttribute can be used on.
 ```c#

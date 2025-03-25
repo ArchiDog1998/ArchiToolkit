@@ -10,8 +10,15 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
 public static class CategoryGenerator
 {
-    public static void GenerateIcons(SourceProductionContext context, IAssemblySymbol assembly,
-        IEnumerable<string> icons)
+    public static void GenerateCategories(SourceProductionContext context, IAssemblySymbol assembly,
+        HashSet<string> categories)
+    {
+        GenerateIcons(context, assembly, categories);
+        GenerateInfos(context, assembly, categories);
+    }
+
+    private static void GenerateIcons(SourceProductionContext context, IAssemblySymbol assembly,
+        IEnumerable<string> categories)
     {
         var addIcon = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("LoadIcon"))
             .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword)))
@@ -47,23 +54,80 @@ public static class CategoryGenerator
                                 Argument(IdentifierName("icon"))
                             ])))));
 
-        var loadMethod = MethodDeclaration(IdentifierName("global::Grasshopper.Kernel.GH_LoadingInstruction"),
-                Identifier("PriorityLoad"))
-            .WithAttributeLists([
-                GeneratedCodeAttribute(typeof(CategoryGenerator))
-                    .AddAttributes(NonUserCodeAttribute())
-            ])
-            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
-            .WithBody(Block((IEnumerable<StatementSyntax>)
+
+        SavePriority(context, assembly, [addIcon], "CategoryIcons", categories, "LoadIcon");
+    }
+
+    private static void GenerateInfos(SourceProductionContext context, IAssemblySymbol assembly,
+        IEnumerable<string> categories)
+    {
+        var method = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("LoadInfo"))
+            .WithModifiers(
+                TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword)))
+            .WithParameterList(ParameterList(
             [
-                ..icons.Select(AddIcon),
-                ReturnStatement(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                    IdentifierName("global::Grasshopper.Kernel.GH_LoadingInstruction"),
-                    IdentifierName("Proceed")))
-            ]));
+                Parameter(Identifier("iconName")).WithType(PredefinedType(Token(SyntaxKind.StringKeyword)))
+            ]))
+            .WithAttributeLists(
+            [
+                GeneratedCodeAttribute(typeof(CategoryGenerator)).AddAttributes(NonUserCodeAttribute())
+            ])
+            .WithBody(Block(
+                LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
+                    .WithVariables([
+                        VariableDeclarator(Identifier("key"))
+                            .WithInitializer(EqualsValueClause(InvocationExpression(
+                                    IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.Get"))
+                                .WithArgumentList(ArgumentList([Argument(IdentifierName("iconName"))]))))
+                    ])),
+                ExpressionStatement(
+                    InvocationExpression(
+                            IdentifierName("global::Grasshopper.Instances.ComponentServer.AddCategoryShortName"))
+                        .WithArgumentList(ArgumentList(
+                        [
+                            Argument(IdentifierName("key")),
+                            Argument(InvocationExpression(
+                                    IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.Get"))
+                                .WithArgumentList(ArgumentList(
+                                [
+                                    Argument(BinaryExpression(SyntaxKind.AddExpression,
+                                        IdentifierName("iconName"),
+                                        LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(".ShortName"))))
+                                ])))
+                        ]))),
+                ExpressionStatement(
+                    InvocationExpression(
+                            IdentifierName("global::Grasshopper.Instances.ComponentServer.AddCategorySymbolName"))
+                        .WithArgumentList(ArgumentList(
+                        [
+                            Argument(IdentifierName("key")),
+                            Argument(ElementAccessExpression(InvocationExpression(
+                                        IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.Get"))
+                                    .WithArgumentList(
+                                        ArgumentList(
+                                        [
+                                            Argument(BinaryExpression(SyntaxKind.AddExpression, IdentifierName("iconName"),
+                                                LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(".SymbolName"))))
+                                        ])))
+                                .WithArgumentList(BracketedArgumentList(
+                                [
+                                    Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0)))
+                                ])))
+                        ])))));
+
+        SavePriority(context, assembly, [method], "CategoryInfos", categories, "LoadInfo");
+
+    }
+
+    private static void SavePriority(SourceProductionContext context, IAssemblySymbol assembly,
+        IEnumerable<MemberDeclarationSyntax> members,
+        string name, IEnumerable<string> categories, string methodName)
+    {
+        var loadMethod = LoadMethod(categories.Select(i => AddInvocation(methodName, i)));
+
 
         var node = NamespaceDeclaration(assembly.Name).WithMembers([
-            ClassDeclaration("AssemblyPriorityCategoryIcons")
+            ClassDeclaration("AssemblyPriority" + name)
                 .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.SealedKeyword)))
                 .WithBaseList(BaseList([
                     SimpleBaseType(IdentifierName("global::Grasshopper.Kernel.GH_AssemblyPriority"))
@@ -71,17 +135,36 @@ public static class CategoryGenerator
                 .WithAttributeLists([
                     GeneratedCodeAttribute(typeof(CategoryGenerator)).AddAttributes(NonUserCodeAttribute())
                 ])
-                .WithMembers([loadMethod, addIcon])
+                .WithMembers([loadMethod, ..members])
         ]);
 
-        context.AddSource("AssemblyPriority.CategoryIcons.g.cs", node.NodeToString());
-    }
+        context.AddSource("AssemblyPriority." + name + ".g.cs", node.NodeToString());
+        return;
 
-    private static StatementSyntax AddIcon(string icon)
-    {
-        return ExpressionStatement(InvocationExpression(IdentifierName("LoadIcon"))
-            .WithArgumentList(ArgumentList([
-                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(icon)))
-            ])));
+        static MethodDeclarationSyntax LoadMethod(IEnumerable<StatementSyntax> members)
+        {
+            return MethodDeclaration(IdentifierName("global::Grasshopper.Kernel.GH_LoadingInstruction"),
+                    Identifier("PriorityLoad"))
+                .WithAttributeLists([
+                    GeneratedCodeAttribute(typeof(CategoryGenerator))
+                        .AddAttributes(NonUserCodeAttribute())
+                ])
+                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
+                .WithBody(Block((IEnumerable<StatementSyntax>)
+                [
+                    ..members,
+                    ReturnStatement(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("global::Grasshopper.Kernel.GH_LoadingInstruction"),
+                        IdentifierName("Proceed")))
+                ]));
+        }
+
+        static StatementSyntax AddInvocation(string methodName, string name)
+        {
+            return ExpressionStatement(InvocationExpression(IdentifierName(methodName))
+                .WithArgumentList(ArgumentList([
+                    Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(name)))
+                ])));
+        }
     }
 }

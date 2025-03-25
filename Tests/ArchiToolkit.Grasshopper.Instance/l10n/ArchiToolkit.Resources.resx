@@ -27,8 +27,14 @@
 	<data name="ArchiToolkit.Grasshopper.Instance.Param_MyType.Description" xml:space="preserve">
 		<value>MyType</value>
 	</data>
-	<data name="Category.MyTestCategory" xml:space="preserve">
-		<value>MyTestCategory</value>
+	<data name="Category.ArchiToolkit.Grasshopper.Instance.ShortName" xml:space="preserve">
+		<value>Short Name</value>
+	</data>
+	<data name="Category.ArchiToolkit.Grasshopper.Instance.SymbolName" xml:space="preserve">
+		<value>S</value>
+	</data>
+	<data name="Category.ArchiToolkit.Grasshopper.Instance" xml:space="preserve">
+		<value>ArchiToolkit.Grasshopper.Instance</value>
 	</data>
 	<data name="Subcategory.Parameter" xml:space="preserve">
 		<value>Parameter</value>
@@ -48,19 +54,19 @@
 	<data name="ArchiToolkit.Grasshopper.Instance.Param_AnotherType.Description" xml:space="preserve">
 		<value>AnotherType</value>
 	</data>
-	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.A" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Ex.A" xml:space="preserve">
 		<value>A</value>
 	</data>
-	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.B" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Ex.B" xml:space="preserve">
 		<value>B</value>
 	</data>
-	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.C" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Ex.C" xml:space="preserve">
 		<value>C</value>
 	</data>
-	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.D" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Ex.D" xml:space="preserve">
 		<value>D</value>
 	</data>
-	<data name="global::ArchiToolkit.Grasshopper.Instance.Ex.E" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Ex.E" xml:space="preserve">
 		<value>E</value>
 	</data>
 	<data name="Your Name.e.Name" xml:space="preserve">
@@ -125,6 +131,12 @@
 	</data>
 	<data name="Your Name.Component.Description" xml:space="preserve">
 		<value>Description</value>
+	</data>
+	<data name="Category.Cate.ShortName" xml:space="preserve">
+		<value>OK</value>
+	</data>
+	<data name="Category.Cate.SymbolName" xml:space="preserve">
+		<value>i</value>
 	</data>
 	<data name="Category.Cate" xml:space="preserve">
 		<value>Cate</value>

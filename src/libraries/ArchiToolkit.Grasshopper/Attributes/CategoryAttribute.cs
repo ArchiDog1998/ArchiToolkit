@@ -10,7 +10,7 @@ namespace ArchiToolkit.Grasshopper;
 /// <remarks>
 /// <para><b>⚠ NOTICE:</b> If you want to make a default <see cref="GH_InstanceDescription.Category"/>, please use it on the assembly. </para>
 /// </remarks>
-/// <param name="recognizeName">The key for localization, leave it for auto-generation.</param>
+/// <param name="recognizeName">The key for localization.</param>
 [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method)]
 [Conditional(Constant.KeepAttributes)]
 public class CategoryAttribute(string recognizeName) : Attribute;

@@ -27,4 +27,9 @@ public interface IName<out T> where T : ISymbol
     /// Name
     /// </summary>
     string Name { get; }
+
+    /// <summary>
+    /// Full Name without global
+    /// </summary>
+    string FullNameNoGlobal { get; }
 }
