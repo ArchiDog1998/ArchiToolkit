@@ -37,13 +37,3 @@ public static class ExampleComponents
         return [];
     }
 }
-
-public class Test
-{
-    [UpgradeTo<Component_Add>(2025, 3, 26)]
-    [DocObj]
-    public static int OldAdd(int x, int y) => x + y;
-
-    [DocObj]
-    public static int Add(int x, int y) => x + y;
-}
