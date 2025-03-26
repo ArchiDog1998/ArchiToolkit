@@ -34,10 +34,16 @@ public static class ExampleComponents
         numbers = new GH_Structure<GH_Number>();
         numbers.Append(new GH_Number(1));
 
-        GH_UpgradeUtil.SwapComponents()
         return [];
     }
+}
+
+public class Test
+{
+    [UpgradeTo<Component_Add>(2025, 3, 26)]
+    [DocObj]
+    public static int OldAdd(int x, int y) => x + y;
 
     [DocObj]
-    public static int Addition(int x, int y) => x + y;
+    public static int Add(int x, int y) => x + y;
 }

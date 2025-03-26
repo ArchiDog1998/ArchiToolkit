@@ -134,7 +134,7 @@ public class Test
 ```
 #### Component Infos
 For some cases, you may want to add more information for this component.
-##### Component
+##### Base Component
 If you want to add your own base component, do it with `BaseComponentAttribute<>`.
 ```c#
 file abstract class MyComponent(string name, string nickname, string description, string category, string subCategory) 
@@ -145,6 +145,19 @@ file abstract class MyComponent(string name, string nickname, string description
 public class Test
 {
     [BaseComponent<MyComponent>]
+    [DocObj]
+    public static int Add(int x, int y) => x + y;
+}
+```
+##### Upgrade Component
+If you want to make an `IGH_UpgradeObject` to update your component, add the attribute `UpgradeToAttribute` to make it.
+```c#
+public class Test
+{
+    [UpgradeTo<Component_Add>(2025, 3, 26)]
+    [DocObj]
+    public static int OldAdd(int x, int y) => x + y;
+    
     [DocObj]
     public static int Add(int x, int y) => x + y;
 }

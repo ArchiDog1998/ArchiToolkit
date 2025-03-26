@@ -40,7 +40,7 @@ public abstract class BasicGenerator
         }
 
         if (symbol.GetAttributes().Any(a =>
-                a.AttributeClass?.GetName().FullName == "global::System.ObsoleteAttribute"))
+                     a.AttributeClass?.GetName().FullName == "global::System.ObsoleteAttribute"))
         {
             IsObsolete = true;
             Exposure = "-1";

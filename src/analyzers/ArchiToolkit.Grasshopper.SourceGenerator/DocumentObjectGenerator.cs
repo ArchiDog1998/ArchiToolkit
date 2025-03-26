@@ -91,7 +91,14 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         BasicGenerator.BaseAttribute = baseAttribute;
         MethodGenerator.GlobalBaseComponent = baseComponent!;
 
-        foreach (var method in methods) method.GenerateSource(context);
+        foreach (var method in methods)
+        {
+            method.GenerateSource(context);
+            if (UpgraderGenerator.Create(method) is { } upgrader)
+            {
+                upgrader.GenerateSource(context);
+            }
+        }
 
         if (GetCsprojDirectory(assembly) is { } dir)
         {

@@ -144,43 +144,79 @@
 	<data name="Subcategory.SubTest" xml:space="preserve">
 		<value>SubTest</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.x.Name" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.x.Name" xml:space="preserve">
 		<value>x</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.x.Nickname" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.x.Nickname" xml:space="preserve">
 		<value>x</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.x.Description" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.x.Description" xml:space="preserve">
 		<value>x</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.y.Name" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.y.Name" xml:space="preserve">
 		<value>y</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.y.Nickname" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.y.Nickname" xml:space="preserve">
 		<value>y</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.y.Description" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.y.Description" xml:space="preserve">
 		<value>y</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.result.Name" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.result.Name" xml:space="preserve">
 		<value>result</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.result.Nickname" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.result.Nickname" xml:space="preserve">
 		<value>result</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.result.Description" xml:space="preserve">
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.result.Description" xml:space="preserve">
 		<value>result</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.Component.Name" xml:space="preserve">
-		<value>Addition</value>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.Component.Name" xml:space="preserve">
+		<value>OldAdd</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.Component.Nickname" xml:space="preserve">
-		<value>Addition</value>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.Component.Nickname" xml:space="preserve">
+		<value>OldAdd</value>
 	</data>
-	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.Component.Description" xml:space="preserve">
-		<value>Addition</value>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_OldAdd.Component.Description" xml:space="preserve">
+		<value>OldAdd</value>
 	</data>
 	<data name="Subcategory.ArchiToolkit.Grasshopper.Instance" xml:space="preserve">
 		<value>ArchiToolkit.Grasshopper.Instance</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.x.Name" xml:space="preserve">
+		<value>x</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.x.Nickname" xml:space="preserve">
+		<value>x</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.x.Description" xml:space="preserve">
+		<value>x</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.y.Name" xml:space="preserve">
+		<value>y</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.y.Nickname" xml:space="preserve">
+		<value>y</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.y.Description" xml:space="preserve">
+		<value>y</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.result.Name" xml:space="preserve">
+		<value>result</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.result.Nickname" xml:space="preserve">
+		<value>result</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.result.Description" xml:space="preserve">
+		<value>result</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.Component.Name" xml:space="preserve">
+		<value>Add</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.Component.Nickname" xml:space="preserve">
+		<value>Add</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Add.Component.Description" xml:space="preserve">
+		<value>Add</value>
 	</data>
 </root>
