@@ -20,6 +20,7 @@ namespace ArchiToolkit.Grasshopper;
 /// </code>
 /// <remarks>
 /// <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute"/> first.</para>
+/// <para><b>⚠ WARNING:</b> You may need to set the FullName with Namespace to the <typeparamref name="T"/>.</para>
 /// </remarks>
 /// <param name="year">The <see cref="DateTime.Year"/> of the <see cref="IGH_UpgradeObject.Version"/></param>
 /// <param name="month">The <see cref="DateTime.Month"/> of the <see cref="IGH_UpgradeObject.Version"/></param>
@@ -30,5 +31,5 @@ namespace ArchiToolkit.Grasshopper;
 /// <typeparam name="T">The component to upgrade to.</typeparam>
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional(Constant.KeepAttributes)]
-public class UpgradeToAttribute<T>(int year, int month, int day, int hour = 0, int minute = 0, int second = 0)
+public class UpgradeToAttribute<T>(int year, int month, int day = 1, int hour = 0, int minute = 0, int second = 0)
     : Attribute where T : IGH_Component, new();

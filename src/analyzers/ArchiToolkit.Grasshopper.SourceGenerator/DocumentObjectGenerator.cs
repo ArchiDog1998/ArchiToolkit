@@ -11,7 +11,7 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 public class  CateInfo
 {
     public string ShortName { get; set; } = string.Empty;
-    public char? SymbolName { get; set; } = null;
+    public char? SymbolName { get; set; }
 }
 
 

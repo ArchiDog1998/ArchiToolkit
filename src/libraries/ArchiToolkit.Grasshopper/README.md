@@ -150,7 +150,9 @@ public class Test
 }
 ```
 ##### Upgrade Component
-If you want to make an `IGH_UpgradeObject` to update your component, add the attribute `UpgradeToAttribute` to make it.
+If you want to make an `IGH_UpgradeObject` to update your component, add the attribute `UpgradeToAttribute` or 
+`UpgradeFromAttribute` to 
+make it.
 ```c#
 public class Test
 {
@@ -158,6 +160,14 @@ public class Test
     [DocObj]
     public static int OldAdd(int x, int y) => x + y;
     
+    [DocObj]
+    public static int Add(int x, int y) => x + y;
+}
+```
+```c#
+public class Test
+{
+    [UpgradeFrom("498A54B0-DA31-4C9F-905D-6FEA011DBFD5", 2025, 3, 26)]
     [DocObj]
     public static int Add(int x, int y) => x + y;
 }
