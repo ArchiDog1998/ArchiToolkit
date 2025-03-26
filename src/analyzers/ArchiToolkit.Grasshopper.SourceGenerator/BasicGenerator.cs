@@ -150,7 +150,8 @@ public abstract class BasicGenerator
 
         var iconProperty = PropertyDeclaration(IdentifierName("global::System.Drawing.Bitmap"), Identifier("Icon"))
             .WithModifiers([Token(SyntaxKind.ProtectedKeyword), Token(SyntaxKind.OverrideKeyword)])
-            .WithExpressionBody(ArrowExpressionClause(InvocationExpression(
+            .WithExpressionBody(ArrowExpressionClause(PostfixUnaryExpression(
+                    SyntaxKind.SuppressNullableWarningExpression,InvocationExpression(
                     IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
                 .WithArgumentList(ArgumentList([
                     Argument(BinaryExpression(SyntaxKind.AddExpression,
@@ -158,7 +159,7 @@ public abstract class BasicGenerator
                                 Literal(Symbol.ContainingAssembly.Name + ".Icons.")),
                             IdentifierName("ResourceKey")),
                         LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(".png"))))
-                ]))))
+                ])))))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(BasicGenerator)).AddAttributes(NonUserCodeAttribute())
             ])

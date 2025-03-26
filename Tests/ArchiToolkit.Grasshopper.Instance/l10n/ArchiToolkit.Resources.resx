@@ -144,4 +144,43 @@
 	<data name="Subcategory.SubTest" xml:space="preserve">
 		<value>SubTest</value>
 	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.x.Name" xml:space="preserve">
+		<value>x</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.x.Nickname" xml:space="preserve">
+		<value>x</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.x.Description" xml:space="preserve">
+		<value>x</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.y.Name" xml:space="preserve">
+		<value>y</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.y.Nickname" xml:space="preserve">
+		<value>y</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.y.Description" xml:space="preserve">
+		<value>y</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.result.Name" xml:space="preserve">
+		<value>result</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.result.Nickname" xml:space="preserve">
+		<value>result</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.result.Description" xml:space="preserve">
+		<value>result</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.Component.Name" xml:space="preserve">
+		<value>Addition</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.Component.Nickname" xml:space="preserve">
+		<value>Addition</value>
+	</data>
+	<data name="ArchiToolkit.Grasshopper.Instance.Component_Addition.Component.Description" xml:space="preserve">
+		<value>Addition</value>
+	</data>
+	<data name="Subcategory.ArchiToolkit.Grasshopper.Instance" xml:space="preserve">
+		<value>ArchiToolkit.Grasshopper.Instance</value>
+	</data>
 </root>

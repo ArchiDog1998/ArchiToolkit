@@ -4,7 +4,7 @@
 ///     For the case you want more data
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public readonly struct Io<T>
+public struct Io<T>
 {
     /// <summary>
     ///     If it was got.
@@ -19,7 +19,7 @@ public readonly struct Io<T>
     /// <summary>
     ///     The value of it
     /// </summary>
-    public T Value { get; }
+    public T Value { get; set; }
 
     internal Io(bool got, int index, T value)
     {
@@ -28,8 +28,5 @@ public readonly struct Io<T>
         Value = value;
     }
 
-    public static implicit operator T(Io<T> t)
-    {
-        return t.Value;
-    }
+    public static implicit operator T(Io<T> t) => t.Value;
 }
