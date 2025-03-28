@@ -15,11 +15,19 @@ public class MethodGenerator : BasicGenerator
 
     public readonly MethodName Name;
 
+    public readonly bool IsAwaiter;
+
     public MethodGenerator(ISymbol symbol) : base(symbol)
     {
         if (symbol is not IMethodSymbol methodSymbol)
             throw new ArgumentException("Symbol is not a type method symbol");
         Name = methodSymbol.GetName();
+        IsAwaiter = methodSymbol.ReturnType.GetMembers("GetAwaiter")
+            .OfType<IMethodSymbol>()
+            .Any(m => m.Parameters.Length == 0 &&
+                      m.ReturnType.GetMembers().Any(m2 => m2.Name == "IsCompleted") &&
+                      m.ReturnType.GetMembers().Any(m2 => m2.Name == "GetResult"));
+        ;
         var owner = Name.ContainingType;
         var items = Name.Parameters.Select(p => new MethodParamItem(this, p, owner));
         if (methodSymbol.ReturnType.SpecialType is not SpecialType.System_Void)
@@ -58,11 +66,12 @@ public class MethodGenerator : BasicGenerator
     protected override char IconType => 'C';
 
     public static ITypeSymbol GlobalBaseComponent { get; set; } = null!;
+    public static Func<string, INamedTypeSymbol> CreateSymbol { get; set; } = null!;
 
     protected override ClassDeclarationSyntax ModifyClass(ClassDeclarationSyntax classSyntax)
     {
         var baseComponent = DocumentObjectGenerator.GetBaseComponent(Name.Symbol.GetAttributes()) ??
-                            GlobalBaseComponent;
+                            (IsAwaiter ? CreateSymbol(RealClassName + ".TaskResult") : GlobalBaseComponent);
 
         var inputMethod = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)),
                 Identifier("RegisterInputParams"))
@@ -74,7 +83,7 @@ public class MethodGenerator : BasicGenerator
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
             ])
-            .WithBody(Block(_parameters.Where(p => p.Type.HasFlag(ParamType.In)).Select((p, i)  => p.IoBlock(true, i))));
+            .WithBody(Block(_parameters.Where(p => p.Type.HasFlag(ParamType.In)).Select((p, i) => p.IoBlock(true, i))));
 
         var outputMethod = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)),
                 Identifier("RegisterOutputParams"))
@@ -86,9 +95,11 @@ public class MethodGenerator : BasicGenerator
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
             ])
-            .WithBody(Block(_parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.IoBlock(false, i))));
+            .WithBody(
+                Block(_parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.IoBlock(false, i))));
 
-        var invocation = InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+        ExpressionSyntax invocation = InvocationExpression(MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
                 IdentifierName(Name.ContainingType.FullName), IdentifierName(Name.Name)))
             .WithArgumentList(
                 ArgumentList(
@@ -109,6 +120,97 @@ public class MethodGenerator : BasicGenerator
                         })
                 ]));
 
+        if (IsAwaiter)
+        {
+            invocation = AwaitExpression(invocation);
+        }
+
+        StatementSyntax invocationStatement = _parameters.Any(p => p.Parameter is null)
+            ? LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
+                .WithVariables([
+                    VariableDeclarator(Identifier("result")).WithInitializer(EqualsValueClause(invocation))
+                ]))
+            : ExpressionStatement(invocation);
+
+        IEnumerable<StatementSyntax> computeMembers;
+
+        if (IsAwaiter)
+        {
+            computeMembers =
+            [
+                IfStatement(IdentifierName("InPreSolve"),
+                    Block((IEnumerable<StatementSyntax>)
+                    [
+                        .._parameters.Where(p => p.Type.HasFlag(ParamType.In)).Select((p, i) => p.GetData(i)),
+
+                        ExpressionStatement(InvocationExpression(MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("TaskList"), IdentifierName("Add")))
+                            .WithArgumentList(ArgumentList(
+                            [
+                                Argument(InvocationExpression(IdentifierName("Compute"))
+                                    .WithArgumentList(
+                                        ArgumentList(
+                                        [
+                                            .._parameters.Where(p => p.Type.HasFlag(ParamType.In))
+                                                .Select(p => Argument(IdentifierName(p.Name)))
+                                        ])))
+                            ]))),
+                        ReturnStatement()
+                    ])),
+                IfStatement(PrefixUnaryExpression(SyntaxKind.LogicalNotExpression,
+                        InvocationExpression(IdentifierName("GetSolveResults"))
+                            .WithArgumentList(
+                                ArgumentList(
+                                [
+                                    Argument(IdentifierName("DA")),
+                                    Argument(DeclarationExpression(IdentifierName("var"),
+                                            SingleVariableDesignation(Identifier("data"))))
+                                        .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword))
+                                ]))),
+                    Block((IEnumerable<StatementSyntax>)
+                    [
+                        .._parameters.Where(p => p.Type.HasFlag(ParamType.In)).Select((p, i) => p.GetData(i)),
+                        ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                            IdentifierName("data"),
+                            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                InvocationExpression(IdentifierName("Compute"))
+                                    .WithArgumentList(ArgumentList(
+                                    [
+                                        .._parameters.Where(p => p.Type.HasFlag(ParamType.In))
+                                            .Select(p => Argument(IdentifierName(p.Name)))
+                                    ])),
+                                IdentifierName("Result"))))
+                    ]))
+            ];
+
+            if (_parameters.Any(p => p.Type.HasFlag(ParamType.Out)))
+            {
+
+                computeMembers = computeMembers.Append(Block((IEnumerable<StatementSyntax>)
+                [
+                    ExpressionStatement(AssignmentExpression(
+                        SyntaxKind.SimpleAssignmentExpression,
+                        DeclarationExpression(IdentifierName("var"),
+                            ParenthesizedVariableDesignation(
+                            [
+                                .._parameters.Where(p => p.Type.HasFlag(ParamType.Out))
+                                    .Select(p => SingleVariableDesignation(Identifier(p.Name)))
+                            ])), IdentifierName("data"))),
+                    .._parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.SetData(i))
+                ]));
+            }
+        }
+        else
+        {
+            computeMembers =
+            [
+                .._parameters.Where(p => p.Type.HasFlag(ParamType.In)).Select((p, i) => p.GetData(i)),
+                invocationStatement,
+                .._parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.SetData(i))
+            ];
+        }
+
         var computeMethod =
             MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("SolveInstance"))
                 .WithModifiers(TokenList(Token(SyntaxKind.ProtectedKeyword), Token(SyntaxKind.OverrideKeyword)))
@@ -121,17 +223,7 @@ public class MethodGenerator : BasicGenerator
                 .WithAttributeLists([
                     GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
                 ])
-                .WithBody(Block((IEnumerable<StatementSyntax>)
-                [
-                    .._parameters.Where(p => p.Type.HasFlag(ParamType.In)).Select((p, i) => p.GetData(i)),
-                    _parameters.Any(p => p.Parameter is null)
-                        ? LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
-                            .WithVariables([
-                                VariableDeclarator(Identifier("result")).WithInitializer(EqualsValueClause(invocation))
-                            ]))
-                        : ExpressionStatement(invocation),
-                    .._parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.SetData(i))
-                ]));
+                .WithBody(Block(computeMembers));
 
         var readMethod = MethodDeclaration(PredefinedType(Token(SyntaxKind.BoolKeyword)), Identifier("Read"))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword)))
@@ -188,7 +280,8 @@ public class MethodGenerator : BasicGenerator
                         Argument(GetArgumentKeyedString(".Component.Nickname", ObjNickname)),
                         Argument(GetArgumentKeyedString(".Component.Description", ObjDescription)),
                         Argument(GetArgumentCategory(Category)),
-                        Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory), (Subcategory ?? BaseSubcategory)))
+                        Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory),
+                            (Subcategory ?? BaseSubcategory)))
                     ]))
             ]))
             .AddMembers(
@@ -217,6 +310,52 @@ public class MethodGenerator : BasicGenerator
                     SyntaxKind.SimpleAssignmentExpression, IdentifierName("m_attributes"),
                     ObjectCreationExpression(IdentifierName(attributeName))
                         .WithArgumentList(ArgumentList([Argument(ThisExpression())])))))));
+
+        if (IsAwaiter)
+        {
+            classSyntax = classSyntax.AddMembers(
+                RecordDeclaration(SyntaxKind.RecordStructDeclaration,
+                        Token(SyntaxKind.RecordKeyword), Identifier("TaskResult"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.ReadOnlyKeyword)))
+                    .WithClassOrStructKeyword(Token(SyntaxKind.StructKeyword))
+                    .WithParameterList(
+                        ParameterList(
+                        [
+                            .._parameters.Where(p => p.Type.HasFlag(ParamType.Out))
+                                .Select(p =>
+                                    Parameter(Identifier(p.Name)).WithType(IdentifierName(p.TypeNameNoIoTask.FullName)))
+                        ]))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                MethodDeclaration(GenericName(Identifier("global::System.Threading.Tasks.Task"))
+                            .WithTypeArgumentList(TypeArgumentList([IdentifierName("TaskResult")])),
+                        Identifier("Compute"))
+                    .WithModifiers(
+                        TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword),
+                            Token(SyntaxKind.AsyncKeyword)))
+                    .WithParameterList(
+                        ParameterList(
+                        [
+                            .._parameters.Where(p => p.Type.HasFlag(ParamType.In))
+                                .Select(p =>
+                                    Parameter(Identifier(p.Name)).WithType(IdentifierName(p.TypeNameNoIoTask.FullName)))
+                        ]))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithBody(Block(
+                        invocationStatement,
+                        ReturnStatement(ObjectCreationExpression(IdentifierName("TaskResult"))
+                            .WithArgumentList(ArgumentList(
+                            [
+                                .._parameters.Where(p => p.Type.HasFlag(ParamType.Out))
+                                    .Select(p =>
+                                        Argument(IdentifierName(p.Name)))
+                            ])))))
+            );
+        }
 
         return classSyntax;
     }

@@ -183,4 +183,40 @@
 	<data name="Subcategory.ArchiToolkit.Grasshopper.Instance" xml:space="preserve">
 		<value>ArchiToolkit.Grasshopper.Instance</value>
 	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.x.Name" xml:space="preserve">
+		<value>x</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.x.Nickname" xml:space="preserve">
+		<value>x</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.x.Description" xml:space="preserve">
+		<value>x</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.y.Name" xml:space="preserve">
+		<value>y</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.y.Nickname" xml:space="preserve">
+		<value>y</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.y.Description" xml:space="preserve">
+		<value>y</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.result.Name" xml:space="preserve">
+		<value>result</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.result.Nickname" xml:space="preserve">
+		<value>result</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.result.Description" xml:space="preserve">
+		<value>result</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.Component.Name" xml:space="preserve">
+		<value>AddAsync</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.Component.Nickname" xml:space="preserve">
+		<value>AddAsync</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.Component.Description" xml:space="preserve">
+		<value>AddAsync</value>
+	</data>
 </root>

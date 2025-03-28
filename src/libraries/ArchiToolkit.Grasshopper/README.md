@@ -213,6 +213,14 @@ public class Test
         => x + y;
 }
 ```
+Or you can just make a default value.
+```c#
+public class Test
+{
+    [DocObj]
+    public static int Add(int x, int y = 10) => x + y;
+}
+```
 ##### Optional
 Optional the data by the attribute `OptionalAttribute`.
 ```c#

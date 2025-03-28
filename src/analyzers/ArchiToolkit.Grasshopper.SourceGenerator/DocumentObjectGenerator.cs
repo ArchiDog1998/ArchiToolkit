@@ -46,6 +46,8 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         var baseComponent = GetBaseComponent(assembly.GetAttributes())
                             ?? arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.GH_Component");
+
+        var baseTaskComponent = arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.GH_TaskCapableComponent`1");
         var baseCategory = GetBaseCategory(assembly.GetAttributes()) ?? assembly.Name;
         var baseSubcategory = GetBaseSubcategory(assembly.GetAttributes()) ?? assembly.Name;
         var baseAttribute = GetBaseAttribute(assembly.GetAttributes());
@@ -90,6 +92,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         BasicGenerator.BaseAttribute = baseAttribute;
         MethodGenerator.GlobalBaseComponent = baseComponent!;
+        MethodGenerator.CreateSymbol = str => baseTaskComponent!.Construct(arg.Compilation.CreateErrorTypeSymbol(null, str, 0)) ;
 
         foreach (var method in methods)
         {

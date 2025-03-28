@@ -59,7 +59,7 @@
         <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net472;net48;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
 
-    <ItemGroup Condition="$(NeedAlmostAllFrameWorks)">
+    <ItemGroup Condition="$(NeedAlmostAllFrameWorks) and !$(MSBuildProjectName.EndsWith('Sources'))">
         <PackageReference Include="PolySharp">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

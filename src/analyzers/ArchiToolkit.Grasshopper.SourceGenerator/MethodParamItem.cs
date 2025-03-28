@@ -35,13 +35,14 @@ public class MethodParamItem(
     ImmutableArray<AttributeData> attributes,
     bool io = false)
 {
-    public readonly ParamAccess Access = GetParamAccess(type.Symbol);
+    public readonly ParamAccess Access = GetParamAccess(GetTypeWithoutIo(type.Symbol));
     public readonly ImmutableArray<AttributeData> Attributes = attributes;
     public readonly bool Io = io;
     public readonly string Name = name;
     public readonly ParameterName? Parameter;
     public readonly ParamType Type = paramType;
     public readonly TypeName TypeName = type;
+    public readonly TypeName TypeNameNoIoTask =  GetTypeWithoutIo(type.Symbol).GetName();
 
     public MethodParamItem(MethodGenerator generator, ParameterName name, TypeName owner)
         : this(generator, name.Name, name.Type,
@@ -89,7 +90,7 @@ public class MethodParamItem(
 
     public ExpressionStatementSyntax SetData(int index)
     {
-        var convertType = GetTypeWithoutIo(TypeName.Symbol).GetName().FullName;
+        var convertType = TypeNameNoIoTask.FullName;
         return ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                 IdentifierName("global::ArchiToolkit.Grasshopper.ActiveObjectHelper"),
                 IdentifierName("SetData" + Access)))
@@ -234,7 +235,7 @@ public class MethodParamItem(
                     return value switch
                     {
                         null => LiteralExpression(SyntaxKind.NullLiteralExpression),
-                        bool b => LiteralExpression(b
+                        bool bo => LiteralExpression(bo
                             ? SyntaxKind.TrueLiteralExpression
                             : SyntaxKind.FalseLiteralExpression),
                         sbyte sb => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(sb)),
@@ -419,19 +420,29 @@ public class MethodParamItem(
         return paramType;
     }
 
+    private static readonly string[] IoNames =
+    [
+        "global::System.Threading.Tasks.Task<>",
+        "global::System.Threading.Tasks.ValueTask<>",
+        "global::ArchiToolkit.Grasshopper.Io<>",
+    ];
+
     private static ITypeSymbol GetTypeWithoutIo(ITypeSymbol typeSymbol)
     {
-        if (typeSymbol is INamedTypeSymbol { IsGenericType: true, TypeArguments.Length: 1 } namedTypeSymbol
-            && namedTypeSymbol.ConstructUnboundGenericType().GetName().FullName ==
-            "global::ArchiToolkit.Grasshopper.Io<>")
-            return namedTypeSymbol.TypeArguments[0];
-        return typeSymbol;
+        return IoNames.Aggregate(typeSymbol, GetTypeWithoutType);
+
+        static ITypeSymbol GetTypeWithoutType(ITypeSymbol typeSymbol, string typeName)
+        {
+            if (typeSymbol is INamedTypeSymbol { IsGenericType: true, TypeArguments.Length: 1 } namedTypeSymbol
+                && namedTypeSymbol.ConstructUnboundGenericType().GetName().FullName ==
+                typeName)
+                return namedTypeSymbol.TypeArguments[0];
+            return typeSymbol;
+        }
     }
 
     private static ParamAccess GetParamAccess(ITypeSymbol typeSymbol)
     {
-        typeSymbol = GetTypeWithoutIo(typeSymbol);
-
         foreach (var type in typeSymbol.AllInterfaces.Append(typeSymbol))
             switch (type.GetName().FullName)
             {

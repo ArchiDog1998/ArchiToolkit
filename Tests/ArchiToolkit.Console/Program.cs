@@ -3,6 +3,13 @@
 using System.Collections;
 using ArchiToolkit.InterpolatedParser;
 
-var a = "";
-"I am sooooo cool!!".Parse($"I am so+ {a}!+");
-Console.WriteLine(a);
+var task = Wait();
+Console.WriteLine("Starting task");
+await task;
+return;
+
+async Task Wait()
+{
+    Console.WriteLine("Waiting...");
+    await Task.Delay(1000);
+}

@@ -9,6 +9,10 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.CSharp" />
+        <PackageReference Include="PolySharp">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.Grasshopper.SourceGenerator\ArchiToolkit.Grasshopper.SourceGenerator.csproj" OutputItemType="analyzer" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Grasshopper\ArchiToolkit.Grasshopper.csproj" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj" OutputItemType="analyzer" />
