@@ -195,7 +195,6 @@ public class MethodParamItem(
                 bool HasFlag(byte flag) => (b & flag) == flag;
             }
 
-
             if (isIn && Attributes.Any(a => a.AttributeClass?.GetName().FullName
                     is "global::ArchiToolkit.Grasshopper.OptionalAttribute"))
                 yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
@@ -221,6 +220,48 @@ public class MethodParamItem(
                      && persistentAttribute2.ConstructorArguments[0].Value?.ToString() is { } property2
                      && persistentAttribute2.AttributeClass?.TypeArguments[0].GetName().FullName is { } customClass)
                 yield return PersistentData(customClass, property2);
+
+            if (isIn && (Parameter?.Symbol.HasExplicitDefaultValue ?? false))
+            {
+                if (GetLiteralExpression(Parameter.Symbol.ExplicitDefaultValue)
+                    is { } literal)
+                {
+                    yield return SetPersistentData(literal);
+                }
+
+                LiteralExpressionSyntax? GetLiteralExpression(object? value)
+                {
+                    return value switch
+                    {
+                        null => LiteralExpression(SyntaxKind.NullLiteralExpression),
+                        bool b => LiteralExpression(b
+                            ? SyntaxKind.TrueLiteralExpression
+                            : SyntaxKind.FalseLiteralExpression),
+                        sbyte sb => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(sb)),
+                        byte b => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(b)),
+                        short s => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(s)),
+                        ushort us => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(us)),
+                        int i => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i)),
+                        uint ui => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(ui)),
+                        long l => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(l)),
+                        ulong ul => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(ul)),
+                        float f => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(f)),
+                        double d => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(d)),
+                        decimal m => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(m)),
+                        char c => LiteralExpression(SyntaxKind.CharacterLiteralExpression, Literal(c)),
+                        string s => LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(s)),
+                        _ => null
+                    };
+                }
+
+                ExpressionStatementSyntax SetPersistentData(LiteralExpressionSyntax valueExpression)
+                {
+                    return ExpressionStatement(InvocationExpression(MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
+                            IdentifierName("SetPersistentData")))
+                        .WithArgumentList(ArgumentList([Argument(valueExpression)])));
+                }
+            }
 
             if (GetInnerType(TypeName.Symbol) is { TypeKind: TypeKind.Enum } enumType)
             {

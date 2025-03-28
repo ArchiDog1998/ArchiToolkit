@@ -15,7 +15,7 @@ Studio is at the version `17.13.4`.
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ArchiToolkit.Grasshopper" Version="0.9.10" />
+    <PackageReference Include="ArchiToolkit.Grasshopper" Version="0.9.13" PrivateAssets="all" />
   </ItemGroup>
 ```
 
