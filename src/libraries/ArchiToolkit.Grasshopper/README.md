@@ -149,6 +149,27 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+##### Task Capable Component
+If you want to create a Task Capable Component, please make your method return a Task or ValueTask or your custom 
+awaitable things.
+```c#
+public class Test
+{
+    [DocObj]
+    public static Task<int> AddAsync(int x, int y) => Task.FromResult(x + y);
+}
+```
+> [!NOTE]
+>
+> It needs to create the [record](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record).
+> So you may need the package [PolySharp](https://www.nuget.org/packages/PolySharp) or you need to add these codes 
+> below to your project
+```c#
+namespace System.Runtime.CompilerServices
+{
+    internal static class IsExternalInit;
+}
+```
 ##### Upgrade Component
 If you want to make an `IGH_UpgradeObject` to update your component, add the attribute `UpgradeToAttribute` or 
 `UpgradeFromAttribute` to 
