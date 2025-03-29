@@ -187,7 +187,6 @@ public class MethodGenerator : BasicGenerator
 
             if (_parameters.Any(p => p.Type.HasFlag(ParamType.Out)))
             {
-
                 computeMembers = computeMembers.Append(Block((IEnumerable<StatementSyntax>)
                 [
                     .._parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.SetData(i, "data."))
@@ -326,8 +325,7 @@ public class MethodGenerator : BasicGenerator
                             .WithTypeArgumentList(TypeArgumentList([IdentifierName("TaskResult")])),
                         Identifier("Compute"))
                     .WithModifiers(
-                        TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword),
-                            Token(SyntaxKind.AsyncKeyword)))
+                        TokenList(Token(SyntaxKind.PrivateKeyword)))
                     .WithParameterList(
                         ParameterList(
                         [
@@ -338,15 +336,25 @@ public class MethodGenerator : BasicGenerator
                     .WithAttributeLists([
                         GeneratedCodeAttribute(typeof(MethodGenerator)).AddAttributes(NonUserCodeAttribute())
                     ])
-                    .WithBody(Block(
-                        invocationStatement,
-                        ReturnStatement(ObjectCreationExpression(IdentifierName("TaskResult"))
-                            .WithArgumentList(ArgumentList(
-                            [
-                                .._parameters.Where(p => p.Type.HasFlag(ParamType.Out))
-                                    .Select(p =>
-                                        Argument(IdentifierName(p.Name)))
-                            ])))))
+                    .WithExpressionBody(ArrowExpressionClause(InvocationExpression(MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("global::System.Threading.Tasks.Task"), IdentifierName("Run")))
+                        .WithArgumentList(ArgumentList(
+                        [
+                            Argument(ParenthesizedLambdaExpression()
+                                    .WithAsyncKeyword(Token(SyntaxKind.AsyncKeyword))
+                                    .WithBlock(Block(
+                                        invocationStatement,
+                                        ReturnStatement(ObjectCreationExpression(IdentifierName("TaskResult"))
+                                            .WithArgumentList(ArgumentList(
+                                            [
+                                                .._parameters.Where(p => p.Type.HasFlag(ParamType.Out))
+                                                    .Select(p =>
+                                                        Argument(IdentifierName(p.Name)))
+                                            ])))))),
+                            Argument(IdentifierName("CancelToken"))
+                        ]))))
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             );
         }
 
