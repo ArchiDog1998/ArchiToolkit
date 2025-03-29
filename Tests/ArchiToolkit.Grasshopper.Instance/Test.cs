@@ -8,5 +8,5 @@ public class Test
     public static int Add(int x, int y = 5) => x + y;
 
     [DocObj]
-    public static Task<int> AddAsync(int x, ref int y) => Task.FromResult(x + y);
+    public static Task<int> AddAsync(int x, int y) => Task.FromResult(x + y);
 }

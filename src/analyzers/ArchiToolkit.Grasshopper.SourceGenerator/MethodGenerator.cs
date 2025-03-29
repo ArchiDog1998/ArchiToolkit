@@ -27,10 +27,11 @@ public class MethodGenerator : BasicGenerator
             .Any(m => m.Parameters.Length == 0 &&
                       m.ReturnType.GetMembers().Any(m2 => m2.Name == "IsCompleted") &&
                       m.ReturnType.GetMembers().Any(m2 => m2.Name == "GetResult"));
-        ;
+
         var owner = Name.ContainingType;
         var items = Name.Parameters.Select(p => new MethodParamItem(this, p, owner));
-        if (methodSymbol.ReturnType.SpecialType is not SpecialType.System_Void)
+        if (methodSymbol.ReturnType.SpecialType is not SpecialType.System_Void
+            && (!IsAwaiter || methodSymbol.ReturnType is INamedTypeSymbol { IsGenericType: true }))
             items = items.Append(new MethodParamItem(this, "result", methodSymbol.ReturnType.GetName(), ParamType.Out,
                 owner,
                 methodSymbol.GetReturnTypeAttributes()));
@@ -189,15 +190,7 @@ public class MethodGenerator : BasicGenerator
 
                 computeMembers = computeMembers.Append(Block((IEnumerable<StatementSyntax>)
                 [
-                    ExpressionStatement(AssignmentExpression(
-                        SyntaxKind.SimpleAssignmentExpression,
-                        DeclarationExpression(IdentifierName("var"),
-                            ParenthesizedVariableDesignation(
-                            [
-                                .._parameters.Where(p => p.Type.HasFlag(ParamType.Out))
-                                    .Select(p => SingleVariableDesignation(Identifier(p.Name)))
-                            ])), IdentifierName("data"))),
-                    .._parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.SetData(i))
+                    .._parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.SetData(i, "data."))
                 ]));
             }
         }

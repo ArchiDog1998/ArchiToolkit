@@ -88,7 +88,7 @@ public class MethodParamItem(
             ]));
     }
 
-    public ExpressionStatementSyntax SetData(int index)
+    public ExpressionStatementSyntax SetData(int index, string prefix = "")
     {
         var convertType = TypeNameNoIoTask.FullName;
         return ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
@@ -99,7 +99,7 @@ public class MethodParamItem(
                 [
                     Argument(IdentifierName("DA")),
                     Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(index))),
-                    Argument(CastExpression(IdentifierName(convertType), IdentifierName(ParameterName)))
+                    Argument(CastExpression(IdentifierName(convertType), IdentifierName(prefix + ParameterName)))
                 ])));
     }
 
