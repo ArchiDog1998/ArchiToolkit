@@ -201,6 +201,15 @@
 	<data name="ArchiToolkit.Whatever.Component_AddAsync.y.Description" xml:space="preserve">
 		<value>y</value>
 	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.name.Name" xml:space="preserve">
+		<value>name</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.name.Nickname" xml:space="preserve">
+		<value>name</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Component_AddAsync.name.Description" xml:space="preserve">
+		<value>name</value>
+	</data>
 	<data name="ArchiToolkit.Whatever.Component_AddAsync.result.Name" xml:space="preserve">
 		<value>result</value>
 	</data>
@@ -218,5 +227,11 @@
 	</data>
 	<data name="ArchiToolkit.Whatever.Component_AddAsync.Component.Description" xml:space="preserve">
 		<value>AddAsync</value>
+	</data>
+	<data name="Optional Key" xml:space="preserve">
+		<value>Localization String</value>
+	</data>
+	<data name="stringArgValue" xml:space="preserve">
+		<value>stringArgValue</value>
 	</data>
 </root>

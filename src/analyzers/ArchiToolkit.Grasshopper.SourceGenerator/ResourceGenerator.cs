@@ -78,16 +78,38 @@ public class ResourceGenerator : IIncrementalGenerator
                     .WithExpressionBody(ArrowExpressionClause(BinaryExpression(SyntaxKind.CoalesceExpression,
                         InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                                 IdentifierName("ResourceManager"), IdentifierName("GetString")))
-                            .WithArgumentList(
-                                ArgumentList(
-                                [
-                                    Argument(IdentifierName("name")),
-
-                                    Argument(IdentifierName("Culture"))
-                                ])),
+                            .WithArgumentList(ArgumentList(
+                            [
+                                Argument(IdentifierName("name")),
+                                Argument(IdentifierName("Culture"))
+                            ])),
                         IdentifierName("name"))))
-                    .WithSemicolonToken(
-                        Token(SyntaxKind.SemicolonToken))
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+
+                MethodDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("Loc"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword), Token(SyntaxKind.PartialKeyword)))
+                    .WithParameterList(
+                        ParameterList(
+                        [
+                            Parameter(Identifier("value"))
+                                .WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
+                                .WithType(PredefinedType(Token(SyntaxKind.StringKeyword))),
+                            Parameter(Identifier("key"))
+                                .WithType(PredefinedType(Token(SyntaxKind.StringKeyword)))
+                                .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.StringLiteralExpression,
+                                    Literal(""))))
+                        ]))
+                    .WithExpressionBody(ArrowExpressionClause(InvocationExpression(IdentifierName("Get"))
+                        .WithArgumentList(ArgumentList(
+                        [
+                            Argument(InvocationExpression(IdentifierName("GetKey"))
+                                .WithArgumentList(ArgumentList(
+                                [
+                                    Argument(IdentifierName("key")),
+                                    Argument(IdentifierName("value"))
+                                ])))
+                        ]))))
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ]);
     }
 }

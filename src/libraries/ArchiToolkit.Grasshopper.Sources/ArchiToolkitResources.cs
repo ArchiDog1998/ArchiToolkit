@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 
 // ReSharper disable ArrangeTypeModifiers
@@ -17,4 +18,25 @@ internal static partial class ArchiToolkitResources
         if (bitmap.Width < 2 || bitmap.Height < 2) return null!;
         return bitmap;
     }
+
+    private static string GetKey(string key, string value)
+    {
+        if (!string.IsNullOrEmpty(key)) return key;
+        var method = new StackFrame(2).GetMethod();
+        if (method is null) return value;
+        var className = method.DeclaringType?.FullName ?? string.Empty;
+        var methodName = method.Name;
+        return className + "." + methodName + "." + value;
+    }
+
+    /// <summary>
+    /// Localization your string
+    /// </summary>
+    /// <code>
+    /// "Localization String".Loc("Optional Key");
+    /// </code>
+    /// <param name="value">The default string</param>
+    /// <param name="key">The local key</param>
+    /// <returns>Localized string</returns>
+    public static partial string Loc(this string value, string key = "");
 }

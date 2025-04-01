@@ -8,12 +8,17 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
-public class  CateInfo
+public class CateInfo
 {
     public string ShortName { get; set; } = string.Empty;
     public char? SymbolName { get; set; }
 }
 
+public readonly struct LocInfo(string key, string value)
+{
+    public string Key => key;
+    public string Value => value;
+}
 
 [Generator(LanguageNames.CSharp)]
 [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers")]
@@ -32,22 +37,103 @@ public class DocumentObjectGenerator : IIncrementalGenerator
                                     method.Modifiers.Any(m => m.IsKind(SyntaxKind.StaticKeyword)),
                 static (context, _) => new MethodGenerator(context.TargetSymbol));
 
-        var items = attributeTypes.Collect().Combine(attributeMethods.Collect()).Combine(context.CompilationProvider);
+        var methodInvocations = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                predicate: static (node, _) => node is InvocationExpressionSyntax,
+                transform: GetLocNames)
+            .Where(static info => info is not null)
+            .Select(static (info, _) => info!.Value);
+
+        var items = attributeTypes.Collect()
+            .Combine(attributeMethods.Collect())
+            .Combine(context.CompilationProvider)
+            .Combine(methodInvocations.Collect());
         context.RegisterSourceOutput(items, Generate);
     }
 
-    private static void Generate(SourceProductionContext context,
-        ((ImmutableArray<TypeGenerator> Types, ImmutableArray<MethodGenerator> Methods) Items,
-            Compilation Compilation) arg)
+
+    private static LocInfo? GetLocNames(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
-        var assembly = arg.Compilation.Assembly;
-        var types = arg.Items.Types.Concat(GetTypeGenerators(assembly.GetAttributes()));
-        var methods = arg.Items.Methods;
+        var invocation = (InvocationExpressionSyntax)context.Node;
+        var model = context.SemanticModel;
+
+        if (model.GetSymbolInfo(invocation).Symbol is not IMethodSymbol symbol) return null;
+
+        if (symbol.Name is not "Loc"
+            || symbol.ContainingType.GetName().FullName is not "global::ArchiToolkit.Grasshopper.ArchiToolkitResources")
+            return null;
+
+        List<string> arguments = [];
+        if (symbol is { IsExtensionMethod: true, ReducedFrom: not null } &&
+            invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            if (ExtractConstantValue(memberAccess.Expression, model) is { } stringArg )
+            {
+                arguments.Add(stringArg);
+            }
+        }
+
+        foreach (var arg in invocation.ArgumentList.Arguments)
+        {
+            if (ExtractConstantValue(arg.Expression, model) is { } stringArg )
+            {
+                arguments.Add(stringArg);
+            }
+        }
+
+        if (!arguments.Any()) return null;
+        var value = arguments[0];
+        var key = arguments.Count == 2 ? arguments[1] : GetName();
+
+        return new LocInfo(key, value);
+
+        string GetName()
+        {
+            var methodSyntax = invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+            if (methodSyntax is null) return value;
+            if(model.GetDeclaredSymbol(methodSyntax) is not { } methodSymbol) return value;
+            var typeSymbol = methodSymbol.ContainingType;
+            return  typeSymbol.ContainingNamespace + "." +typeSymbol.MetadataName + "." + methodSymbol.Name + "." + value;
+        }
+    }
+
+    private static string? ExtractConstantValue(ExpressionSyntax expression, SemanticModel model)
+    {
+        switch (expression)
+        {
+            case LiteralExpressionSyntax { Token.ValueText: { } stringValue }:
+                return stringValue;
+            case IdentifierNameSyntax identifier:
+            {
+                var symbol = model.GetSymbolInfo(identifier).Symbol;
+                switch (symbol)
+                {
+                    case IFieldSymbol { HasConstantValue: true } fieldSymbol:
+                        return fieldSymbol.ConstantValue as string;
+                    case ILocalSymbol { HasConstantValue: true } localSymbol:
+                        return localSymbol.ConstantValue as string;
+                }
+
+                break;
+            }
+        }
+
+        return null;
+    }
+
+    private static void Generate(SourceProductionContext context,
+        (((ImmutableArray<TypeGenerator> Types, ImmutableArray<MethodGenerator> Methods) Items,
+            Compilation Compilation) Left, ImmutableArray<LocInfo> Locs ) arg)
+    {
+        var compilation = arg.Left.Compilation;
+        var assembly = compilation.Assembly;
+        var types = arg.Left.Items.Types.Concat(GetTypeGenerators(assembly.GetAttributes()));
+        var methods = arg.Left.Items.Methods;
 
         var baseComponent = GetBaseComponent(assembly.GetAttributes())
-                            ?? arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.GH_Component");
+                            ?? compilation.GetTypeByMetadataName("Grasshopper.Kernel.GH_Component");
 
-        var baseTaskComponent = arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.GH_TaskCapableComponent`1");
+        var baseTaskComponent = compilation.GetTypeByMetadataName("Grasshopper.Kernel.GH_TaskCapableComponent`1");
         var baseCategory = GetBaseCategory(assembly.GetAttributes()) ?? assembly.Name;
         var baseSubcategory = GetBaseSubcategory(assembly.GetAttributes()) ?? assembly.Name;
         var baseAttribute = GetBaseAttribute(assembly.GetAttributes());
@@ -59,7 +145,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         BasicGenerator.Categories.Clear();
         BasicGenerator.BaseCategory = baseCategory;
         BasicGenerator.BaseSubcategory = baseSubcategory;
-        TypeGenerator.BaseGoo = arg.Compilation.GetTypeByMetadataName("Grasshopper.Kernel.Types.GH_Goo`1")!;
+        TypeGenerator.BaseGoo = compilation.GetTypeByMetadataName("Grasshopper.Kernel.Types.GH_Goo`1")!;
         BasicGenerator.CategoryInfos = GetCategoryInfos(assembly.GetAttributes());
 
         foreach (var type in types)
@@ -73,7 +159,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             if (!typeAndClasses.ContainsKey(key)) typeAndClasses.Add(key, className);
         }
 
-        foreach (var item in GetAllParams(arg.Compilation.GlobalNamespace)
+        foreach (var item in GetAllParams(compilation.GlobalNamespace)
                      .OrderByDescending(i => i.Score))
         foreach (var k in item.Keys)
         {
@@ -92,7 +178,8 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         BasicGenerator.BaseAttribute = baseAttribute;
         MethodGenerator.GlobalBaseComponent = baseComponent!;
-        MethodGenerator.CreateSymbol = str => baseTaskComponent!.Construct(arg.Compilation.CreateErrorTypeSymbol(null, str, 0)) ;
+        MethodGenerator.CreateSymbol =
+            str => baseTaskComponent!.Construct(compilation.CreateErrorTypeSymbol(null, str, 0));
 
         foreach (var method in methods)
         {
@@ -105,6 +192,11 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         if (GetCsprojDirectory(assembly) is { } dir)
         {
+            foreach (var info in arg.Locs)
+            {
+                BasicGenerator.Translations[info.Key] = info.Value;
+            }
+
             GenerateTranslations(dir.FullName);
             GenerateIcons(dir.FullName);
         }
@@ -283,7 +375,8 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         foreach (var attr in attributes)
         {
             if (attr.AttributeClass is not { } attributeClass) continue;
-            if (attributeClass.GetName().FullName is not "global::ArchiToolkit.Grasshopper.CategoryInfoAttribute") continue;
+            if (attributeClass.GetName().FullName is not "global::ArchiToolkit.Grasshopper.CategoryInfoAttribute")
+                continue;
             if (attr.ConstructorArguments.Length is 0) continue;
 
             var key = attr.ConstructorArguments[0].Value?.ToString() ?? string.Empty;
@@ -292,6 +385,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             if (attr.ConstructorArguments[2].Value?.ToString() is { Length: > 0 } symbolName
                 && symbolName[0] is not char.MinValue) info.SymbolName = symbolName[0];
         }
+
         return categories;
     }
 

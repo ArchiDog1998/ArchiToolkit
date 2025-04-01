@@ -369,3 +369,9 @@ public class MyType : IGH_PreviewData, IGH_BakeAwareData
     }
 }
 ```
+### Others
+#### Localization
+For the case you want to use the ArchiToolkit.Resources. You can do this to let it generate the string for you.
+```c#
+"Localization String".Loc("Optional Key");
+```
