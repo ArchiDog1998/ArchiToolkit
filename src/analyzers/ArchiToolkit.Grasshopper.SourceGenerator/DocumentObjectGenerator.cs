@@ -89,7 +89,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         string GetName()
         {
-            var methodSyntax = invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+            var methodSyntax = invocation.Ancestors().OfType<MemberDeclarationSyntax>().FirstOrDefault();
             if (methodSyntax is null) return value;
             if(model.GetDeclaredSymbol(methodSyntax) is not { } methodSymbol) return value;
             var typeSymbol = methodSymbol.ContainingType;
