@@ -228,6 +228,12 @@
 	<data name="ArchiToolkit.Whatever.Component_AddAsync.Component.Description" xml:space="preserve">
 		<value>AddAsync</value>
 	</data>
+	<data name="What a field" xml:space="preserve">
+		<value>What a field</value>
+	</data>
+	<data name="ArchiToolkit.Whatever.Test.AddAsync.What Hell" xml:space="preserve">
+		<value>What Hell</value>
+	</data>
 	<data name="Optional Key" xml:space="preserve">
 		<value>Localization String</value>
 	</data>

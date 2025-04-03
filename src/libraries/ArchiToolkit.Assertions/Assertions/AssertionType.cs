@@ -10,7 +10,6 @@ public enum AssertionType : byte
     /// </summary>
     Could,
 
-
     /// <summary>
     ///     Should way.
     /// </summary>

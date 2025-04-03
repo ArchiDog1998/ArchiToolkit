@@ -1,7 +1,15 @@
 ﻿// ReSharper disable LocalizableElement
 
 using System.Collections;
+using ArchiToolkit.Assertions;
+using ArchiToolkit.Assertions.Execution;
+using ArchiToolkit.Assertions.FluentValidation;
+using ArchiToolkit.Console;
 using ArchiToolkit.InterpolatedParser;
+
+var validator = new Validator();
+new Item().Must().BeValidBy(validator);
+
 
 var task = Wait();
 Console.WriteLine("Starting task");

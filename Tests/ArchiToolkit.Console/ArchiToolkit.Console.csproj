@@ -10,6 +10,7 @@
         <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.Fluent.SourceGenerator\ArchiToolkit.Fluent.SourceGenerator.csproj" OutputItemType="analyzer" />
         <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.InterpolatedParser.SourceGenerator\ArchiToolkit.InterpolatedParser.SourceGenerator.csproj" OutputItemType="analyzer" />
         <ProjectReference Include="..\..\src\analyzers\ArchiToolkit.PureConst.Analyzer\ArchiToolkit.PureConst.Analyzer.csproj" OutputItemType="analyzer" />
+        <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Assertions.FluentValidation\ArchiToolkit.Assertions.FluentValidation.csproj" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.Fluent\ArchiToolkit.Fluent.csproj" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.PureConst\ArchiToolkit.PureConst.csproj" />
         <ProjectReference Include="..\..\src\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj" OutputItemType="analyzer"  />
@@ -18,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="FluentValidation" />
       <PackageReference Include="Microsoft.Extensions.Logging.Console"/>
       <PackageReference Include="Seq.Extensions.Logging"/>
     </ItemGroup>

@@ -86,7 +86,7 @@ public readonly struct AssertionService(IAssertionStrategy pushStrategy, IAssert
     private static void CheckCurrentServices()
     {
         if (CurrentServices.Count > 0) return;
-        CurrentServices.Add(new AssertionService((AssertionType)byte.MaxValue));
+        CurrentServices.Add(new AssertionService(AssertionType.Must));
     }
 
     private static MergedAssertionStrategy CalculateMergedPushStrategy()
