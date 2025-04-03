@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>0.9.14.3</Version>
+        <Version>0.9.15</Version>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
