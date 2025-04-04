@@ -258,7 +258,14 @@ public class MethodGenerator : BasicGenerator
         var addedMembers = baseComponent
             .GetBaseTypesAndThis()
             .SelectMany(t => t.GetMembers())
-            .Where(m => m.DeclaredAccessibility is not Accessibility.Private and not Accessibility.ProtectedAndInternal)
+            .Where(m => m.DeclaredAccessibility switch
+                {
+                    Accessibility.Private => false,
+                    Accessibility.ProtectedAndInternal when !baseComponent.ContainingAssembly
+                        .Equals(Symbol.ContainingAssembly, SymbolEqualityComparer.Default) => false,
+                    _ => true
+                }
+            )
             .Select(i => i.Name)
             .ToArray();
 
@@ -280,7 +287,7 @@ public class MethodGenerator : BasicGenerator
             [
                 .._parameters
                     .Where(p => p.Type is ParamType.Field)
-                    .Where(p => !addedMembers.Contains(p.Name))
+                    .Where(p => !addedMembers.Contains(p.ParameterName))
                     .Select(p => p.Field()),
                 inputMethod,
                 outputMethod,
@@ -342,16 +349,16 @@ public class MethodGenerator : BasicGenerator
                         .WithArgumentList(ArgumentList(
                         [
                             Argument(ParenthesizedLambdaExpression()
-                                    .WithAsyncKeyword(Token(SyntaxKind.AsyncKeyword))
-                                    .WithBlock(Block(
-                                        invocationStatement,
-                                        ReturnStatement(ObjectCreationExpression(IdentifierName("TaskResult"))
-                                            .WithArgumentList(ArgumentList(
-                                            [
-                                                .._parameters.Where(p => p.Type.HasFlag(ParamType.Out))
-                                                    .Select(p =>
-                                                        Argument(IdentifierName(p.Name)))
-                                            ])))))),
+                                .WithAsyncKeyword(Token(SyntaxKind.AsyncKeyword))
+                                .WithBlock(Block(
+                                    invocationStatement,
+                                    ReturnStatement(ObjectCreationExpression(IdentifierName("TaskResult"))
+                                        .WithArgumentList(ArgumentList(
+                                        [
+                                            .._parameters.Where(p => p.Type.HasFlag(ParamType.Out))
+                                                .Select(p =>
+                                                    Argument(IdentifierName(p.Name)))
+                                        ])))))),
                             Argument(IdentifierName("CancelToken"))
                         ]))))
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
