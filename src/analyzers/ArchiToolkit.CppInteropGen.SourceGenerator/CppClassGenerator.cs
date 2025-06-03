@@ -1,19 +1,20 @@
-﻿using Microsoft.CodeAnalysis.Text;
+﻿using System.Text;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+using SyntaxExtensions = ArchiToolkit.RoslynHelper.Extensions.SyntaxExtensions;
 
 namespace ArchiToolkit.CppInteropGen.SourceGenerator;
 
-using System.Text;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static RoslynHelper.Extensions.SyntaxExtensions;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static SyntaxExtensions;
+using static SyntaxFactory;
 
 public class CppClassGenerator
 {
     private readonly string _className;
+    private readonly string _dllName = string.Empty;
     private readonly IReadOnlyList<string> _fields;
     private readonly IReadOnlyList<CMethodGenerator> _methods;
-    private readonly string _dllName = string.Empty;
 
     public CppClassGenerator(SourceText text, string className)
     {
@@ -120,10 +121,9 @@ public class CppClassGenerator
                     ])))
                 .WithBody(Block(
                     ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
-                        IdentifierName("Ptr"), IdentifierName("ptr"))))),
+                        IdentifierName("Ptr"), IdentifierName("ptr")))))
         ];
         if (!string.IsNullOrEmpty(_dllName))
-        {
             members = members.Append(
                 PropertyDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("DllName"))
                     .WithAttributeLists([GeneratedCodeAttribute(typeof(CppClassGenerator))])
@@ -131,7 +131,6 @@ public class CppClassGenerator
                     .WithExpressionBody(ArrowExpressionClause(LiteralExpression(SyntaxKind.StringLiteralExpression,
                         Literal(_dllName))))
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
-        }
 
         return ClassDeclaration(_className)
             .WithModifiers(
@@ -174,6 +173,67 @@ public class CppClassGenerator
 
         public MemberDeclarationSyntax Generate()
         {
+            if (_methodName.Contains("Create", StringComparison.InvariantCultureIgnoreCase))
+                return ConstructorDeclaration(_className)
+                    .WithModifiers(TokenList(Token(_isPrivate ? SyntaxKind.PrivateKeyword : SyntaxKind.PublicKeyword)))
+                    .WithAttributeLists([GeneratedCodeAttribute(typeof(CMethodGenerator))])
+                    .WithParameterList(ParameterList(
+                    [
+                        .._parameters.Take(_parameters.Count - 1).Select(p => p.GenerateParameter())
+                    ]))
+                    .WithBody(Block(
+                        GetRunMethod(Block(
+                            GetFunctionPointer(_parameters.Select(p => p.GenerateFunctionPointer())),
+                            FixedStatement(VariableDeclaration(PointerType(PointerType(IdentifierName("Data"))))
+                                    .WithVariables([
+                                        VariableDeclarator(Identifier("ptr"))
+                                            .WithInitializer(EqualsValueClause(PrefixUnaryExpression(
+                                                SyntaxKind.AddressOfExpression, IdentifierName("Ptr"))))
+                                    ]),
+                                ReturnStatement(InvocationExpression(IdentifierName("method"))
+                                    .WithArgumentList(ArgumentList(
+                                    [
+                                        .._parameters.Take(_parameters.Count - 1).Select(p => p.GenerateArgument()),
+                                        Argument(IdentifierName("ptr"))
+                                    ]))))
+                        ))));
+
+            if (_methodName.Contains("Delete", StringComparison.InvariantCultureIgnoreCase))
+                return MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("Delete"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.ProtectedKeyword), Token(SyntaxKind.OverrideKeyword)))
+                    .WithAttributeLists([GeneratedCodeAttribute(typeof(CMethodGenerator))])
+                    .WithBody(Block(
+                        GetRunMethod(Block(
+                            GetFunctionPointer(_parameters.Select(p => p.GenerateFunctionPointer())),
+                            ReturnStatement(InvocationExpression(IdentifierName("method"))
+                                .WithArgumentList(ArgumentList(
+                                [
+                                    Argument(IdentifierName("Ptr"))
+                                ])))
+                        ))));
+
+            return MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)),
+                    Identifier(_isPrivate ? "_" + _csMethodName : _csMethodName))
+                .WithModifiers(TokenList(Token(_isPrivate ? SyntaxKind.PrivateKeyword : SyntaxKind.PublicKeyword)))
+                .WithAttributeLists([GeneratedCodeAttribute(typeof(CMethodGenerator))])
+                .WithParameterList(ParameterList(
+                [
+                    .._parameters.Skip(1).Select(p => p.GenerateParameter())
+                ]))
+                .WithBody(Block((StatementSyntax[])
+                [
+                    .._parameters.Where(p => p.IsRefOrOut).SelectMany(p => p.GenerateLocalDeclaration()),
+                    GetRunMethod(Block(
+                        GetFunctionPointer(_parameters.Select(p => p.GenerateFunctionPointer())),
+                        ReturnStatement(InvocationExpression(IdentifierName("method"))
+                            .WithArgumentList(ArgumentList(
+                            [
+                                Argument(IdentifierName("Ptr")),
+                                .._parameters.Skip(1).Select(p => p.GenerateArgument())
+                            ]))))),
+                    .._parameters.Where(p => p.IsRefOrOut).Select(p => p.GenerateAssignment())
+                ]));
+
             ExpressionStatementSyntax GetRunMethod(BlockSyntax block)
             {
                 return ExpressionStatement(InvocationExpression(IdentifierName("SafeRun"))
@@ -213,98 +273,14 @@ public class CppClassGenerator
                                     ])))))
                     ]));
             }
-
-            if (_methodName.Contains("Create"))
-                return ConstructorDeclaration(_className)
-                    .WithModifiers(TokenList(Token(_isPrivate ? SyntaxKind.PrivateKeyword : SyntaxKind.PublicKeyword)))
-                    .WithAttributeLists([GeneratedCodeAttribute(typeof(CMethodGenerator))])
-                    .WithParameterList(ParameterList(
-                    [
-                        .._parameters.Take(_parameters.Count - 1).Select(p => p.GenerateParameter())
-                    ]))
-                    .WithBody(Block(
-                        GetRunMethod(Block(
-                            GetFunctionPointer(_parameters.Select(p => p.GenerateFunctionPointer())),
-                            FixedStatement(VariableDeclaration(PointerType(PointerType(IdentifierName("Data"))))
-                                    .WithVariables([
-                                        VariableDeclarator(Identifier("ptr"))
-                                            .WithInitializer(EqualsValueClause(PrefixUnaryExpression(
-                                                SyntaxKind.AddressOfExpression, IdentifierName("Ptr"))))
-                                    ]),
-                                ReturnStatement(InvocationExpression(IdentifierName("method"))
-                                    .WithArgumentList(ArgumentList(
-                                    [
-                                        .._parameters.Take(_parameters.Count - 1).Select(p => p.GenerateArgument()),
-                                        Argument(IdentifierName("ptr"))
-                                    ]))))
-                        ))));
-
-            if (_methodName.Contains("Delete"))
-                return MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("Delete"))
-                    .WithModifiers(TokenList(Token(SyntaxKind.ProtectedKeyword), Token(SyntaxKind.OverrideKeyword)))
-                    .WithAttributeLists([GeneratedCodeAttribute(typeof(CMethodGenerator))])
-                    .WithBody(Block(
-                        GetRunMethod(Block(
-                            GetFunctionPointer(_parameters.Select(p => p.GenerateFunctionPointer())),
-                            ReturnStatement(InvocationExpression(IdentifierName("method"))
-                                .WithArgumentList(ArgumentList(
-                                [
-                                    Argument(IdentifierName("Ptr"))
-                                ])))
-                        ))));
-
-            return MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)),
-                    Identifier(_isPrivate ? "_" + _csMethodName : _csMethodName))
-                .WithModifiers(TokenList(Token(_isPrivate ? SyntaxKind.PrivateKeyword : SyntaxKind.PublicKeyword)))
-                .WithAttributeLists([GeneratedCodeAttribute(typeof(CMethodGenerator))])
-                .WithParameterList(ParameterList(
-                [
-                    .._parameters.Skip(1).Select(p => p.GenerateParameter())
-                ]))
-                .WithBody(Block((StatementSyntax[])
-                [
-                    .._parameters.Where(p => p.IsRefOrOut).SelectMany(p => p.GenerateLocalDeclaration()),
-                    GetRunMethod(Block(
-                        GetFunctionPointer(_parameters.Select(p => p.GenerateFunctionPointer())),
-                        ReturnStatement(InvocationExpression(IdentifierName("method"))
-                            .WithArgumentList(ArgumentList(
-                            [
-                                Argument(IdentifierName("Ptr")),
-                                .._parameters.Skip(1).Select(p => p.GenerateArgument())
-                            ]))))),
-                    .._parameters.Where(p => p.IsRefOrOut).Select(p => p.GenerateAssignment()),
-                ]));
-
-            LocalFunctionStatementSyntax PInvokeFunction()
-            {
-                return LocalFunctionStatement(IdentifierName("global::System.IntPtr"), Identifier(_methodName))
-                    .WithAttributeLists(
-                    [
-                        GeneratedCodeAttribute(typeof(CMethodGenerator)).AddAttributes(Attribute(
-                                IdentifierName("global::System.Runtime.InteropServices.DllImport"))
-                            .WithArgumentList(AttributeArgumentList(
-                            [
-                                AttributeArgument(IdentifierName("DllName")),
-                                AttributeArgument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                        IdentifierName("global::System.Runtime.InteropServices.CallingConvention"),
-                                        IdentifierName("Cdecl")))
-                                    .WithNameEquals(NameEquals(IdentifierName("CallingConvention")))
-                            ])))
-                    ])
-                    .WithModifiers(TokenList(Token(SyntaxKind.StaticKeyword), Token(SyntaxKind.ExternKeyword)))
-                    .WithParameterList(ParameterList(
-                    [
-                        .._parameters.Select(p => p.GenerateParameter())
-                    ]))
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
-            }
         }
 
         private class ParameterGenerator
         {
+            private readonly string _name;
             private readonly int _ptrCount;
-            private readonly ParameterType _type;
             private readonly string _rawTypeName;
+            private readonly ParameterType _type;
 
             public ParameterGenerator(string parameterString)
             {
@@ -336,7 +312,7 @@ public class CppClassGenerator
                             "unsigned int" => "uint",
                             "unsigned long long" => "ulong",
                             "size_t" => "global::System.UIntPtr",
-                            _ => typeName,
+                            _ => typeName
                         };
                     return typeName + ".Data";
                 }
@@ -356,8 +332,6 @@ public class CppClassGenerator
 
             public bool IsRefOrOut => _type is ParameterType.Ref or ParameterType.Out;
 
-            private readonly string _name;
-
             private string TypeNameWithPointer => _type switch
             {
                 ParameterType.Ref or ParameterType.Out => _rawTypeName + new string('*', _ptrCount - 1),
@@ -372,6 +346,8 @@ public class CppClassGenerator
                     return s.EndsWith(".Data*") ? s.Substring(0, s.Length - 6) : s;
                 }
             }
+
+            private bool IsData => TypeNameWithPointer.EndsWith(".Data*");
 
             public ParameterSyntax GenerateParameter()
             {
@@ -392,8 +368,6 @@ public class CppClassGenerator
             {
                 return FunctionPointerParameter(IdentifierName(_rawTypeName + new string('*', _ptrCount)));
             }
-
-            private bool IsData => TypeNameWithPointer.EndsWith(".Data*");
 
             public ArgumentSyntax GenerateArgument()
             {
