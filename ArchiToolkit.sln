@@ -85,6 +85,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.So
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Assertions.FluentValidation", "src\libraries\ArchiToolkit.Assertions.FluentValidation\ArchiToolkit.Assertions.FluentValidation.csproj", "{C8A52917-709C-4BF4-9E5F-2ECF7CEE8580}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CppInteropGen", "CppInteropGen", "{6CD726FE-A185-4878-B57A-DF9CA2466D51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.CppInteropGen", "src\libraries\ArchiToolkit.CppInteropGen\ArchiToolkit.CppInteropGen.csproj", "{17FC80CD-877D-4878-B8DF-E5335C15E26E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{42293C6E-693B-44BB-AA69-A8D431F322BB} = {42293C6E-693B-44BB-AA69-A8D431F322BB}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.CppInteropGen.SourceGenerator", "src\analyzers\ArchiToolkit.CppInteropGen.SourceGenerator\ArchiToolkit.CppInteropGen.SourceGenerator.csproj", "{42293C6E-693B-44BB-AA69-A8D431F322BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -170,6 +179,14 @@ Global
 		{C8A52917-709C-4BF4-9E5F-2ECF7CEE8580}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8A52917-709C-4BF4-9E5F-2ECF7CEE8580}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8A52917-709C-4BF4-9E5F-2ECF7CEE8580}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17FC80CD-877D-4878-B8DF-E5335C15E26E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17FC80CD-877D-4878-B8DF-E5335C15E26E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17FC80CD-877D-4878-B8DF-E5335C15E26E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17FC80CD-877D-4878-B8DF-E5335C15E26E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42293C6E-693B-44BB-AA69-A8D431F322BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42293C6E-693B-44BB-AA69-A8D431F322BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42293C6E-693B-44BB-AA69-A8D431F322BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42293C6E-693B-44BB-AA69-A8D431F322BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,5 +217,8 @@ Global
 		{31552682-9BEF-49E9-B683-AC3B26EBA24E} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
 		{F1BE5A2D-86D3-43DC-BB4E-76C14B15C7B7} = {23F577BA-37E9-4BF2-8957-6801EAF882EB}
 		{C8A52917-709C-4BF4-9E5F-2ECF7CEE8580} = {5839FE18-49B3-4E86-93E8-F465943B1885}
+		{6CD726FE-A185-4878-B57A-DF9CA2466D51} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
+		{17FC80CD-877D-4878-B8DF-E5335C15E26E} = {6CD726FE-A185-4878-B57A-DF9CA2466D51}
+		{42293C6E-693B-44BB-AA69-A8D431F322BB} = {6CD726FE-A185-4878-B57A-DF9CA2466D51}
 	EndGlobalSection
 EndGlobal
