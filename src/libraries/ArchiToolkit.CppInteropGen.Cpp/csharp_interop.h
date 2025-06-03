@@ -11,8 +11,8 @@
 #define API_EXPORT extern "C" __attribute__((visibility("default")))
 #endif
 
-#define CSHARP_WRAPPER(FUNC_DECL, BODY) \
-API_EXPORT char* FUNC_DECL {                 \
+#define CSHARP_WRAPPER(FUNC_DECL, BODY)   \
+API_EXPORT inline char* FUNC_DECL {       \
 return (wrap_call([&] BODY));             \
 }
 
