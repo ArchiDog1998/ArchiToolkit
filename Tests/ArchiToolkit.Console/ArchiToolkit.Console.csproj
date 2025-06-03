@@ -25,7 +25,4 @@
       <PackageReference Include="Microsoft.Extensions.Logging.Console"/>
       <PackageReference Include="Seq.Extensions.Logging"/>
     </ItemGroup>
-    <ItemGroup>
-        <AdditionalFiles Include="C:\Users\ArchiTed\Work\Codes\KitchenSink\KitchenSink.Geometry.Occt.Cpp\*_C.cpp" Visible="false"/>
-    </ItemGroup>
 </Project>
