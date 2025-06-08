@@ -51,7 +51,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                 ClassDeclaration(target.Name).WithModifiers(TokenList(Token(SyntaxKind.PartialKeyword)))
                     .WithBaseList(BaseList([SimpleBaseType(baseType)]))
                     .WithMembers([
-                        ..CreatorMembers(target.Name),
+                        ..CreatorMembers(target.Name, data),
                         ..GenerateMembers(members, dictionary, trackerName),
                     ]),
                 ClassDeclaration(target.Name + "Extensions")
@@ -60,6 +60,20 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                     .WithMembers([
                         GenerateCreateTracker(target),
                         GenerateCreateTracker(data),
+                        MethodDeclaration(IdentifierName(target.Name), Identifier("ToValidResult"))
+                            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
+                            .WithAttributeLists([
+                                GeneratedCodeAttribute(typeof(ValidResultsGenerator))
+                                    .AddAttributes(NonUserCodeAttribute(), PureAttribute())
+                            ])
+                            .WithParameterList(ParameterList(
+                            [
+                                Parameter(Identifier("value"))
+                                    .WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
+                                    .WithType(IdentifierName(data.GetName().FullName))
+                            ]))
+                            .WithExpressionBody(ArrowExpressionClause(IdentifierName("value")))
+                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
                         ..GenerateStaticMembers(members, dictionary, trackerName),
                     ]),
                 ClassDeclaration(trackerName)
@@ -261,7 +275,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
             .WithAccessorList(AccessorList([..accessors]));
     }
 
-    private static IEnumerable<MemberDeclarationSyntax> CreatorMembers(string className)
+    private static IEnumerable<MemberDeclarationSyntax> CreatorMembers(string className, INamedTypeSymbol dataType)
     {
         yield return ConstructorDeclaration(Identifier(className))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
@@ -294,6 +308,26 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                 .WithArgumentList(ArgumentList(
                 [
                     Argument(IdentifierName("data"))
+                ]))))
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+
+        yield return ConversionOperatorDeclaration(Token(SyntaxKind.ImplicitKeyword),
+                IdentifierName(className))
+            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
+            .WithAttributeLists([
+                GeneratedCodeAttribute(typeof(ValidResultsGenerator))
+                    .AddAttributes(NonUserCodeAttribute(), PureAttribute())
+            ])
+            .WithParameterList(ParameterList(
+            [
+                Parameter(Identifier("value")).WithType(IdentifierName(dataType.GetName().FullName))
+            ]))
+            .WithExpressionBody(ArrowExpressionClause(InvocationExpression(
+                    MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("Data"), IdentifierName("Ok")))
+                .WithArgumentList(ArgumentList(
+                [
+                    Argument(IdentifierName("value"))
                 ]))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
