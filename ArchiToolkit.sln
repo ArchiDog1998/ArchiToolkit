@@ -94,6 +94,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.CppInteropGen"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.CppInteropGen.SourceGenerator", "src\analyzers\ArchiToolkit.CppInteropGen.SourceGenerator\ArchiToolkit.CppInteropGen.SourceGenerator.csproj", "{42293C6E-693B-44BB-AA69-A8D431F322BB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ValidResults", "ValidResults", "{76CD1180-2DAA-482D-8D88-41390217A619}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.ValidResults", "src\libraries\ArchiToolkit.ValidResults\ArchiToolkit.ValidResults.csproj", "{393A8659-2C09-4F03-9804-2900ABDCED4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.ValidResults.SourceGenerator", "src\analyzers\ArchiToolkit.ValidResults.SourceGenerator\ArchiToolkit.ValidResults.SourceGenerator.csproj", "{1A1D841D-AA54-4C69-8D65-9A904CD5935D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -187,6 +193,14 @@ Global
 		{42293C6E-693B-44BB-AA69-A8D431F322BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42293C6E-693B-44BB-AA69-A8D431F322BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42293C6E-693B-44BB-AA69-A8D431F322BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{393A8659-2C09-4F03-9804-2900ABDCED4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{393A8659-2C09-4F03-9804-2900ABDCED4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{393A8659-2C09-4F03-9804-2900ABDCED4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{393A8659-2C09-4F03-9804-2900ABDCED4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A1D841D-AA54-4C69-8D65-9A904CD5935D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A1D841D-AA54-4C69-8D65-9A904CD5935D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A1D841D-AA54-4C69-8D65-9A904CD5935D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A1D841D-AA54-4C69-8D65-9A904CD5935D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -220,5 +234,8 @@ Global
 		{6CD726FE-A185-4878-B57A-DF9CA2466D51} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
 		{17FC80CD-877D-4878-B8DF-E5335C15E26E} = {6CD726FE-A185-4878-B57A-DF9CA2466D51}
 		{42293C6E-693B-44BB-AA69-A8D431F322BB} = {6CD726FE-A185-4878-B57A-DF9CA2466D51}
+		{76CD1180-2DAA-482D-8D88-41390217A619} = {752493CD-971A-4559-B5F1-C931C2AB58BE}
+		{393A8659-2C09-4F03-9804-2900ABDCED4F} = {76CD1180-2DAA-482D-8D88-41390217A619}
+		{1A1D841D-AA54-4C69-8D65-9A904CD5935D} = {76CD1180-2DAA-482D-8D88-41390217A619}
 	EndGlobalSection
 EndGlobal

@@ -6,10 +6,10 @@ using ArchiToolkit.Assertions.Execution;
 using ArchiToolkit.Assertions.FluentValidation;
 using ArchiToolkit.Console;
 using ArchiToolkit.InterpolatedParser;
+using ArchiToolkit.ValidResults;
 
 var validator = new Validator();
 new Item().Must().BeValidBy(validator);
-
 
 var task = Wait();
 Console.WriteLine("Starting task");
