@@ -8,6 +8,10 @@ using ArchiToolkit.Console;
 using ArchiToolkit.InterpolatedParser;
 using ArchiToolkit.ValidResults;
 
+ValidResultsConfig.AddValidator(new DoubleValidator());
+var datetimeResult = DateTime.Now.ToValidResult();
+var result = datetimeResult.AddDays(-10);
+
 var validator = new Validator();
 new Item().Must().BeValidBy(validator);
 

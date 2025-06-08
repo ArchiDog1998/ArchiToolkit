@@ -1,24 +1,17 @@
-﻿using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
-using ArchiToolkit.ValidResults;
-using FluentResults;
+﻿using ArchiToolkit.ValidResults;
 using FluentValidation;
 
 namespace ArchiToolkit.Console;
 
-public class TestItem
-{
-    public static TestItem operator +(TestItem a, TestItem b) => new();
-}
-
-public static class DateTimeResultExtensions2
-{
-
-}
-
 [GenerateValidResultAttribute<DateTime>]
 public partial class DateTimeResult
 {
+}
 
-
+public class TestClass2 : IDisposable
+{
+    public void Dispose()
+    {
+        // TODO release managed resources here
+    }
 }

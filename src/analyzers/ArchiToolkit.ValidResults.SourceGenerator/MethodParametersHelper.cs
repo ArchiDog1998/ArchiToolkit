@@ -19,7 +19,7 @@ public static class MethodParametersHelper
     public static BaseMethodDeclarationSyntax GenerateMethodByParameters(IMethodSymbol method, ParameterRelay[] parameters,
         Dictionary<ISymbol?, INamedTypeSymbol> dictionary, MethodType type, string trackerName)
     {
-        var resultType = TypeHelper.FindValidResultType(dictionary, method.ReturnType);
+        var resultType = TypeHelper.FindValidResultType(dictionary, method.ReturnType, out _);
         var resultDataType = TypeHelper.GetResultDataType(method.ReturnType);
 
         ExpressionSyntax invocation;

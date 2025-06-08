@@ -42,17 +42,38 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
         if (members.OfType<IPropertySymbol>().Any(m => m.Name is "Value")) return;
         if (members.OfType<IFieldSymbol>().Any(m => m.Name is "Value")) return;
 
-        var baseType = TypeHelper.FindValidResultType(dictionary, data);
+        var baseType = TypeHelper.FindValidResultType(dictionary, data, out var addDisposed);
         var trackerName = target.Name + "Tracker";
+
+        IEnumerable<BaseTypeSyntax> baseTypes = [SimpleBaseType(baseType)];
+        if (addDisposed)
+        {
+            baseTypes = baseTypes.Append(SimpleBaseType(IdentifierName("global::System.IDisposable")));
+        }
+
+        IEnumerable<MemberDeclarationSyntax> disposeableMembers = addDisposed
+            ?
+            [
+                MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("Dispose"))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithAttributeLists([
+                        GeneratedCodeAttribute(typeof(ValidResultsGenerator)).AddAttributes(NonUserCodeAttribute())
+                    ])
+                    .WithBody(Block(
+                        ExpressionStatement(ConditionalAccessExpression(IdentifierName("ValueOrDefault"),
+                            InvocationExpression(MemberBindingExpression(IdentifierName("Dispose")))))))
+            ]
+            : [];
 
         var node = NamespaceDeclaration(target.ContainingNamespace.ToDisplayString())
             .WithMembers(
             [
                 ClassDeclaration(target.Name).WithModifiers(TokenList(Token(SyntaxKind.PartialKeyword)))
-                    .WithBaseList(BaseList([SimpleBaseType(baseType)]))
+                    .WithBaseList(BaseList([..baseTypes]))
                     .WithMembers([
                         ..CreatorMembers(target.Name, data),
                         ..GenerateMembers(members, dictionary, trackerName),
+                        ..disposeableMembers,
                     ]),
                 ClassDeclaration(target.Name + "Extensions")
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
@@ -265,7 +286,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
         }
 
-        return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType), Identifier(propertyName))
+        return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType, out _), Identifier(propertyName))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(ValidResultsGenerator)).AddAttributes(NonUserCodeAttribute())

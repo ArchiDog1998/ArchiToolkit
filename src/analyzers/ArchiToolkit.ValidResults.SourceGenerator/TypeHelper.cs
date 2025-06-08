@@ -32,12 +32,17 @@ public static class TypeHelper
         return QualifiedName(childType, IdentifierName("Data"));
     }
 
+    public static bool IsDisposable(ITypeSymbol type)
+    {
+        return type.AllInterfaces.Any(i => i.GetName().FullName is "global::System.IDisposable");
+    }
 
     public static TypeSyntax FindValidResultType(Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
-        ITypeSymbol target)
+        ITypeSymbol target, out bool shouldDispose)
     {
         if (target.SpecialType is SpecialType.System_Void)
         {
+            shouldDispose = false;
             return IdentifierName(Identifier("global::ArchiToolkit.ValidResults.ValidResult"));
         }
 
@@ -47,16 +52,24 @@ public static class TypeHelper
         }
 
         if (target.GetName().FullName is "global::ArchiToolkit.ValidResults.ValidResult.Data")
+        {
+            shouldDispose = false;
             return IdentifierName(Identifier("global::ArchiToolkit.ValidResults.ValidResult"));
+        }
 
+        var isDataDispose = IsDisposable(target);
         var loopTarget = target.BaseType;
         while (loopTarget is not null)
         {
             if (dictionary.TryGetValue(loopTarget, out var symbol))
+            {
+                shouldDispose = isDataDispose && !IsDisposable(symbol);
                 return IdentifierName(symbol.GetName().FullName);
+            }
             loopTarget = loopTarget.BaseType;
         }
 
+        shouldDispose = isDataDispose;
         return GenericName(
                 Identifier("global::ArchiToolkit.ValidResults.ValidResult"))
             .WithTypeArgumentList(TypeArgumentList(
@@ -75,5 +88,4 @@ public static class TypeHelper
         });
         return resultInterface?.TypeArguments.FirstOrDefault();
     }
-
 }
