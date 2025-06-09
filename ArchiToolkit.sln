@@ -71,15 +71,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper", "src\libraries\ArchiToolkit.Grasshopper\ArchiToolkit.Grasshopper.csproj", "{7B4F8193-E9A1-4B63-A3EE-9CA16079AE3B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{532CF3F0-48CC-4A08-BE79-7EEE5C463B44} = {532CF3F0-48CC-4A08-BE79-7EEE5C463B44}
-		{AC304631-0DD1-40EC-85B4-224C0DDB6B1B} = {AC304631-0DD1-40EC-85B4-224C0DDB6B1B}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.SourceGenerator", "src\analyzers\ArchiToolkit.Grasshopper.SourceGenerator\ArchiToolkit.Grasshopper.SourceGenerator.csproj", "{532CF3F0-48CC-4A08-BE79-7EEE5C463B44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.Instance", "tests\ArchiToolkit.Grasshopper.Instance\ArchiToolkit.Grasshopper.Instance.csproj", "{31552682-9BEF-49E9-B683-AC3B26EBA24E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{AC304631-0DD1-40EC-85B4-224C0DDB6B1B} = {AC304631-0DD1-40EC-85B4-224C0DDB6B1B}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.Grasshopper.Sources", "src\libraries\ArchiToolkit.Grasshopper.Sources\ArchiToolkit.Grasshopper.Sources.csproj", "{F1BE5A2D-86D3-43DC-BB4E-76C14B15C7B7}"
 EndProject
@@ -97,6 +93,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ValidResults", "ValidResults", "{76CD1180-2DAA-482D-8D88-41390217A619}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.ValidResults", "src\libraries\ArchiToolkit.ValidResults\ArchiToolkit.ValidResults.csproj", "{393A8659-2C09-4F03-9804-2900ABDCED4F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1A1D841D-AA54-4C69-8D65-9A904CD5935D} = {1A1D841D-AA54-4C69-8D65-9A904CD5935D}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiToolkit.ValidResults.SourceGenerator", "src\analyzers\ArchiToolkit.ValidResults.SourceGenerator\ArchiToolkit.ValidResults.SourceGenerator.csproj", "{1A1D841D-AA54-4C69-8D65-9A904CD5935D}"
 EndProject
