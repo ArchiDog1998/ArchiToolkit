@@ -322,7 +322,7 @@ partial class Build : NukeBuild
                 var match = regx.Match(message);
                 if (!match.Success) continue;
 
-                var type = match.Groups[0].Value;
+                if (!Gitmojis.TryGetValue(match.Groups[0].Value, out var type)) continue;
                 ref var builder = ref CollectionsMarshal.GetValueRefOrAddDefault(commitsBuilders, type, out var exist);
                 if (!exist) builder = new StringBuilder();
                 var content = regx.Replace(message, string.Empty).Split('\n')[0].Trim();
@@ -340,8 +340,7 @@ partial class Build : NukeBuild
             CommitsNote.AppendLine("## Commits");
             foreach (var pair in commitsBuilders)
             {
-                if (!Gitmojis.TryGetValue(pair.Key, out var gitmoji)) continue;
-                CommitsNote.AppendLine($"### {pair.Key} {gitmoji}");
+                CommitsNote.AppendLine($"### {Gitmojis.FirstOrDefault(i => i.Value == pair.Key).Key} {pair.Key}");
                 CommitsNote.Append(pair.Value);
             }
         });
@@ -431,11 +430,13 @@ partial class Build : NukeBuild
             if (jObject["gitmojis"] is not JArray emojis) return;
             foreach (var emoji in emojis)
             {
-                var key = emoji["code"]?.ToString();
                 var description = emoji["description"]?.ToString();
 
-                if (key is null || description is null) continue;
-                Gitmojis[key] = description;
+                if (description is null) continue;
+                if (emoji["emoji"]?.ToString() is { } emojiKey)
+                    Gitmojis[emojiKey] = description;
+                if (emoji["code"]?.ToString() is { } codeKey)
+                    Gitmojis[codeKey] = description;
             }
         });
 
