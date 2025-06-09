@@ -24,13 +24,14 @@ public class ValidResult(ValidResult.Data data) : IValidResult
         }
 
         [Pure]
-        public static implicit operator Data(Result result) => new (result);
+        public static implicit operator Data(Result result) => new(result);
     }
 
     public Result Result => data.Result;
 
     [Pure]
     public static implicit operator ValidResult(Data data) => new(data);
+
     public static bool operator true(ValidResult message) => message.Result.IsSuccess;
     public static bool operator false(ValidResult message) => message.Result.IsFailed;
 }
@@ -46,8 +47,7 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         public static Data Ok(TValue value, params IReadOnlyCollection<ISuccess> successes)
         {
             if (value is null) throw new ArgumentNullException(nameof(value));
-            var validationResult = ValidResultsConfig.Validate(value);
-
+            var validationResult = ValidResultsConfig.ValidateObject(value);
             var result = Result.Ok().WithSuccesses(successes);
 
             return validationResult.IsValid
@@ -65,15 +65,17 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         public static implicit operator Data(TValue value) => Ok(value);
 
         [Pure]
-        public static implicit operator Data(Result result) => new (result, default!);
+        public static implicit operator Data(Result result) => new(result, default!);
     }
 
     [Pure]
     public static implicit operator ValidResult<TValue>(Data data) => new(data);
+
     [Pure]
     public static implicit operator ValidResult<TValue>(TValue value) => Data.Ok(value);
+
     public Result Result => data.Result;
-    public TValue ValueOrDefault =>  data.ValueOrDefault;
+    public TValue ValueOrDefault => data.ValueOrDefault;
 
     public TValue Value
     {
@@ -104,7 +106,7 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
 
     protected ValidResult<T>.Data GetProperty<T>(Func<ValidResult<T>.Data> getter)
     {
-        if (ValidResultsConfig.ExceptionHandler is not {} handle)
+        if (ValidResultsConfig.ExceptionHandler is not { } handle)
             return getter();
         try
         {
@@ -122,4 +124,6 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         if (value.Result.IsFailed) return;
         setter(value.Value);
     }
+
+    object? IValidObjectResult.ValueOrDefault => ValueOrDefault;
 }

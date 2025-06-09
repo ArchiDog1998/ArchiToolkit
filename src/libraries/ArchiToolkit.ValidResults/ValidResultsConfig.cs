@@ -6,44 +6,50 @@ namespace ArchiToolkit.ValidResults;
 
 public static class ValidResultsConfig
 {
-    private static readonly Dictionary<Type, Func<object, ValidationResult>> Validators = new();
+    public delegate bool ShouldUseDelegate(string methodName, string methodArgumentName);
+
+    private static readonly Dictionary<Type, ValidResultsValidator> Validators = new();
 
     public static Func<Exception, IError>? ExceptionHandler { get; set; } = ex => new ExceptionalError(ex.Message, ex);
 
-    internal static ValidationResult Validate<T>(T value)
+    internal static ValidationResult ValidateObject<T>(T value)
     {
         if (value is null) throw new ArgumentNullException(nameof(value));
-        var validator = GetValidator<T>();
-        return validator?.Invoke(value) ?? new ValidationResult();
+        return new ValidationResult(GetValidators(typeof(T)).Select(f => f.ValidateObject(value)));
     }
 
-    private static Func<object, ValidationResult>? GetValidator<T>()
+    internal static ValidationResult ValidateArgument(object value, string methodName, string methodArgumentName)
+    {
+        if (value is null) throw new ArgumentNullException(nameof(value));
+        return new ValidationResult(GetValidators(value.GetType())
+            .Select(f => f.ValidateArgument(value, methodName, methodArgumentName)));
+    }
+
+    private static IEnumerable<ValidResultsValidator> GetValidators(Type type)
+    {
+        return Validators.Where(kvp => kvp.Key.IsAssignableFrom(type)).Select(kvp => kvp.Value).ToArray();
+    }
+
+    public static Guid AddValidator<T>(IValidator<T> validator, ShouldUseDelegate? shouldUse = null)
+    {
+        return AddValidator<T>(validator.Validate, shouldUse);
+    }
+
+    public static Guid AddValidator<T>(Func<T, ValidationResult> validator, ShouldUseDelegate? shouldUse = null)
     {
         var type = typeof(T);
-
-        if (Validators.TryGetValue(type, out var del))
-            return del;
-
-        foreach (var kvp in Validators.Where(kvp => kvp.Key.IsAssignableFrom(type)))
-        {
-            return kvp.Value;
-        }
-
-        return null;
-    }
-
-    public static void AddValidator<T>(IValidator<T> validator)
-    {
-        AddValidator<T>(validator.Validate);
-    }
-
-    public static void AddValidator<T>(Func<T, ValidationResult> validator)
-    {
-        Validators[typeof(T)] = o => validator((T)o);
+        if (!Validators.TryGetValue(type, out var resultValidator))
+            resultValidator = Validators[type] = new ValidResultsValidator(type);
+        return resultValidator.AddValidator(o => validator((T)o), shouldUse);
     }
 
     public static void RemoveValidator<T>()
     {
         Validators.Remove(typeof(T));
+    }
+
+    public static bool RemoveValidator(Guid key)
+    {
+        return Validators.Values.Any(i => i.RemoveValidator(key));
     }
 }

@@ -2,8 +2,14 @@
 
 namespace ArchiToolkit.ValidResults;
 
-public interface IValidResult<out TValue> : IValidResult
+public interface IValidObjectResult : IValidResult
 {
+    object? ValueOrDefault { get; }
+}
+
+public interface IValidResult<out TValue> : IValidObjectResult
+{
+    new TValue ValueOrDefault { get; }
     TValue Value { get; }
 }
 

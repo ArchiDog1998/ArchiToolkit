@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace ArchiToolkit.Console;
 
-[GenerateValidResultAttribute<DateTime>]
+[GenerateValidResult<DateTime>]
 public partial class DateTimeResult
 {
 }

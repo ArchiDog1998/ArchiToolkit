@@ -29,21 +29,37 @@ public static class ValidResultsExtensions
     }
 
     [Pure]
-    public static IEnumerable<IReason> GetReasons<TValue>(this ResultTracker<TValue> tracker) where TValue : IValidResult
+    public static IEnumerable<IReason> GetReasons<TValue>(this ResultTracker<TValue> tracker,
+        [CallerArgumentExpression(nameof(tracker))]
+        string methodArgumentName = "",
+        [CallerMemberName] string memberName = "") where TValue : IValidResult
     {
-        return tracker.Value.Result.Reasons
-            .Select(i => i is ObjectValidationError validation ? validation.WithInstanceName(tracker.CallerInfo) : i);
+        return GetReasons(tracker.Value, tracker.CallerInfo, memberName, methodArgumentName);
     }
 
     [Pure]
-    public static IEnumerable<IReason> GetReasons<TValue>(TValue value,
+    public static IEnumerable<IReason> GetReasons<TValue>(this TValue value,
         string valueName,
         string filePath,
-        int fileLineNumber) where TValue : IValidResult
+        int fileLineNumber,
+        [CallerArgumentExpression(nameof(value))]
+        string methodArgumentName = "",
+        [CallerMemberName] string memberName = "") where TValue : IValidResult
     {
         var callerInfo = GetCallerInfo(valueName, filePath, fileLineNumber);
-        return value.Result.Reasons
+        return GetReasons(value, callerInfo, memberName, methodArgumentName);
+    }
+
+    [Pure]
+    private static IEnumerable<IReason> GetReasons<TValue>(TValue value, string callerInfo, string methodName, string methodArgumentName)where TValue : IValidResult
+    {
+        var reasons = value.Result.Reasons
             .Select(i => i is ObjectValidationError validation ? validation.WithInstanceName(callerInfo) : i);
+
+        if (value.Result.IsFailed || value is not IValidObjectResult { ValueOrDefault: {} targetObject }) return reasons;
+        var argumentValidationResult = ValidResultsConfig.ValidateArgument(targetObject, methodName, methodArgumentName);
+        if (argumentValidationResult.IsValid) return reasons;
+        return reasons.Append(new ObjectValidationError(argumentValidationResult, callerInfo));
     }
 
     [Pure]
@@ -59,6 +75,6 @@ public static class ValidResultsExtensions
     [Pure]
     public static string GetCallerInfo(string valueName, string filePath, int fileLineNumber)
     {
-        return $"The \"{valueName}\" at {Path.GetFileName(filePath)} ({fileLineNumber})";
+        return $"\"{valueName}\" at {Path.GetFileName(filePath)} ({fileLineNumber})";
     }
 }
