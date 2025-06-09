@@ -51,7 +51,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
             baseTypes = baseTypes.Append(SimpleBaseType(IdentifierName("global::System.IDisposable")));
         }
 
-        IEnumerable<MemberDeclarationSyntax> disposeableMembers = addDisposed
+        IEnumerable<MemberDeclarationSyntax> disposableMembers = addDisposed
             ?
             [
                 MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("Dispose"))
@@ -60,8 +60,12 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                         GeneratedCodeAttribute(typeof(ValidResultsGenerator)).AddAttributes(NonUserCodeAttribute())
                     ])
                     .WithBody(Block(
-                        ExpressionStatement(ConditionalAccessExpression(IdentifierName("ValueOrDefault"),
-                            InvocationExpression(MemberBindingExpression(IdentifierName("Dispose")))))))
+                        IfStatement(IsPatternExpression(IdentifierName("ValueOrDefault"),
+                                DeclarationPattern(IdentifierName("global::System.IDisposable"),
+                                    SingleVariableDesignation(Identifier("dispose")))),
+                            ExpressionStatement(InvocationExpression(MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("dispose"), IdentifierName("Dispose")))))))
             ]
             : [];
 
@@ -70,10 +74,11 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
             [
                 ClassDeclaration(target.Name).WithModifiers(TokenList(Token(SyntaxKind.PartialKeyword)))
                     .WithBaseList(BaseList([..baseTypes]))
+                    .WithXmlComment($"/// <summary>The Valid Result for <see cref=\"{data.GetName().SummaryName}\"/>.</summary>")
                     .WithMembers([
                         ..CreatorMembers(target.Name, data),
                         ..GenerateMembers(members, dictionary, trackerName),
-                        ..disposeableMembers,
+                        ..disposableMembers,
                     ]),
                 ClassDeclaration(target.Name + "Extensions")
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
@@ -286,7 +291,8 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
         }
 
-        return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType, out _), Identifier(propertyName))
+        return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType, out _),
+                Identifier(propertyName))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(ValidResultsGenerator)).AddAttributes(NonUserCodeAttribute())
