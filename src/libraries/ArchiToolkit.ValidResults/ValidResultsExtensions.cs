@@ -76,7 +76,7 @@ public static class ValidResultsExtensions
     public static string GetCallerInfo(string valueName, string filePath, int fileLineNumber)
     {
         var fileInfo = ValidResultsConfig.FileInfoFormater?.Invoke((filePath, fileLineNumber))
-                       ?? $"{filePath}:line {fileLineNumber}";
+                       ?? $"{Path.GetFileName(filePath)}:{fileLineNumber}";
         return $"{valueName} in {fileInfo}";
     }
 }
