@@ -101,7 +101,7 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
 
     protected ValidResult<T>.Data GetProperty<T>(Func<T> getter)
     {
-        return GetProperty(() => new ValidResult<T>.Data(Result, getter()));
+        return GetProperty(() => new ValidResult<T>.Data(Result, Result.IsFailed ? default! : getter()));
     }
 
     protected ValidResult<T>.Data GetProperty<T>(Func<ValidResult<T>.Data> getter)

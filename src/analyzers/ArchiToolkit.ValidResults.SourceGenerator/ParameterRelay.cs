@@ -173,8 +173,19 @@ public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, Express
 
         if (DefaultValue is not null)
         {
-            parameter = parameter.WithType(NullableType(parameter.Type!))
-                .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression)));
+            if (Type.IsRefLikeType)
+            {
+                parameter = parameter.WithDefault(
+                    EqualsValueClause(
+                        LiteralExpression(
+                            SyntaxKind.DefaultLiteralExpression,
+                            Token(SyntaxKind.DefaultKeyword))));
+            }
+            else
+            {
+                parameter = parameter.WithType(NullableType(parameter.Type!))
+                    .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression)));
+            }
         }
 
         return parameter;
@@ -182,15 +193,25 @@ public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, Express
 
     public ExpressionStatementSyntax? CreateDefaultValue()
     {
-        if (DefaultValue is null) return null;
+        if (DefaultValue is null || Type.IsRefLikeType) return null;
 
-        return ExpressionStatement(
-            AssignmentExpression(
-                SyntaxKind.CoalesceAssignmentExpression,
-                IdentifierName(Name),
-                CastExpression(
-                    IdentifierName(type.GetName().FullName),
-                    DefaultValue)));
+        return ExpressionStatement(AssignmentExpression(SyntaxKind.CoalesceAssignmentExpression,
+            IdentifierName(Name),
+            InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                    MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                        GenericName(Identifier("global::ArchiToolkit.ValidResults.ValidResult"))
+                            .WithTypeArgumentList(TypeArgumentList(
+                            [
+                                IdentifierName(Type.GetName().FullName)
+                            ])),
+                        IdentifierName("Data")), IdentifierName("Ok")))
+                .WithArgumentList(ArgumentList(
+                [
+                    Argument(
+                        CastExpression(
+                            IdentifierName(type.GetName().FullName),
+                            DefaultValue))
+                ]))));
     }
 
 

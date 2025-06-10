@@ -306,7 +306,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                     [
                         Argument(ParenthesizedLambdaExpression()
                             .WithExpressionBody(MemberAccessExpression(
-                                SyntaxKind.SimpleMemberAccessExpression, IdentifierName("Value"),
+                                SyntaxKind.SimpleMemberAccessExpression, IdentifierName("ValueOrDefault"),
                                 IdentifierName(propertyName))))
                     ]))))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
