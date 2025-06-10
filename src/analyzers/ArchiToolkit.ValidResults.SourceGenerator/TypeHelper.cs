@@ -38,7 +38,7 @@ public static class TypeHelper
     }
 
     public static TypeSyntax FindValidResultType(Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
-        ITypeSymbol target, out bool shouldDispose, out INamedTypeSymbol? dataTypeSymbol)
+        ITypeSymbol target, out bool shouldDispose, out ITypeSymbol? dataTypeSymbol, bool containSelf)
     {
         dataTypeSymbol = null;
         if (target.SpecialType is SpecialType.System_Void)
@@ -59,7 +59,7 @@ public static class TypeHelper
         }
 
         var isDataDispose = IsDisposable(target);
-        if (FindValidResultType(dictionary, target) is { } pair)
+        if (FindValidResultType(dictionary, target, containSelf) is { } pair)
         {
             var (dataSymbol, resultTypeSymbol) = pair;
             shouldDispose = isDataDispose && !IsDisposable(resultTypeSymbol);
@@ -76,10 +76,10 @@ public static class TypeHelper
             ]));
     }
 
-    private static (INamedTypeSymbol DataSymbol, INamedTypeSymbol TargetSymbol)? FindValidResultType(Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
-        ITypeSymbol data)
+    private static (ITypeSymbol DataSymbol, INamedTypeSymbol TargetSymbol)? FindValidResultType(Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
+        ITypeSymbol data, bool containSelf)
     {
-        var loopTarget = data.BaseType;
+        var loopTarget = containSelf  ? data : data.BaseType;
         while (loopTarget is not null)
         {
             if (dictionary.TryGetValue(loopTarget, out var symbol))

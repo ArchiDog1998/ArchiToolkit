@@ -43,7 +43,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
         if (members.OfType<IPropertySymbol>().Any(m => m.Name is "Value")) return;
         if (members.OfType<IFieldSymbol>().Any(m => m.Name is "Value")) return;
 
-        var baseType = TypeHelper.FindValidResultType(dictionary, data, out var addDisposed, out var baseDataSymbol);
+        var baseType = TypeHelper.FindValidResultType(dictionary, data, out var addDisposed, out var baseDataSymbol, false);
         var trackerName = target.Name + "Tracker";
 
         IEnumerable<BaseTypeSyntax> baseTypes = [SimpleBaseType(baseType)];
@@ -204,7 +204,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateStaticMembers(IReadOnlyCollection<ISymbol> members,
-        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName, INamedTypeSymbol? baseTypeSymbol)
+        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName, ITypeSymbol? baseTypeSymbol)
     {
         var staticMethods = baseTypeSymbol?
             .GetMembers()
@@ -227,7 +227,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateMembers(IReadOnlyCollection<ISymbol> members,
-        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName, INamedTypeSymbol? baseTypeSymbol)
+        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName, ITypeSymbol? baseTypeSymbol)
     {
         var propertyOrFieldNames = baseTypeSymbol?.GetMembers().OfType<IPropertySymbol>().Select(i => i.Name)
             .Concat(baseTypeSymbol.GetMembers().OfType<IFieldSymbol>().Select(i => i.Name)).ToArray() ?? [];
@@ -329,7 +329,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
         }
 
-        return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType, out _, out _),
+        return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType, out _, out _, true),
                 Identifier(propertyName))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
             .WithAttributeLists([
