@@ -16,7 +16,7 @@ file class LoggerStrategy(AssertionLogOptions options) : IAssertionStrategy
     }
 
     public object? HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion,
-        object? tag)
+        object? tag, CallerInfo callerInfo)
     {
         if (scope.Tag is not ILogger logger) return null;
 
@@ -29,10 +29,10 @@ file class LoggerStrategy(AssertionLogOptions options) : IAssertionStrategy
             arguments = arguments.Append(tag);
         }
 
-        if (options.ShowFrame && assertion.StackFrame is { } frame)
+        if (options.ShowCallerInfo)
         {
-            format += "\nStackFrame: {StackFrame}";
-            arguments = arguments.Append(options.StackFrameFormat?.Invoke(frame) ?? frame.GetString());
+            format += "\nCallerInfo: {CallerInfo}";
+            arguments = arguments.Append(options.CallerInfoFormat?.Invoke(callerInfo) ?? callerInfo.ToString());
         }
 
         var eventId = tag is EventId id ? id : 0;

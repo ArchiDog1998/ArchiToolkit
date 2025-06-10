@@ -11,6 +11,7 @@ public static class ValidResultsConfig
     private static readonly Dictionary<Type, ValidResultsValidator> Validators = new();
 
     public static Func<Exception, IError>? ExceptionHandler { get; set; } = ex => new ExceptionalError(ex.Message, ex);
+    public static Func<(string FilePath, int FileLineNumber), string>? FileInfoFormater { get; set; } = null;
 
     internal static ValidationResult ValidateObject<T>(T value)
     {

@@ -6,7 +6,6 @@ using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Assertions;
 using ArchiToolkit.Assertions.Exceptions;
 using ArchiToolkit.Assertions.Execution;
-using ArchiToolkit.Assertions.Utils;
 
 namespace ArchiToolkit.Assertions;
 
@@ -17,7 +16,7 @@ file class DefaultPushStrategy(
     string timeFormat) : IAssertionStrategy
 {
     public object? HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion,
-        object? tag)
+        object? tag, CallerInfo callerInfo)
     {
         if (assertionType < minRaisingExceptionType) return null;
         var message = $"{assertion.Message}\nwhen [{assertion.Time.ToString(timeFormat)}]{scope.Context}";
@@ -35,7 +34,7 @@ file class DefaultScopeStrategy(
     AssertionType minRaisingExceptionType,
     [StringSyntax(StringSyntaxAttribute.DateTimeFormat)]
     string timeFormat,
-    Func<StackFrame, string>? stackFrameFormat) : IAssertionStrategy
+    Func<CallerInfo, string>? callerInfoFormate) : IAssertionStrategy
 {
     public object? HandleFailure(AssertionScope scope, IReadOnlyList<IAssertion> assertions)
     {
@@ -47,10 +46,8 @@ file class DefaultScopeStrategy(
             foreach (var assertionItem in assertion.Items)
             {
                 stringBuilder.AppendLine(
-                    $"{++messageCount:D2}. [{assertionItem.Time.ToString(timeFormat)}]{assertionItem.Message}");
-                var frame = assertionItem.StackFrame;
-                if (frame is null) continue;
-                stringBuilder.AppendLine(stackFrameFormat?.Invoke(frame) ?? $"  at {frame.GetString()}");
+                    $"{++messageCount:D2}. [{assertionItem.Time.ToString(timeFormat)}] {assertionItem.Message}");
+                stringBuilder.AppendLine(callerInfoFormate?.Invoke(assertion.CallerInfo) ?? $"  {assertion.CallerInfo}");
             }
         }
 
@@ -61,7 +58,7 @@ file class DefaultScopeStrategy(
     }
 
     public object? HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion,
-        object? tag)
+        object? tag, CallerInfo callerInfo)
     {
         return null;
     }
@@ -106,11 +103,11 @@ public readonly struct AssertionService(IAssertionStrategy pushStrategy, IAssert
     /// </summary>
     /// <param name="minRaisingExceptionType"></param>
     /// <param name="timeFormat"></param>
-    /// <param name="stackFrameFormat"></param>
+    /// <param name="callerInfoFormat"></param>
     public AssertionService(AssertionType minRaisingExceptionType, string timeFormat = "yyyy-MM-dd HH:mm:ss.fff zzz",
-        Func<StackFrame, string>? stackFrameFormat = null)
+        Func<CallerInfo, string>? callerInfoFormat = null)
         : this(new DefaultPushStrategy(minRaisingExceptionType, timeFormat),
-            new DefaultScopeStrategy(minRaisingExceptionType, timeFormat, stackFrameFormat))
+            new DefaultScopeStrategy(minRaisingExceptionType, timeFormat, callerInfoFormat))
     {
     }
 

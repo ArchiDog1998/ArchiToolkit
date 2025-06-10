@@ -8,11 +8,13 @@ public class WhichConstraint<TValue> : IConstraint
 {
     private readonly string _name;
     private readonly Lazy<TValue> _value;
+    private readonly CallerInfo _callerInfo;
 
-    internal WhichConstraint(Lazy<TValue> value, string name)
+    internal WhichConstraint(Lazy<TValue> value, string name, CallerInfo callerInfo)
     {
         _value = value;
         _name = name;
+        _callerInfo = callerInfo;
     }
 
     /// <summary>
@@ -40,6 +42,6 @@ public class WhichConstraint<TValue> : IConstraint
             isValid = false;
         }
 
-        return new ObjectAssertion<TValue>(value, _name, assertionType, isValid);
+        return new ObjectAssertion<TValue>(value, _name, assertionType, _callerInfo, isValid);
     }
 }

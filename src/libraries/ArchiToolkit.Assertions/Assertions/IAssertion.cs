@@ -21,4 +21,9 @@ public interface IAssertion
     ///     Assertion Type
     /// </summary>
     AssertionType Type { get; }
+
+    /// <summary>
+    ///  The Caller Info
+    /// </summary>
+    CallerInfo CallerInfo { get; }
 }

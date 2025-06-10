@@ -1,11 +1,9 @@
 ﻿// ReSharper disable LocalizableElement
 
-using System.Collections;
 using ArchiToolkit.Assertions;
 using ArchiToolkit.Assertions.Execution;
 using ArchiToolkit.Assertions.FluentValidation;
 using ArchiToolkit.Console;
-using ArchiToolkit.InterpolatedParser;
 using ArchiToolkit.ValidResults;
 
 ValidResultsConfig.AddValidator(new DoubleValidator(), (methodName, argumentName) =>
@@ -14,11 +12,14 @@ ValidResultsConfig.AddValidator(new DoubleValidator(), (methodName, argumentName
     return result;
 });
 var datetimeResult = DateTime.Now.ToValidResult();
-var result = datetimeResult.AddDays(-10);
+var result = datetimeResult.AddDays(10);
 
 Console.WriteLine(result);
 var validator = new Validator();
-new Item().Must().BeValidBy(validator);
+using (new AssertionScope())
+{
+    new Item().Must().BeValidBy(validator);
+}
 
 var task = Wait();
 Console.WriteLine("Starting task");

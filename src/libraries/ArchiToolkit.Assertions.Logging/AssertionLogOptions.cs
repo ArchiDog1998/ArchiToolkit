@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using ArchiToolkit.Assertions.Assertions;
 
 namespace ArchiToolkit.Assertions.Logging;
 
@@ -6,9 +6,9 @@ namespace ArchiToolkit.Assertions.Logging;
 ///     The assertion log options
 /// </summary>
 /// <param name="ShowTag"></param>
-/// <param name="ShowFrame"></param>
-/// <param name="StackFrameFormat"></param>
+/// <param name="ShowCallerInfo"></param>
+/// <param name="CallerInfoFormat"></param>
 public readonly record struct AssertionLogOptions(
     bool ShowTag,
-    bool ShowFrame,
-    Func<StackFrame, string>? StackFrameFormat = null);
+    bool ShowCallerInfo,
+    Func<CallerInfo, string>? CallerInfoFormat = null);

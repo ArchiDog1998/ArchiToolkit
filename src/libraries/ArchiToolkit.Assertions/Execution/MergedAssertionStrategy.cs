@@ -9,14 +9,14 @@ internal class MergedAssertionStrategy(params IAssertionStrategy[] strategies)
     {
         return strategies.Select(strategy => (strategy,  strategy.HandleFailure(scope, assertions)))
             .Where(pair => pair.Item2 is not null)
-            .ToDictionary(pair => pair.Item1, pair => pair.Item2!);
+            .ToDictionary(pair => pair.strategy, pair => pair.Item2!);
     }
 
     public IDictionary<IAssertionStrategy, object> HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion,
-        object? tag)
+        object? tag, CallerInfo callerInfo)
     {
-        return strategies.Select(strategy => (strategy,  strategy.HandleFailure(scope, assertionType, assertion, tag)))
+        return strategies.Select(strategy => (strategy,  strategy.HandleFailure(scope, assertionType, assertion, tag, callerInfo)))
             .Where(pair => pair.Item2 is not null)
-            .ToDictionary(pair => pair.Item1, pair => pair.Item2!);
+            .ToDictionary(pair => pair.strategy, pair => pair.Item2!);
     }
 }

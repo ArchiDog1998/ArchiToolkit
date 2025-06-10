@@ -23,13 +23,13 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     private readonly AssertionType _type;
     private bool _reversed;
 
-    internal ObjectAssertion(TValue subject, string valueName, AssertionType type, bool isValid = true)
-        : this(subject, valueName, type, DateTimeOffset.Now, AssertionScope.Current, isValid)
+    internal ObjectAssertion(TValue subject, string valueName, AssertionType type, CallerInfo callerInfo, bool isValid = true)
+        : this(subject, valueName, type, DateTimeOffset.Now, AssertionScope.Current, callerInfo, isValid)
     {
     }
 
     private ObjectAssertion(TValue subject, string valueName, AssertionType type, DateTimeOffset createTime,
-        AssertionScope scope, bool isValid)
+        AssertionScope scope, CallerInfo callerInfo, bool isValid)
     {
         Subject = subject;
         SubjectName = string.IsNullOrEmpty(valueName) ? "Unknown" : valueName;
@@ -38,6 +38,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         _scope = scope;
         _isValid = isValid;
         _scope.AddAssertion(this);
+        CallerInfo = callerInfo;
     }
 
     /// <summary>
@@ -69,6 +70,8 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     /// <inheritdoc />
     AssertionType IAssertion.Type => _type;
 
+    public CallerInfo CallerInfo { get; }
+
     /// <inheritdoc />
     DateTimeOffset IAssertion.CreatedTime => _createTime;
 
@@ -76,7 +79,7 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     {
         return type == _type
             ? this
-            : new ObjectAssertion<TValue>(Subject, SubjectName, type, _createTime, _scope, _isValid);
+            : new ObjectAssertion<TValue>(Subject, SubjectName, type, _createTime, _scope, CallerInfo, _isValid);
     }
 
 
@@ -423,27 +426,9 @@ public sealed class ObjectAssertion<TValue> : IAssertion
 
     private IDictionary<IAssertionStrategy, object> AddAssertionItem(AssertionItemType type, AssertMessage message, object? tag)
     {
-        var skipIndex = GetIndex(new StackTrace());
-        var item = new AssertionItem(type, message, new StackTrace(skipIndex, true), DateTimeOffset.Now, tag);
+        var item = new AssertionItem(type, message, DateTimeOffset.Now, tag);
         _items.Add(item);
-        return _scope.PushAssertionItem(item, _type, tag);
-
-        static int GetIndex(StackTrace stackTrace)
-        {
-            var index = 0;
-            foreach (var frame in stackTrace.GetFrames())
-            {
-                index++;
-
-                if (frame.GetMethod() is not MethodInfo method) continue;
-                if (method.ReturnType.GetInterfaces().All(i => i != typeof(IConstraint))) continue;
-                if (method.DeclaringType?.Assembly == typeof(IAssertion).Assembly
-                    && method.Name.Contains(nameof(ObjectAssertion<object>.AssertCheck))) continue;
-                return index;
-            }
-
-            throw new InvalidOperationException("Failed to get the frame index!");
-        }
+        return _scope.PushAssertionItem(item, _type, tag, CallerInfo);
     }
 
     #endregion
