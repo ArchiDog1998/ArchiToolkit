@@ -311,21 +311,16 @@ partial class Build : NukeBuild
         .DependsOn(GetGitmoji, GetCommits)
         .Executes(() =>
         {
-            var regx = GitmojiRegex();
-
             Dictionary<string, StringBuilder> commitsBuilders = new();
 
             foreach (var commit in Commits)
             {
                 var message = commit.Commit.Message;
 
-                var match = regx.Match(message);
-                if (!match.Success) continue;
-
-                if (!Gitmojis.TryGetValue(match.Groups[0].Value, out var type)) continue;
+                var type = GetCommitType(message, out var content);
+                if (string.IsNullOrEmpty(type)) continue;
                 ref var builder = ref CollectionsMarshal.GetValueRefOrAddDefault(commitsBuilders, type, out var exist);
                 if (!exist) builder = new StringBuilder();
-                var content = regx.Replace(message, string.Empty).Split('\n')[0].Trim();
                 if (Contributors.Add(commit))
                 {
                     builder.AppendLine($"1. {content} by @{commit.Author.Login} in {commit.Sha}");
@@ -344,6 +339,18 @@ partial class Build : NukeBuild
                 CommitsNote.Append(pair.Value);
             }
         });
+
+    private static string GetCommitType(string message, out string content)
+    {
+        foreach (var pair in Gitmojis.Where(pair => message.StartsWith(pair.Key)))
+        {
+            content = message[pair.Key.Length..].Split('\n')[0].Trim();
+            return pair.Value;
+        }
+
+        return content = string.Empty;
+    }
+
 
     private readonly StringBuilder PullRequestNote = new();
 
@@ -416,10 +423,7 @@ partial class Build : NukeBuild
             }
         });
 
-    private readonly Dictionary<string, string> Gitmojis = [];
-
-    [GeneratedRegex("^:(.*):")]
-    private static partial Regex GitmojiRegex();
+    private static readonly Dictionary<string, string> Gitmojis = [];
 
     Target GetGitmoji => d => d
         .Executes(async () =>
