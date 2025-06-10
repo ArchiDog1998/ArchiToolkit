@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using ArchiToolkit.RoslynHelper;
 using ArchiToolkit.RoslynHelper.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -42,7 +43,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
         if (members.OfType<IPropertySymbol>().Any(m => m.Name is "Value")) return;
         if (members.OfType<IFieldSymbol>().Any(m => m.Name is "Value")) return;
 
-        var baseType = TypeHelper.FindValidResultType(dictionary, data, out var addDisposed);
+        var baseType = TypeHelper.FindValidResultType(dictionary, data, out var addDisposed, out var baseDataSymbol);
         var trackerName = target.Name + "Tracker";
 
         IEnumerable<BaseTypeSyntax> baseTypes = [SimpleBaseType(baseType)];
@@ -74,18 +75,20 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
             [
                 ClassDeclaration(target.Name).WithModifiers(TokenList(Token(SyntaxKind.PartialKeyword)))
                     .WithBaseList(BaseList([..baseTypes]))
-                    .WithXmlComment($"/// <summary>The Valid Result for <see cref=\"{data.GetName().SummaryName}\"/>.</summary>")
+                    .WithXmlComment(
+                        $"/// <summary>The Valid Result for <see cref=\"{data.GetName().SummaryName}\"/>.</summary>")
                     .WithMembers([
                         ..CreatorMembers(target.Name, data),
-                        ..GenerateMembers(members, dictionary, trackerName),
+                        ..InterfacesMembers(target.Name, data, dictionary),
+                        ..GenerateMembers(members, dictionary, trackerName, baseDataSymbol),
                         ..disposableMembers,
                     ]),
                 ClassDeclaration(target.Name + "Extensions")
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
                     .WithAttributeLists([GeneratedCodeAttribute(typeof(ValidResultsGenerator))])
                     .WithMembers([
-                        GenerateCreateTracker(target),
-                        GenerateCreateTracker(data),
+                        GenerateCreateTracker(target, true),
+                        GenerateCreateTracker(data, false),
                         MethodDeclaration(IdentifierName(target.Name), Identifier("ToValidResult"))
                             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
                             .WithAttributeLists([
@@ -98,9 +101,15 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                                     .WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
                                     .WithType(IdentifierName(data.GetName().FullName))
                             ]))
-                            .WithExpressionBody(ArrowExpressionClause(IdentifierName("value")))
+                            .WithExpressionBody(ArrowExpressionClause(InvocationExpression(MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName(target.Name), IdentifierName("Ok")))
+                                .WithArgumentList(ArgumentList(
+                                [
+                                    Argument(IdentifierName("value"))
+                                ]))))
                             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                        ..GenerateStaticMembers(members, dictionary, trackerName),
+                        ..GenerateStaticMembers(members, dictionary, trackerName, baseDataSymbol),
                     ]),
                 ClassDeclaration(trackerName)
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
@@ -136,8 +145,16 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
         context.AddSource(target.Name + ".g.cs", node.NodeToString());
         return;
 
-        MethodDeclarationSyntax GenerateCreateTracker(ITypeSymbol type)
+        MethodDeclarationSyntax GenerateCreateTracker(ITypeSymbol type, bool isTarget)
         {
+            var argument = isTarget
+                ? Argument(IdentifierName("value"))
+                : Argument(InvocationExpression(IdentifierName("ToValidResult"))
+                    .WithArgumentList(ArgumentList(
+                    [
+                        Argument(IdentifierName("value"))
+                    ])));
+
             return MethodDeclaration(IdentifierName(trackerName),
                     Identifier("Track"))
                 .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
@@ -155,7 +172,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                         IdentifierName(trackerName))
                     .WithArgumentList(ArgumentList(
                     [
-                        Argument(IdentifierName("value")),
+                        argument,
                         Argument(InvocationExpression(MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
                                 IdentifierName("global::ArchiToolkit.ValidResults.ValidResultsExtensions"),
@@ -187,12 +204,20 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateStaticMembers(IReadOnlyCollection<ISymbol> members,
-        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName)
+        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName, INamedTypeSymbol? baseTypeSymbol)
     {
+        var staticMethods = baseTypeSymbol?
+            .GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(m => !m.IsStatic)
+            .Select(m => new MethodSignature(m))
+            .ToArray() ?? [];
+
         foreach (var method in members
                      .OfType<IMethodSymbol>()
                      .Where(p => !p.ReturnType.IsRefLikeType)
-                     .Where(p => !p.IsStatic))
+                     .Where(p => !p.IsStatic)
+                     .Where(p => !staticMethods.Contains(new MethodSignature(p))))
         {
             if (method.MethodKind is MethodKind.Ordinary)
             {
@@ -202,11 +227,22 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateMembers(IReadOnlyCollection<ISymbol> members,
-        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName)
+        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName, INamedTypeSymbol? baseTypeSymbol)
     {
+        var propertyOrFieldNames = baseTypeSymbol?.GetMembers().OfType<IPropertySymbol>().Select(i => i.Name)
+            .Concat(baseTypeSymbol.GetMembers().OfType<IFieldSymbol>().Select(i => i.Name)).ToArray() ?? [];
+
+        var staticMethods = baseTypeSymbol?
+            .GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(m => m.IsStatic)
+            .Select(m => new MethodSignature(m))
+            .ToArray() ?? [];
+
         foreach (var property in members
                      .OfType<IPropertySymbol>()
                      .Where(p => !p.IsStatic)
+                     .Where(p => !propertyOrFieldNames.Contains(p.Name))
                      .Where(p => !p.Type.IsRefLikeType))
         {
             yield return GenerateProperty(property.Type, property.Name, property.ContainingType,
@@ -216,6 +252,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
         foreach (var field in members
                      .OfType<IFieldSymbol>()
                      .Where(p => !p.IsStatic)
+                     .Where(p => !propertyOrFieldNames.Contains(p.Name))
                      .Where(p => !p.Type.IsRefLikeType))
         {
             yield return GenerateProperty(field.Type, field.Name, field.ContainingType,
@@ -225,7 +262,8 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
         foreach (var method in members
                      .OfType<IMethodSymbol>()
                      .Where(p => !p.ReturnType.IsRefLikeType)
-                     .Where(p => p.IsStatic))
+                     .Where(p => p.IsStatic)
+                     .Where(p => !staticMethods.Contains(new MethodSignature(p))))
         {
             if (method.MethodKind is MethodKind.Ordinary)
             {
@@ -291,7 +329,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
         }
 
-        return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType, out _),
+        return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType, out _, out _),
                 Identifier(propertyName))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
             .WithAttributeLists([
@@ -300,6 +338,38 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
             .WithXmlComment(
                 $"/// <inheritdoc cref=\"{declarationType.GetName().SummaryName}.{propertyName}\"/>")
             .WithAccessorList(AccessorList([..accessors]));
+    }
+
+    private static IEnumerable<ConversionOperatorDeclarationSyntax> InterfacesMembers(string className,
+        INamedTypeSymbol dataType, Dictionary<ISymbol?, INamedTypeSymbol> dictionary)
+    {
+        foreach (var interfaceSymbol in dataType.AllInterfaces)
+        {
+            if(!dictionary.TryGetValue(interfaceSymbol, out var resultSymbol)) continue;
+            yield return ConversionOperatorDeclaration(Token(SyntaxKind.ImplicitKeyword),
+                    IdentifierName(resultSymbol.GetName().FullName))
+                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
+                .WithAttributeLists([
+                    GeneratedCodeAttribute(typeof(ValidResultsGenerator)).AddAttributes(NonUserCodeAttribute(), PureAttribute())
+                ])
+                .WithParameterList(ParameterList(
+                [
+                    Parameter(Identifier("value")).WithType(IdentifierName(className))
+                ]))
+                .WithBody(Block(
+                    ReturnStatement(ImplicitObjectCreationExpression()
+                        .WithArgumentList(ArgumentList(
+                        [
+                            Argument(ImplicitObjectCreationExpression()
+                                .WithArgumentList(ArgumentList(
+                                [
+                                    Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName("value"), IdentifierName("Result"))),
+                                    Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName("value"), IdentifierName("ValueOrDefault")))
+                                ])))
+                        ])))));
+        }
     }
 
     private static IEnumerable<MemberDeclarationSyntax> CreatorMembers(string className, INamedTypeSymbol dataType)
@@ -318,6 +388,25 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                     Argument(IdentifierName("data"))
                 ])))
             .WithBody(Block());
+
+        yield return MethodDeclaration(IdentifierName(className), Identifier("Ok"))
+            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
+            .WithAttributeLists([
+                GeneratedCodeAttribute(typeof(ValidResultsGenerator))
+                    .AddAttributes(NonUserCodeAttribute(), PureAttribute())
+            ])
+            .WithParameterList(ParameterList(
+            [
+                Parameter(Identifier("value")).WithType(IdentifierName(dataType.GetName().FullName))
+            ]))
+            .WithExpressionBody(ArrowExpressionClause(InvocationExpression(
+                    MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("Data"), IdentifierName("Ok")))
+                .WithArgumentList(ArgumentList(
+                [
+                    Argument(IdentifierName("value"))
+                ]))))
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
         yield return ConversionOperatorDeclaration(Token(SyntaxKind.ImplicitKeyword),
                 IdentifierName(className))
@@ -338,25 +427,26 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                 ]))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
-        yield return ConversionOperatorDeclaration(Token(SyntaxKind.ImplicitKeyword),
-                IdentifierName(className))
-            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
-            .WithAttributeLists([
-                GeneratedCodeAttribute(typeof(ValidResultsGenerator))
-                    .AddAttributes(NonUserCodeAttribute(), PureAttribute())
-            ])
-            .WithParameterList(ParameterList(
-            [
-                Parameter(Identifier("value")).WithType(IdentifierName(dataType.GetName().FullName))
-            ]))
-            .WithExpressionBody(ArrowExpressionClause(InvocationExpression(
-                    MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                        IdentifierName("Data"), IdentifierName("Ok")))
-                .WithArgumentList(ArgumentList(
+        if (dataType.TypeKind is not TypeKind.Interface)
+        {
+            yield return ConversionOperatorDeclaration(Token(SyntaxKind.ImplicitKeyword),
+                    IdentifierName(className))
+                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
+                .WithAttributeLists([
+                    GeneratedCodeAttribute(typeof(ValidResultsGenerator))
+                        .AddAttributes(NonUserCodeAttribute(), PureAttribute())
+                ])
+                .WithParameterList(ParameterList(
                 [
-                    Argument(IdentifierName("value"))
-                ]))))
-            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+                    Parameter(Identifier("value")).WithType(IdentifierName(dataType.GetName().FullName))
+                ]))
+                .WithExpressionBody(ArrowExpressionClause(InvocationExpression(IdentifierName("Ok"))
+                    .WithArgumentList(ArgumentList(
+                    [
+                        Argument(IdentifierName("value"))
+                    ]))))
+                .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+        }
     }
 
     private static Dictionary<ISymbol?, INamedTypeSymbol> GetClassesSymbols(IEnumerable<ISymbol?> symbols)

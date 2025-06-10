@@ -38,8 +38,9 @@ public static class TypeHelper
     }
 
     public static TypeSyntax FindValidResultType(Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
-        ITypeSymbol target, out bool shouldDispose)
+        ITypeSymbol target, out bool shouldDispose, out INamedTypeSymbol? dataTypeSymbol)
     {
+        dataTypeSymbol = null;
         if (target.SpecialType is SpecialType.System_Void)
         {
             shouldDispose = false;
@@ -58,15 +59,12 @@ public static class TypeHelper
         }
 
         var isDataDispose = IsDisposable(target);
-        var loopTarget = target.BaseType;
-        while (loopTarget is not null)
+        if (FindValidResultType(dictionary, target) is { } pair)
         {
-            if (dictionary.TryGetValue(loopTarget, out var symbol))
-            {
-                shouldDispose = isDataDispose && !IsDisposable(symbol);
-                return IdentifierName(symbol.GetName().FullName);
-            }
-            loopTarget = loopTarget.BaseType;
+            var (dataSymbol, resultTypeSymbol) = pair;
+            shouldDispose = isDataDispose && !IsDisposable(resultTypeSymbol);
+            dataTypeSymbol = dataSymbol;
+            return IdentifierName(resultTypeSymbol.GetName().FullName);
         }
 
         shouldDispose = isDataDispose;
@@ -76,6 +74,23 @@ public static class TypeHelper
             [
                 IdentifierName(target.GetName().FullName)
             ]));
+    }
+
+    private static (INamedTypeSymbol DataSymbol, INamedTypeSymbol TargetSymbol)? FindValidResultType(Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
+        ITypeSymbol data)
+    {
+        var loopTarget = data.BaseType;
+        while (loopTarget is not null)
+        {
+            if (dictionary.TryGetValue(loopTarget, out var symbol))
+            {
+                return (loopTarget, symbol);
+            }
+
+            loopTarget = loopTarget.BaseType;
+        }
+
+        return null;
     }
 
     private static ITypeSymbol? GetParentDataType(ITypeSymbol type)
