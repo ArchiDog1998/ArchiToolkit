@@ -13,20 +13,13 @@ public partial class DateTimeResult
 {
 }
 
-public class TestClass3 : TestClass2
+[GenerateValidResult<TestClass2>]
+public partial class TestClass2Result
 {
 
 }
 
-public class TestClass2 : IDisposable
+public class TestClass2
 {
-    public void AddThings()
-    {
-
-    }
-
-public void Dispose()
-    {
-        // TODO release managed resources here
-    }
+    public static TestClass2 Create() => new TestClass2();
 }
