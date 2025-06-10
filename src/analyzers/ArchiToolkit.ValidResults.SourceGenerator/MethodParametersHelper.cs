@@ -114,6 +114,7 @@ public static class MethodParametersHelper
             ]))
             .WithBody(Block((StatementSyntax[])
             [
+                ..parameters.Select(p => p.CreateDefaultValue()).OfType<ExpressionStatementSyntax>(),
                 ..GenerateReasons(parameters, out var reasonNames, isTracker),
                 ..parameters.Select(p => p.CreateLocalDeclarationStatement(isTracker)),
                 LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
