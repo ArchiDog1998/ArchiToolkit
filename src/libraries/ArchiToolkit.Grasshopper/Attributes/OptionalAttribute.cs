@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
 using Grasshopper.Kernel;
+
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// Set the <see cref="IGH_Param.Optional"/> for the parameters.
+///     Set the <see cref="IGH_Param.Optional" /> for the parameters.
 /// </summary>
 /// <code>
 /// public class Test
@@ -13,7 +14,7 @@ namespace ArchiToolkit.Grasshopper;
 /// }
 /// </code>
 /// <remarks>
-/// <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute"/> first.</para>
+///     <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute" /> first.</para>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional(Constant.KeepAttributes)]

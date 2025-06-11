@@ -2,8 +2,6 @@
 
 public class ResultTracker<TValue>
 {
-    public TValue Value { get; }
-    public string CallerInfo { get; }
     protected internal ResultTracker(
         TValue value,
         string callerInfo)
@@ -11,4 +9,7 @@ public class ResultTracker<TValue>
         Value = value;
         CallerInfo = callerInfo;
     }
+
+    public TValue Value { get; }
+    public string CallerInfo { get; }
 }

@@ -47,7 +47,8 @@ file class DefaultScopeStrategy(
             {
                 stringBuilder.AppendLine(
                     $"{++messageCount:D2}. [{assertionItem.Time.ToString(timeFormat)}] {assertionItem.Message}");
-                stringBuilder.AppendLine(callerInfoFormate?.Invoke(assertion.CallerInfo) ?? $"  {assertion.CallerInfo}");
+                stringBuilder.AppendLine(callerInfoFormate?.Invoke(assertion.CallerInfo) ??
+                                         $"  {assertion.CallerInfo}");
             }
         }
 

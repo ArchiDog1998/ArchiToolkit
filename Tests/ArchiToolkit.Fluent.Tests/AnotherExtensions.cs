@@ -1,4 +1,5 @@
 ﻿// ReSharper disable once CheckNamespace
+
 namespace ArchiToolkit.Fluent.Tests.Another;
 
 public static class BasicTypeExtensions

@@ -87,7 +87,8 @@ public class ResourceGenerator : IIncrementalGenerator
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
 
                 MethodDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("Loc"))
-                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword), Token(SyntaxKind.PartialKeyword)))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword),
+                        Token(SyntaxKind.PartialKeyword)))
                     .WithParameterList(
                         ParameterList(
                         [

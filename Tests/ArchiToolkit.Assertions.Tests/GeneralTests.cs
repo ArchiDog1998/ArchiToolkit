@@ -1,7 +1,4 @@
-﻿using ArchiToolkit.Assertions.Assertions.Extensions;
-using ArchiToolkit.Assertions.Execution;
-
-namespace ArchiToolkit.Assertions.Tests;
+﻿namespace ArchiToolkit.Assertions.Tests;
 
 public class GeneralTests
 {

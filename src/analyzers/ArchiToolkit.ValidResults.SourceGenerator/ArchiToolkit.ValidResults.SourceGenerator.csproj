@@ -3,7 +3,7 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj" />
+        <ProjectReference Include="..\..\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace ArchiToolkit.Assertions.Utils;

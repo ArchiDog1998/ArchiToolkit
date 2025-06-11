@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 namespace ArchiToolkit.RoslynHelper.Extensions;
 
 /// <summary>
-/// Extensions for symbol
+///     Extensions for symbol
 /// </summary>
 public static class SymbolExtensions
 {
@@ -13,31 +13,39 @@ public static class SymbolExtensions
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static TypeName GetName(this ITypeSymbol symbol) => new(symbol);
+    public static TypeName GetName(this ITypeSymbol symbol)
+    {
+        return new TypeName(symbol);
+    }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static TypeParamName GetName(this ITypeParameterSymbol symbol) => new(symbol);
+    public static TypeParamName GetName(this ITypeParameterSymbol symbol)
+    {
+        return new TypeParamName(symbol);
+    }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static MethodName GetName(this IMethodSymbol symbol) => new(symbol);
+    public static MethodName GetName(this IMethodSymbol symbol)
+    {
+        return new MethodName(symbol);
+    }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static ParameterName GetName(this IParameterSymbol symbol) => new(symbol);
+    public static ParameterName GetName(this IParameterSymbol symbol)
+    {
+        return new ParameterName(symbol);
+    }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="symbols"></param>
     /// <returns></returns>
@@ -47,7 +55,6 @@ public static class SymbolExtensions
     }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="symbols"></param>
     /// <returns></returns>

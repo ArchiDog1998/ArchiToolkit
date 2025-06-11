@@ -28,5 +28,8 @@ public struct Io<T>
         Value = value;
     }
 
-    public static implicit operator T(Io<T> t) => t.Value;
+    public static implicit operator T(Io<T> t)
+    {
+        return t.Value;
+    }
 }

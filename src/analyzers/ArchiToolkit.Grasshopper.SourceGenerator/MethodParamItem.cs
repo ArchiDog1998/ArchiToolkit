@@ -35,6 +35,13 @@ public class MethodParamItem(
     ImmutableArray<AttributeData> attributes,
     bool io = false)
 {
+    private static readonly string[] IoNames =
+    [
+        "global::System.Threading.Tasks.Task<>",
+        "global::System.Threading.Tasks.ValueTask<>",
+        "global::ArchiToolkit.Grasshopper.Io<>"
+    ];
+
     public readonly ParamAccess Access = GetParamAccess(GetTypeWithoutIo(type.Symbol));
     public readonly ImmutableArray<AttributeData> Attributes = attributes;
     public readonly bool Io = io;
@@ -42,7 +49,7 @@ public class MethodParamItem(
     public readonly ParameterName? Parameter;
     public readonly ParamType Type = paramType;
     public readonly TypeName TypeName = type;
-    public readonly TypeName TypeNameNoIoTask =  GetTypeWithoutIo(type.Symbol).GetName();
+    public readonly TypeName TypeNameNoIoTask = GetTypeWithoutIo(type.Symbol).GetName();
 
     public MethodParamItem(MethodGenerator generator, ParameterName name, TypeName owner)
         : this(generator, name.Name, name.Type,
@@ -154,46 +161,39 @@ public class MethodParamItem(
                 && tagAttr.ConstructorArguments[0].Value is byte b)
             {
                 if (HasFlag(1 << 0) && isIn) // Principal
-                {
                     yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
                         IdentifierName("PrincipalParameterIndex"), LiteralExpression(
                             SyntaxKind.NumericLiteralExpression,
                             Literal(index))));
-                }
 
                 if (HasFlag(1 << 1)) // Reverse
-                {
                     yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
                             IdentifierName("Reverse")), LiteralExpression(SyntaxKind.TrueLiteralExpression)));
-                }
 
                 if (HasFlag(1 << 2)) // Flatten
-                {
                     yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             IdentifierName("param"), IdentifierName("DataMapping")),
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             IdentifierName("global::Grasshopper.Kernel.GH_DataMapping"), IdentifierName("Flatten"))));
-                }
 
                 if (HasFlag(1 << 3)) // Graft
-                {
                     yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             IdentifierName("param"), IdentifierName("DataMapping")),
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             IdentifierName("global::Grasshopper.Kernel.GH_DataMapping"), IdentifierName("Graft"))));
-                }
 
                 if (HasFlag(1 << 4)) // Simplify
-                {
                     yield return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
                             IdentifierName("Simplify")), LiteralExpression(SyntaxKind.TrueLiteralExpression)));
-                }
 
-                bool HasFlag(byte flag) => (b & flag) == flag;
+                bool HasFlag(byte flag)
+                {
+                    return (b & flag) == flag;
+                }
             }
 
             if (isIn && Attributes.Any(a => a.AttributeClass?.GetName().FullName
@@ -226,9 +226,7 @@ public class MethodParamItem(
             {
                 if (GetLiteralExpression(Parameter.Symbol.ExplicitDefaultValue)
                     is { } literal)
-                {
                     yield return SetPersistentData(literal);
-                }
 
                 LiteralExpressionSyntax? GetLiteralExpression(object? value)
                 {
@@ -265,9 +263,7 @@ public class MethodParamItem(
             }
 
             if (GetInnerType(TypeName.Symbol) is { TypeKind: TypeKind.Enum } enumType)
-            {
                 foreach (var fieldSymbol in enumType.GetMembers().OfType<IFieldSymbol>().Where(s => s.IsConst))
-                {
                     yield return ExpressionStatement(InvocationExpression(MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression, IdentifierName("param"),
                             IdentifierName("AddNamedValue")))
@@ -279,8 +275,6 @@ public class MethodParamItem(
                                 Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression,
                                     Literal(Convert.ToInt32(fieldSymbol.ConstantValue))))
                             ])));
-                }
-            }
 
             yield return AddParameter();
         }
@@ -419,13 +413,6 @@ public class MethodParamItem(
         if (name.IsOut) paramType |= ParamType.Out;
         return paramType;
     }
-
-    private static readonly string[] IoNames =
-    [
-        "global::System.Threading.Tasks.Task<>",
-        "global::System.Threading.Tasks.ValueTask<>",
-        "global::ArchiToolkit.Grasshopper.Io<>",
-    ];
 
     private static ITypeSymbol GetTypeWithoutIo(ITypeSymbol typeSymbol)
     {

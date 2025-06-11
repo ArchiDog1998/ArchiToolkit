@@ -13,9 +13,9 @@ public class MethodGenerator : BasicGenerator
 {
     private readonly List<MethodParamItem> _parameters;
 
-    public readonly MethodName Name;
-
     public readonly bool IsAwaiter;
+
+    public readonly MethodName Name;
 
     public MethodGenerator(ISymbol symbol) : base(symbol)
     {
@@ -121,10 +121,7 @@ public class MethodGenerator : BasicGenerator
                         })
                 ]));
 
-        if (IsAwaiter)
-        {
-            invocation = AwaitExpression(invocation);
-        }
+        if (IsAwaiter) invocation = AwaitExpression(invocation);
 
         StatementSyntax invocationStatement = _parameters.Any(p => p.Parameter is null)
             ? LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
@@ -186,12 +183,10 @@ public class MethodGenerator : BasicGenerator
             ];
 
             if (_parameters.Any(p => p.Type.HasFlag(ParamType.Out)))
-            {
                 computeMembers = computeMembers.Append(Block((IEnumerable<StatementSyntax>)
                 [
                     .._parameters.Where(p => p.Type.HasFlag(ParamType.Out)).Select((p, i) => p.SetData(i, "data."))
                 ]));
-            }
         }
         else
         {
@@ -280,7 +275,7 @@ public class MethodGenerator : BasicGenerator
                         Argument(GetArgumentKeyedString(".Component.Description", ObjDescription)),
                         Argument(GetArgumentCategory(Category)),
                         Argument(GetArgumentRawString("Subcategory." + (Subcategory ?? BaseSubcategory),
-                            (Subcategory ?? BaseSubcategory)))
+                            Subcategory ?? BaseSubcategory))
                     ]))
             ]))
             .AddMembers(
@@ -311,7 +306,6 @@ public class MethodGenerator : BasicGenerator
                         .WithArgumentList(ArgumentList([Argument(ThisExpression())])))))));
 
         if (IsAwaiter)
-        {
             classSyntax = classSyntax.AddMembers(
                 RecordDeclaration(SyntaxKind.RecordStructDeclaration,
                         Token(SyntaxKind.RecordKeyword), Identifier("TaskResult"))
@@ -363,7 +357,6 @@ public class MethodGenerator : BasicGenerator
                         ]))))
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             );
-        }
 
         return classSyntax;
     }

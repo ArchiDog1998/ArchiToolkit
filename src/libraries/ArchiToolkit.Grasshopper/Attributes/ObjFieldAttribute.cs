@@ -6,7 +6,7 @@ using Grasshopper.Kernel;
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// if the data is a field of the <see cref="IGH_Component"/>, please use it.
+///     if the data is a field of the <see cref="IGH_Component" />, please use it.
 /// </summary>
 /// <code>
 /// public class Test
@@ -16,8 +16,8 @@ namespace ArchiToolkit.Grasshopper;
 /// }
 /// </code>
 /// <remarks>
-/// <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute"/> first.</para>
-/// <para><b>⚠ WARNING:</b> The data must not be <see langword="out"/>.</para>
+///     <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute" /> first.</para>
+///     <para><b>⚠ WARNING:</b> The data must not be <see langword="out" />.</para>
 /// </remarks>
 /// <param name="saveToFile">if it should be saved into the file</param>
 [AttributeUsage(AttributeTargets.Parameter)]

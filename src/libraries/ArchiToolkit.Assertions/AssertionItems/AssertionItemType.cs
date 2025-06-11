@@ -60,7 +60,7 @@ public enum AssertionItemType : byte
     Empty,
 
     /// <summary>
-    ///  Valid
+    ///     Valid
     /// </summary>
-    Valid,
+    Valid
 }

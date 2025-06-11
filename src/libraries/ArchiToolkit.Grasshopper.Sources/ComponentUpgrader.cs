@@ -24,10 +24,7 @@ public abstract class ComponentUpgrader<TTarget>(Guid from, DateTime time)
 
         var index = document.Objects.IndexOf(target);
 
-        if (target is IGH_Component oldComponent)
-        {
-            SwapParameters(oldComponent, result);
-        }
+        if (target is IGH_Component oldComponent) SwapParameters(oldComponent, result);
 
         result.CreateAttributes();
         result.Attributes.Pivot = target.Attributes.Pivot;
@@ -43,14 +40,10 @@ public abstract class ComponentUpgrader<TTarget>(Guid from, DateTime time)
 
     private static void SwapParameters(IGH_Component oldComponent, IGH_Component newComponent)
     {
-        foreach (var (from , to ) in  ConnectParameters(oldComponent.Params.Input, newComponent.Params.Input))
-        {
+        foreach (var (from, to) in ConnectParameters(oldComponent.Params.Input, newComponent.Params.Input))
             GH_UpgradeUtil.MigrateSources(from, to);
-        }
-        foreach (var (from , to ) in  ConnectParameters(oldComponent.Params.Output, newComponent.Params.Output))
-        {
+        foreach (var (from, to) in ConnectParameters(oldComponent.Params.Output, newComponent.Params.Output))
             GH_UpgradeUtil.MigrateRecipients(from, to);
-        }
     }
 
     private static IEnumerable<(IGH_Param From, IGH_Param To)> ConnectParameters(List<IGH_Param> oldParams,
@@ -58,28 +51,21 @@ public abstract class ComponentUpgrader<TTarget>(Guid from, DateTime time)
     {
         //TODO: Better way to get the best param.
         foreach (var oldParam in oldParams)
-        {
             if (newParams.OrderByDescending(p => GetScore(oldParam, p)).FirstOrDefault() is { } newParam)
-            {
                 yield return (oldParam, newParam);
-            }
-        }
     }
 
     private static int GetScore(IGH_Param paramA, IGH_Param paramB)
     {
         var score = 0;
-        if (paramA.GetType() == paramB.GetType())
-        {
-            score += 10;
-        }
+        if (paramA.GetType() == paramB.GetType()) score += 10;
         score += GetStringScore(paramA.Name.ToUpper(), paramB.Name.ToUpper());
         return score;
     }
 
     private static int GetStringScore(string a, string b)
     {
-        return - LevenshteinDistance(a, b);
+        return -LevenshteinDistance(a, b);
     }
 
     public static int LevenshteinDistance(string s1, string s2)
@@ -94,16 +80,15 @@ public abstract class ComponentUpgrader<TTarget>(Guid from, DateTime time)
             dp[0, j] = j;
 
         for (var i = 1; i <= len1; i++)
+        for (var j = 1; j <= len2; j++)
         {
-            for (var j = 1; j <= len2; j++)
-            {
-                var cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
-                dp[i, j] = Math.Min(Math.Min(
-                        dp[i - 1, j] + 1,    // Deletion
-                        dp[i, j - 1] + 1),   // Insertion
-                    dp[i - 1, j - 1] + cost); // Substitution
-            }
+            var cost = s1[i - 1] == s2[j - 1] ? 0 : 1;
+            dp[i, j] = Math.Min(Math.Min(
+                    dp[i - 1, j] + 1, // Deletion
+                    dp[i, j - 1] + 1), // Insertion
+                dp[i - 1, j - 1] + cost); // Substitution
         }
+
         return dp[len1, len2];
     }
 }

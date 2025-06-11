@@ -6,7 +6,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="Grasshopper" />
-      <PackageReference Include="System.Drawing.Common" />
+        <PackageReference Include="Grasshopper"/>
+        <PackageReference Include="System.Drawing.Common"/>
     </ItemGroup>
 </Project>

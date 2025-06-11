@@ -11,9 +11,11 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
 public abstract class BasicGenerator
 {
+    private readonly Guid? _guid;
     public readonly ISymbol Symbol;
 
     public string ObjName, ObjNickname, ObjDescription;
+
     protected BasicGenerator(ISymbol symbol)
     {
         Symbol = symbol;
@@ -26,9 +28,8 @@ public abstract class BasicGenerator
 
         if (Symbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.GetName().FullName
                     is "global::ArchiToolkit.Grasshopper.ObjGuidAttribute") is
-            { ConstructorArguments.Length: 1 } attr
+                { ConstructorArguments.Length: 1 } attr
             && attr.ConstructorArguments[0].Value?.ToString() is { } guid)
-        {
             try
             {
                 _guid = new Guid(guid);
@@ -37,10 +38,9 @@ public abstract class BasicGenerator
             {
                 _guid = null;
             }
-        }
 
         if (symbol.GetAttributes().Any(a =>
-                     a.AttributeClass?.GetName().FullName == "global::System.ObsoleteAttribute"))
+                a.AttributeClass?.GetName().FullName == "global::System.ObsoleteAttribute"))
         {
             IsObsolete = true;
             Exposure = "-1";
@@ -87,13 +87,13 @@ public abstract class BasicGenerator
 
     public string? Exposure { get; set; }
     public bool IsObsolete { get; }
-
-    private readonly Guid? _guid;
     public Guid Id => _guid ?? StringToGuid(IdName);
 
     internal static HashSet<string> Icons { get; } = [];
     internal static HashSet<string> Categories { get; } = [];
     internal static Dictionary<string, string> Translations { get; } = [];
+
+    public static Dictionary<string, CateInfo> CategoryInfos { get; set; } = [];
 
     private string ToRealNameNoTags(string className)
     {
@@ -151,15 +151,16 @@ public abstract class BasicGenerator
         var iconProperty = PropertyDeclaration(IdentifierName("global::System.Drawing.Bitmap"), Identifier("Icon"))
             .WithModifiers([Token(SyntaxKind.ProtectedKeyword), Token(SyntaxKind.OverrideKeyword)])
             .WithExpressionBody(ArrowExpressionClause(PostfixUnaryExpression(
-                    SyntaxKind.SuppressNullableWarningExpression,InvocationExpression(
-                    IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
-                .WithArgumentList(ArgumentList([
-                    Argument(BinaryExpression(SyntaxKind.AddExpression,
-                        BinaryExpression(SyntaxKind.AddExpression, LiteralExpression(SyntaxKind.StringLiteralExpression,
-                                Literal(Symbol.ContainingAssembly.Name + ".Icons.")),
-                            IdentifierName("ResourceKey")),
-                        LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(".png"))))
-                ])))))
+                SyntaxKind.SuppressNullableWarningExpression, InvocationExpression(
+                        IdentifierName("global::ArchiToolkit.Grasshopper.ArchiToolkitResources.GetIcon"))
+                    .WithArgumentList(ArgumentList([
+                        Argument(BinaryExpression(SyntaxKind.AddExpression,
+                            BinaryExpression(SyntaxKind.AddExpression, LiteralExpression(
+                                    SyntaxKind.StringLiteralExpression,
+                                    Literal(Symbol.ContainingAssembly.Name + ".Icons.")),
+                                IdentifierName("ResourceKey")),
+                            LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(".png"))))
+                    ])))))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(BasicGenerator)).AddAttributes(NonUserCodeAttribute())
             ])
@@ -198,7 +199,6 @@ public abstract class BasicGenerator
         Icons.Add(IconType + KeyName);
     }
 
-    public static Dictionary<string, CateInfo> CategoryInfos { get; set; } = [];
     public static InvocationExpressionSyntax GetArgumentCategory(string? category)
     {
         var cateKey = category ?? string.Empty;
@@ -209,7 +209,8 @@ public abstract class BasicGenerator
         Categories.Add(key);
         Icons.Add("c" + key);
         Translations[key + ".ShortName"] = string.IsNullOrEmpty(info.ShortName) ? ToShort(category) : info.ShortName;
-        Translations[key + ".SymbolName"] = info.SymbolName is null ? char.ToUpper(category[0]).ToString() : info.SymbolName.ToString();
+        Translations[key + ".SymbolName"] =
+            info.SymbolName is null ? char.ToUpper(category[0]).ToString() : info.SymbolName.ToString();
 
         return GetArgumentRawString(key, category);
 

@@ -30,7 +30,7 @@ internal static partial class ArchiToolkitResources
     }
 
     /// <summary>
-    /// Localization your string
+    ///     Localization your string
     /// </summary>
     /// <code>
     /// "Localization String".Loc("Optional Key");

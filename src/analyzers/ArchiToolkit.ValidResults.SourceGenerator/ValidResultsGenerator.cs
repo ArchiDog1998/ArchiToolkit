@@ -43,14 +43,12 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
         if (members.OfType<IPropertySymbol>().Any(m => m.Name is "Value")) return;
         if (members.OfType<IFieldSymbol>().Any(m => m.Name is "Value")) return;
 
-        var baseType = TypeHelper.FindValidResultType(dictionary, data, out var addDisposed, out var baseDataSymbol, false);
+        var baseType =
+            TypeHelper.FindValidResultType(dictionary, data, out var addDisposed, out var baseDataSymbol, false);
         var trackerName = target.Name + "Tracker";
 
         IEnumerable<BaseTypeSyntax> baseTypes = [SimpleBaseType(baseType)];
-        if (addDisposed)
-        {
-            baseTypes = baseTypes.Append(SimpleBaseType(IdentifierName("global::System.IDisposable")));
-        }
+        if (addDisposed) baseTypes = baseTypes.Append(SimpleBaseType(IdentifierName("global::System.IDisposable")));
 
         IEnumerable<MemberDeclarationSyntax> disposableMembers = addDisposed
             ?
@@ -81,7 +79,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                         ..CreatorMembers(target.Name, data),
                         ..InterfacesMembers(target.Name, data, dictionary),
                         ..GenerateMembers(members, dictionary, trackerName, baseDataSymbol),
-                        ..disposableMembers,
+                        ..disposableMembers
                     ]),
                 ClassDeclaration(target.Name + "Extensions")
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
@@ -109,7 +107,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                                     Argument(IdentifierName("value"))
                                 ]))))
                             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                        ..GenerateStaticMembers(members, dictionary, trackerName, baseDataSymbol),
+                        ..GenerateStaticMembers(members, dictionary, trackerName, baseDataSymbol)
                     ]),
                 ClassDeclaration(trackerName)
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
@@ -139,7 +137,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                                     Argument(IdentifierName("callerInfo"))
                                 ])))
                             .WithBody(Block()),
-                        ..GenerateStaticOperatorMembers(members, dictionary, trackerName),
+                        ..GenerateStaticOperatorMembers(members, dictionary, trackerName)
                     ])
             ]);
         context.AddSource(target.Name + ".g.cs", node.NodeToString());
@@ -197,10 +195,8 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                      .Where(p => !p.ReturnType.IsRefLikeType)
                      .Where(p => p.IsStatic)
                      .Where(p => p.MethodKind is MethodKind.UserDefinedOperator))
-        {
             yield return StaticOrdinaryMethod(method, dictionary, MethodParametersHelper.MethodType.Operator,
                 trackerName);
-        }
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateStaticMembers(IReadOnlyCollection<ISymbol> members,
@@ -218,12 +214,8 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                      .Where(p => !p.ReturnType.IsRefLikeType)
                      .Where(p => !p.IsStatic)
                      .Where(p => !staticMethods.Contains(new MethodSignature(p))))
-        {
             if (method.MethodKind is MethodKind.Ordinary)
-            {
                 yield return OrdinaryMethod(method, dictionary, trackerName);
-            }
-        }
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateMembers(IReadOnlyCollection<ISymbol> members,
@@ -244,33 +236,25 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                      .Where(p => !p.IsStatic)
                      .Where(p => !propertyOrFieldNames.Contains(p.Name))
                      .Where(p => !p.Type.IsRefLikeType))
-        {
             yield return GenerateProperty(property.Type, property.Name, property.ContainingType,
                 dictionary, property.GetMethod is not null, property.SetMethod is not null);
-        }
 
         foreach (var field in members
                      .OfType<IFieldSymbol>()
                      .Where(p => !p.IsStatic)
                      .Where(p => !propertyOrFieldNames.Contains(p.Name))
                      .Where(p => !p.Type.IsRefLikeType))
-        {
             yield return GenerateProperty(field.Type, field.Name, field.ContainingType,
                 dictionary, true, true);
-        }
 
         foreach (var method in members
                      .OfType<IMethodSymbol>()
                      .Where(p => !p.ReturnType.IsRefLikeType)
                      .Where(p => p.IsStatic)
                      .Where(p => !staticMethods.Contains(new MethodSignature(p))))
-        {
             if (method.MethodKind is MethodKind.Ordinary)
-            {
                 yield return StaticOrdinaryMethod(method, dictionary, MethodParametersHelper.MethodType.Static,
                     trackerName);
-            }
-        }
     }
 
     private static MemberDeclarationSyntax OrdinaryMethod(IMethodSymbol method,
@@ -298,7 +282,6 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
         List<AccessorDeclarationSyntax> accessors = new(2);
 
         if (hasGetter)
-        {
             accessors.Add(AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                 .WithExpressionBody(ArrowExpressionClause(InvocationExpression(
                         IdentifierName("GetProperty"))
@@ -310,10 +293,8 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                                 IdentifierName(propertyName))))
                     ]))))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
-        }
 
         if (hasSetter)
-        {
             accessors.Add(AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
                 .WithExpressionBody(ArrowExpressionClause(InvocationExpression(
                         IdentifierName("SetProperty"))
@@ -327,7 +308,6 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                                     IdentifierName(propertyName)), IdentifierName("v"))))
                     ]))))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
-        }
 
         return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType, out _, out _, true),
                 Identifier(propertyName))
@@ -345,12 +325,13 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
     {
         foreach (var interfaceSymbol in dataType.AllInterfaces)
         {
-            if(!dictionary.TryGetValue(interfaceSymbol, out var resultSymbol)) continue;
+            if (!dictionary.TryGetValue(interfaceSymbol, out var resultSymbol)) continue;
             yield return ConversionOperatorDeclaration(Token(SyntaxKind.ImplicitKeyword),
                     IdentifierName(resultSymbol.GetName().FullName))
                 .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
                 .WithAttributeLists([
-                    GeneratedCodeAttribute(typeof(ValidResultsGenerator)).AddAttributes(NonUserCodeAttribute(), PureAttribute())
+                    GeneratedCodeAttribute(typeof(ValidResultsGenerator))
+                        .AddAttributes(NonUserCodeAttribute(), PureAttribute())
                 ])
                 .WithParameterList(ParameterList(
                 [
@@ -364,9 +345,9 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                                 .WithArgumentList(ArgumentList(
                                 [
                                     Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                            IdentifierName("value"), IdentifierName("Result"))),
+                                        IdentifierName("value"), IdentifierName("Result"))),
                                     Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                            IdentifierName("value"), IdentifierName("ValueOrDefault")))
+                                        IdentifierName("value"), IdentifierName("ValueOrDefault")))
                                 ])))
                         ])))));
         }
@@ -428,7 +409,6 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
         if (dataType.TypeKind is not TypeKind.Interface)
-        {
             yield return ConversionOperatorDeclaration(Token(SyntaxKind.ImplicitKeyword),
                     IdentifierName(className))
                 .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
@@ -446,7 +426,6 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                         Argument(IdentifierName("value"))
                     ]))))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
-        }
     }
 
     private static Dictionary<ISymbol?, INamedTypeSymbol> GetClassesSymbols(IEnumerable<ISymbol?> symbols)

@@ -10,8 +10,8 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
 public class TypeGenerator : BasicGenerator
 {
-    public string ObjTypeName, ObjTypeDescription;
     public readonly TypeName Name;
+    public string ObjTypeName, ObjTypeDescription;
 
     public TypeGenerator(ISymbol symbol) : base(symbol)
     {
@@ -21,6 +21,13 @@ public class TypeGenerator : BasicGenerator
         ObjTypeName = ObjTypeDescription = Name.Name;
         GetObjNames(Symbol.GetAttributes(), ref ObjTypeName, ref ObjTypeDescription);
     }
+
+    protected override string IdName => Name.FullName;
+
+    public override string ClassName => "Param_" + Name.Name;
+    protected override char IconType => 'P';
+
+    public static ITypeSymbol BaseGoo { get; set; } = null!;
 
     private static void GetObjNames(IEnumerable<AttributeData> attributes, ref string name, ref string description)
     {
@@ -35,19 +42,16 @@ public class TypeGenerator : BasicGenerator
         if (!string.IsNullOrEmpty(relay)) description = relay!;
     }
 
-    protected override string IdName => Name.FullName;
-
-    public override string ClassName => "Param_" + Name.Name;
-    protected override char IconType => 'P';
-
-    public static ITypeSymbol BaseGoo { get; set; } = null!;
-
     protected override ClassDeclarationSyntax ModifyClass(ClassDeclarationSyntax classSyntax)
     {
-        List<SimpleBaseTypeSyntax> baseTypes = [SimpleBaseType(GenericName(Identifier("global::Grasshopper.Kernel.GH_PersistentParam"))
+        List<SimpleBaseTypeSyntax> baseTypes =
+        [
+            SimpleBaseType(GenericName(Identifier("global::Grasshopper.Kernel.GH_PersistentParam"))
                 .WithTypeArgumentList(TypeArgumentList([
                     QualifiedName(
-                        IdentifierName(RealClassName), IdentifierName("Goo"))])))];
+                        IdentifierName(RealClassName), IdentifierName("Goo"))
+                ])))
+        ];
 
         var basicGoo = (INamedTypeSymbol)(DocumentObjectGenerator.GetTypeAttribute(Name.Symbol.GetAttributes(),
                                               "global::ArchiToolkit.Grasshopper.BaseGooAttribute<>")?.Symbol
@@ -392,7 +396,7 @@ public class TypeGenerator : BasicGenerator
                         .WithAttributeLists([
                             GeneratedCodeAttribute(typeof(TypeGenerator)).AddAttributes(NonUserCodeAttribute())
                         ])
-                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
                 ]);
 
             classSyntax = classSyntax.AddMembers(gooClassPreview,
@@ -574,6 +578,7 @@ public class TypeGenerator : BasicGenerator
                             ])))))
             );
         }
+
         return classSyntax.WithBaseList(BaseList([..baseTypes]));
     }
 }

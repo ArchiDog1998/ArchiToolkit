@@ -1,10 +1,10 @@
 ﻿using ArchiToolkit.Grasshopper;
 using ArchiToolkit.Grasshopper.Instance;
 using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
 using Rhino;
 using Rhino.DocObjects;
 using Rhino.Geometry;
+
 [assembly: DocObj<AnotherType>(name: "What a type")]
 
 namespace ArchiToolkit.Grasshopper.Instance;
@@ -16,6 +16,12 @@ public class AnotherType;
 [DocObj]
 public class MyType : IGH_PreviewData, IGH_BakeAwareData
 {
+    public bool BakeGeometry(RhinoDoc doc, ObjectAttributes att, out Guid obj_guid)
+    {
+        obj_guid = Guid.Empty;
+        return false;
+    }
+
     public void DrawViewportWires(GH_PreviewWireArgs args)
     {
     }
@@ -25,9 +31,4 @@ public class MyType : IGH_PreviewData, IGH_BakeAwareData
     }
 
     public BoundingBox ClippingBox => BoundingBox.Unset;
-    public bool BakeGeometry(RhinoDoc doc, ObjectAttributes att, out Guid obj_guid)
-    {
-        obj_guid = Guid.Empty;
-        return false;
-    }
 }

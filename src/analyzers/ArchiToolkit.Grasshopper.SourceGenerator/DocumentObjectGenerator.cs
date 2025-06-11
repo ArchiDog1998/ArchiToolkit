@@ -39,8 +39,8 @@ public class DocumentObjectGenerator : IIncrementalGenerator
 
         var methodInvocations = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: static (node, _) => node is InvocationExpressionSyntax,
-                transform: GetLocNames)
+                static (node, _) => node is InvocationExpressionSyntax,
+                GetLocNames)
             .Where(static info => info is not null)
             .Select(static (info, _) => info!.Value);
 
@@ -66,20 +66,12 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         List<string> arguments = [];
         if (symbol is { IsExtensionMethod: true, ReducedFrom: not null } &&
             invocation.Expression is MemberAccessExpressionSyntax memberAccess)
-        {
-            if (ExtractConstantValue(memberAccess.Expression, model) is { } stringArg )
-            {
+            if (ExtractConstantValue(memberAccess.Expression, model) is { } stringArg)
                 arguments.Add(stringArg);
-            }
-        }
 
         foreach (var arg in invocation.ArgumentList.Arguments)
-        {
-            if (ExtractConstantValue(arg.Expression, model) is { } stringArg )
-            {
+            if (ExtractConstantValue(arg.Expression, model) is { } stringArg)
                 arguments.Add(stringArg);
-            }
-        }
 
         if (!arguments.Any()) return null;
         var value = arguments[0];
@@ -91,9 +83,10 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         {
             var methodSyntax = invocation.Ancestors().OfType<MemberDeclarationSyntax>().FirstOrDefault();
             if (methodSyntax is null) return value;
-            if(model.GetDeclaredSymbol(methodSyntax) is not { } methodSymbol) return value;
+            if (model.GetDeclaredSymbol(methodSyntax) is not { } methodSymbol) return value;
             var typeSymbol = methodSymbol.ContainingType;
-            return  typeSymbol.ContainingNamespace + "." +typeSymbol.MetadataName + "." + methodSymbol.Name + "." + value;
+            return typeSymbol.ContainingNamespace + "." + typeSymbol.MetadataName + "." + methodSymbol.Name + "." +
+                   value;
         }
     }
 
@@ -184,18 +177,12 @@ public class DocumentObjectGenerator : IIncrementalGenerator
         foreach (var method in methods)
         {
             method.GenerateSource(context);
-            if (UpgraderGenerator.Create(method) is { } upgrader)
-            {
-                upgrader.GenerateSource(context);
-            }
+            if (UpgraderGenerator.Create(method) is { } upgrader) upgrader.GenerateSource(context);
         }
 
         if (GetCsprojDirectory(assembly) is { } dir)
         {
-            foreach (var info in arg.Locs)
-            {
-                BasicGenerator.Translations[info.Key] = info.Value;
-            }
+            foreach (var info in arg.Locs) BasicGenerator.Translations[info.Key] = info.Value;
 
             GenerateTranslations(dir.FullName);
             GenerateIcons(dir.FullName);
@@ -307,7 +294,7 @@ public class DocumentObjectGenerator : IIncrementalGenerator
             {
                 var result = new TypeGenerator(attr.AttributeClass!.TypeArguments[0])
                 {
-                    Exposure = "-1",
+                    Exposure = "-1"
                 };
                 ApplyString(attr, 0, s => result.KeyName = s);
                 ApplyString(attr, 1, s => result.ObjName = s);

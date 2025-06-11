@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
 using Grasshopper.Kernel;
+
 #pragma warning disable CS9113 // Parameter is unread.
 
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// Set the custom <see cref="GH_Exposure"/> in <see cref="IGH_DocumentObject.Exposure"/>.
+///     Set the custom <see cref="GH_Exposure" /> in <see cref="IGH_DocumentObject.Exposure" />.
 /// </summary>
 /// <code>
 /// // For the method, you can do things like this:
@@ -21,7 +22,7 @@ namespace ArchiToolkit.Grasshopper;
 /// public class MyType;
 /// </code>
 /// <remarks>
-/// <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute"/> first.</para>
+///     <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute" /> first.</para>
 /// </remarks>
 /// <param name="exposure">just the exposure</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method)]

@@ -15,10 +15,12 @@ public partial class DateTimeResult
 [GenerateValidResult<TestClass2>]
 public partial class TestClass2Result
 {
-
 }
 
 public class TestClass2
 {
-    public static TestClass2 Create(bool a = false) => new TestClass2();
+    public static TestClass2 Create(bool a = false)
+    {
+        return new TestClass2();
+    }
 }

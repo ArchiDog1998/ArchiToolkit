@@ -1,10 +1,7 @@
-﻿using System.Collections.Immutable;
-using ArchiToolkit.RoslynHelper.Extensions;
+﻿using ArchiToolkit.RoslynHelper.Extensions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static ArchiToolkit.RoslynHelper.Extensions.SyntaxExtensions;
 
 
 namespace ArchiToolkit.ValidResults.SourceGenerator;
@@ -13,10 +10,7 @@ public static class TypeHelper
 {
     public static TypeSyntax GetResultDataType(ITypeSymbol type)
     {
-        if (GetParentDataType(type) is { } dataType)
-        {
-            type = dataType;
-        }
+        if (GetParentDataType(type) is { } dataType) type = dataType;
 
         if (type.GetName().FullName is "global::ArchiToolkit.ValidResults.ValidResult.Data")
             return IdentifierName(Identifier("global::ArchiToolkit.ValidResults.ValidResult.Data"));
@@ -47,10 +41,7 @@ public static class TypeHelper
             return IdentifierName(Identifier("global::ArchiToolkit.ValidResults.ValidResult"));
         }
 
-        if (GetParentDataType(target) is { } dataType)
-        {
-            target = dataType;
-        }
+        if (GetParentDataType(target) is { } dataType) target = dataType;
 
         if (target.GetName().FullName is "global::ArchiToolkit.ValidResults.ValidResult.Data")
         {
@@ -76,16 +67,14 @@ public static class TypeHelper
             ]));
     }
 
-    private static (ITypeSymbol DataSymbol, INamedTypeSymbol TargetSymbol)? FindValidResultType(Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
+    private static (ITypeSymbol DataSymbol, INamedTypeSymbol TargetSymbol)? FindValidResultType(
+        Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
         ITypeSymbol data, bool containSelf)
     {
-        var loopTarget = containSelf  ? data : data.BaseType;
+        var loopTarget = containSelf ? data : data.BaseType;
         while (loopTarget is not null)
         {
-            if (dictionary.TryGetValue(loopTarget, out var symbol))
-            {
-                return (loopTarget, symbol);
-            }
+            if (dictionary.TryGetValue(loopTarget, out var symbol)) return (loopTarget, symbol);
 
             loopTarget = loopTarget.BaseType;
         }

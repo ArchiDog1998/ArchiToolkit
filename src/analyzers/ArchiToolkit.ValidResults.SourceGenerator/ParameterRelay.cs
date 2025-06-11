@@ -8,15 +8,24 @@ namespace ArchiToolkit.ValidResults.SourceGenerator;
 
 public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, ExpressionSyntax? defaultValue = null)
 {
+    public ParameterRelay(IParameterSymbol symbol) : this(symbol.Type, symbol.Name, symbol.RefKind,
+        GetDefaultValueExpression(symbol))
+    {
+    }
+
     public ITypeSymbol Type => type;
     public string Name => name;
     public RefKind Kind => kind;
     public ExpressionSyntax? DefaultValue => defaultValue;
 
-    public ParameterRelay(IParameterSymbol symbol) : this(symbol.Type, symbol.Name, symbol.RefKind,
-        GetDefaultValueExpression(symbol))
+
+    private SyntaxKind? Modifier => Kind switch
     {
-    }
+        RefKind.Ref => SyntaxKind.RefKeyword,
+        RefKind.Out => SyntaxKind.OutKeyword,
+        RefKind.In => SyntaxKind.InKeyword,
+        _ => null
+    };
 
     private static ExpressionSyntax? GetDefaultValueExpression(IParameterSymbol parameter)
     {
@@ -52,10 +61,8 @@ public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, Express
                 .FirstOrDefault(f => f.HasConstantValue && Equals(f.ConstantValue, value));
 
             if (enumMember != null)
-            {
                 return ParseExpression(
                     $"{type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.{enumMember.Name}");
-            }
         }
 
         return value switch
@@ -90,13 +97,11 @@ public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, Express
     public LocalDeclarationStatementSyntax CreateLocalDeclarationStatement(bool isTracker)
     {
         if (Type.IsRefLikeType)
-        {
             return LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
                 .WithVariables([
                     VariableDeclarator(Identifier("_" + Name))
                         .WithInitializer(EqualsValueClause(IdentifierName(Name)))
                 ]));
-        }
 
         return Kind switch
         {
@@ -120,10 +125,7 @@ public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, Express
     public ArgumentSyntax GenerateArgument()
     {
         var argument = Argument(IdentifierName("_" + Name));
-        if (Modifier is { } modifier)
-        {
-            argument = argument.WithRefOrOutKeyword(Token(modifier));
-        }
+        if (Modifier is { } modifier) argument = argument.WithRefOrOutKeyword(Token(modifier));
 
         return argument;
     }
@@ -139,11 +141,8 @@ public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, Express
         else if (isTracker)
         {
             if (Type.Equals(containingType, SymbolEqualityComparer.Default))
-            {
                 parameter = parameter.WithType(IdentifierName(trackerName));
-            }
             else
-            {
                 parameter = parameter.WithType(
                     GenericName(Identifier("global::ArchiToolkit.ValidResults.ResultTracker"))
                         .WithTypeArgumentList(TypeArgumentList(
@@ -154,7 +153,6 @@ public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, Express
                                     IdentifierName(Type.GetName().FullName)
                                 ]))
                         ])));
-            }
         }
         else
         {
@@ -166,26 +164,19 @@ public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, Express
         }
 
 
-        if (Modifier is { } modifier)
-        {
-            parameter = parameter.WithModifiers(TokenList(Token(modifier)));
-        }
+        if (Modifier is { } modifier) parameter = parameter.WithModifiers(TokenList(Token(modifier)));
 
         if (DefaultValue is not null)
         {
             if (Type.IsRefLikeType)
-            {
                 parameter = parameter.WithDefault(
                     EqualsValueClause(
                         LiteralExpression(
                             SyntaxKind.DefaultLiteralExpression,
                             Token(SyntaxKind.DefaultKeyword))));
-            }
             else
-            {
                 parameter = parameter.WithType(NullableType(parameter.Type!))
                     .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression)));
-            }
         }
 
         return parameter;
@@ -213,15 +204,6 @@ public class ParameterRelay(ITypeSymbol type, string name, RefKind kind, Express
                             DefaultValue))
                 ]))));
     }
-
-
-    private SyntaxKind? Modifier => Kind switch
-    {
-        RefKind.Ref => SyntaxKind.RefKeyword,
-        RefKind.Out => SyntaxKind.OutKeyword,
-        RefKind.In => SyntaxKind.InKeyword,
-        _ => null,
-    };
 
     public LocalDeclarationStatementSyntax GenerateReason(out string reasonName, bool isTracker)
     {

@@ -9,12 +9,12 @@ using FluentValidation.Results;
 namespace ArchiToolkit.Assertions.FluentValidation;
 
 /// <summary>
-/// The extension for the Fluent Validation
+///     The extension for the Fluent Validation
 /// </summary>
 public static class AssertionValidationExtensions
 {
     /// <summary>
-    ///  If it is valid by Fluent Validation
+    ///     If it is valid by Fluent Validation
     /// </summary>
     /// <param name="assertion"></param>
     /// <param name="validator">The validator</param>
@@ -36,5 +36,8 @@ public static class AssertionValidationExtensions
             assertionParams);
     }
 
-    private static string ToErrorMessage(this ValidationFailure failure) => failure.ErrorMessage;
+    private static string ToErrorMessage(this ValidationFailure failure)
+    {
+        return failure.ErrorMessage;
+    }
 }

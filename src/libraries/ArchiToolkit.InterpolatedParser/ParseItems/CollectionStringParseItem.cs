@@ -59,6 +59,7 @@ public sealed class CollectionStringParseItem<TCollection, TValue>(
                 {
                     result.Add(false);
                 }
+
                 break;
             }
             else

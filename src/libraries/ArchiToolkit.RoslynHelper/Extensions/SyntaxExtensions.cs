@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -43,11 +42,11 @@ public static class SyntaxExtensions
     /// <returns></returns>
     public static BaseNamespaceDeclarationSyntax NamespaceDeclaration(string name, string? comment = null)
     {
-        return MakeGenerated( FileScopedNamespaceDeclaration(ParseName(name)), comment);
+        return MakeGenerated(FileScopedNamespaceDeclaration(ParseName(name)), comment);
     }
 
     /// <summary>
-    /// Make the node as the auto generated.
+    ///     Make the node as the auto generated.
     /// </summary>
     /// <param name="syntax"></param>
     /// <param name="comment"></param>
@@ -62,9 +61,9 @@ public static class SyntaxExtensions
                    + "\n// </auto-generated>";
 
         return syntax.WithLeadingTrivia(TriviaList(
-                Comment(text),
-                Trivia(PragmaWarningDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true)),
-                Trivia(NullableDirectiveTrivia(Token(SyntaxKind.EnableKeyword), true))));
+            Comment(text),
+            Trivia(PragmaWarningDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true)),
+            Trivia(NullableDirectiveTrivia(Token(SyntaxKind.EnableKeyword), true))));
     }
 
     #region Attribute
@@ -95,7 +94,7 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
-    ///    Obsolete Attribute
+    ///     Obsolete Attribute
     /// </summary>
     /// <returns></returns>
     public static AttributeSyntax ObsoleteAttribute()
@@ -104,7 +103,7 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
-    /// Pure attribute.
+    ///     Pure attribute.
     /// </summary>
     /// <returns></returns>
     public static AttributeSyntax PureAttribute()

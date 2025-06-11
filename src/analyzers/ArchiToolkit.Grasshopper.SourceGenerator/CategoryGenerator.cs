@@ -106,8 +106,10 @@ public static class CategoryGenerator
                                     .WithArgumentList(
                                         ArgumentList(
                                         [
-                                            Argument(BinaryExpression(SyntaxKind.AddExpression, IdentifierName("iconName"),
-                                                LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(".SymbolName"))))
+                                            Argument(BinaryExpression(SyntaxKind.AddExpression,
+                                                IdentifierName("iconName"),
+                                                LiteralExpression(SyntaxKind.StringLiteralExpression,
+                                                    Literal(".SymbolName"))))
                                         ])))
                                 .WithArgumentList(BracketedArgumentList(
                                 [
@@ -116,7 +118,6 @@ public static class CategoryGenerator
                         ])))));
 
         SavePriority(context, assembly, [method], "CategoryInfos", categories, "LoadInfo");
-
     }
 
     private static void SavePriority(SourceProductionContext context, IAssemblySymbol assembly,

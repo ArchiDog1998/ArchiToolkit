@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -27,7 +26,7 @@ namespace NukeBuilder;
     On = [GitHubActionsTrigger.Push],
     ImportSecrets = [nameof(NuGetApiKey), nameof(GithubToken)],
     InvokedTargets = [nameof(PushMain)])]
-partial class Build : NukeBuild
+class Build : NukeBuild
 {
     [Parameter] readonly string GithubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
     [Parameter] readonly string NuGetApiKey = Environment.GetEnvironmentVariable("NUGET_API_KEY");
@@ -65,10 +64,7 @@ partial class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            foreach (var project in Solution.AllProjects.Where(p => p.Name.EndsWith(".Tests")))
-            {
-                TestProject(project);
-            }
+            foreach (var project in Solution.AllProjects.Where(p => p.Name.EndsWith(".Tests"))) TestProject(project);
 
             return;
 
@@ -295,9 +291,7 @@ partial class Build : NukeBuild
             var repository = await client.Repository.Get(Repository.GetGitHubOwner(), Repository.GetGitHubName());
             ReleaseNote.AppendLine(repository.Description);
             if (PushedPackages.Count > 0)
-            {
                 ReleaseNote.AppendLine($"Nuget Packages:\n{string.Join("\n", PushedPackages)}");
-            }
 
             ReleaseNote.Append(PullRequestNote);
             ReleaseNote.Append(IssuesNote);
@@ -322,13 +316,9 @@ partial class Build : NukeBuild
                 ref var builder = ref CollectionsMarshal.GetValueRefOrAddDefault(commitsBuilders, type, out var exist);
                 if (!exist) builder = new StringBuilder();
                 if (Contributors.Add(commit))
-                {
                     builder.AppendLine($"1. {content} by @{commit.Author.Login} in {commit.Sha}");
-                }
                 else
-                {
                     builder.AppendLine($"1. {content} in {commit.Sha}");
-                }
             }
 
             if (commitsBuilders.Count == 0) return;
@@ -363,7 +353,7 @@ partial class Build : NukeBuild
             };
             var pullRequests =
                 await client.PullRequest.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(),
-                    new PullRequestRequest()
+                    new PullRequestRequest
                     {
                         State = ItemStateFilter.Closed
                     });
@@ -374,16 +364,10 @@ partial class Build : NukeBuild
             PullRequestNote.AppendLine("## Pull Requests");
 
             foreach (var pr in mergedPRs)
-            {
                 if (Contributors.Add(pr))
-                {
                     PullRequestNote.AppendLine($"1. {pr.Title} by @{pr.User.Login} in #{pr.Number}");
-                }
                 else
-                {
                     PullRequestNote.AppendLine($"1. {pr.Title} #{pr.Number}");
-                }
-            }
         });
 
     private readonly StringBuilder IssuesNote = new();
@@ -398,10 +382,10 @@ partial class Build : NukeBuild
 
             var issues =
                 await client.Issue.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(),
-                    new RepositoryIssueRequest()
+                    new RepositoryIssueRequest
                     {
                         Since = LastTagCreatedTime,
-                        State = ItemStateFilter.Closed,
+                        State = ItemStateFilter.Closed
                     });
 
             var closedIssues = issues.Where(i => i.PullRequest is null).ToArray();
@@ -413,13 +397,9 @@ partial class Build : NukeBuild
                 var icon = issue.StateReason?.Value is ItemStateReason.Completed ? "✅" : "🚫";
 
                 if (issue.User is { } user)
-                {
                     IssuesNote.AppendLine($"1. {icon}{issue.Title} by @{user.Login} in #{issue.Number}");
-                }
                 else
-                {
                     IssuesNote.AppendLine($"1. {icon}{issue.Title} #{issue.Number}");
-                }
             }
         });
 

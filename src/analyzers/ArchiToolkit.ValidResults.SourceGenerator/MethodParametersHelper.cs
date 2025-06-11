@@ -13,10 +13,70 @@ public static class MethodParametersHelper
     {
         Static,
         Instance,
-        Operator,
+        Operator
     }
 
-    public static BaseMethodDeclarationSyntax GenerateMethodByParameters(IMethodSymbol method, ParameterRelay[] parameters,
+    private static readonly Dictionary<string, SyntaxKind> OperatorNameToSyntaxKind = new()
+    {
+        ["op_Addition"] = SyntaxKind.PlusToken,
+        ["op_Subtraction"] = SyntaxKind.MinusToken,
+        ["op_Multiply"] = SyntaxKind.AsteriskToken,
+        ["op_Division"] = SyntaxKind.SlashToken,
+        ["op_Modulus"] = SyntaxKind.PercentToken,
+        ["op_ExclusiveOr"] = SyntaxKind.CaretToken,
+        ["op_BitwiseAnd"] = SyntaxKind.AmpersandToken,
+        ["op_BitwiseOr"] = SyntaxKind.BarToken,
+        ["op_LogicalAnd"] = SyntaxKind.AmpersandAmpersandToken,
+        ["op_LogicalOr"] = SyntaxKind.BarBarToken,
+        ["op_Assign"] = SyntaxKind.EqualsToken,
+        ["op_LeftShift"] = SyntaxKind.LessThanLessThanToken,
+        ["op_RightShift"] = SyntaxKind.GreaterThanGreaterThanToken,
+        ["op_Equality"] = SyntaxKind.EqualsEqualsToken,
+        ["op_Inequality"] = SyntaxKind.ExclamationEqualsToken,
+        ["op_GreaterThan"] = SyntaxKind.GreaterThanToken,
+        ["op_LessThan"] = SyntaxKind.LessThanToken,
+        ["op_GreaterThanOrEqual"] = SyntaxKind.GreaterThanEqualsToken,
+        ["op_LessThanOrEqual"] = SyntaxKind.LessThanEqualsToken,
+        ["op_Increment"] = SyntaxKind.PlusPlusToken,
+        ["op_Decrement"] = SyntaxKind.MinusMinusToken,
+        ["op_UnaryNegation"] = SyntaxKind.MinusToken,
+        ["op_UnaryPlus"] = SyntaxKind.PlusToken,
+        ["op_OnesComplement"] = SyntaxKind.TildeToken,
+        ["op_True"] = SyntaxKind.TrueKeyword,
+        ["op_False"] = SyntaxKind.FalseKeyword
+    };
+
+    public static readonly Dictionary<string, SyntaxKind> OperatorNameToExpressionSyntaxKind = new()
+    {
+        ["op_Addition"] = SyntaxKind.AddExpression,
+        ["op_Subtraction"] = SyntaxKind.SubtractExpression,
+        ["op_Multiply"] = SyntaxKind.MultiplyExpression,
+        ["op_Division"] = SyntaxKind.DivideExpression,
+        ["op_Modulus"] = SyntaxKind.ModuloExpression,
+        ["op_BitwiseAnd"] = SyntaxKind.BitwiseAndExpression,
+        ["op_BitwiseOr"] = SyntaxKind.BitwiseOrExpression,
+        ["op_ExclusiveOr"] = SyntaxKind.ExclusiveOrExpression,
+        ["op_LeftShift"] = SyntaxKind.LeftShiftExpression,
+        ["op_RightShift"] = SyntaxKind.RightShiftExpression,
+        ["op_Equality"] = SyntaxKind.EqualsExpression,
+        ["op_Inequality"] = SyntaxKind.NotEqualsExpression,
+        ["op_GreaterThan"] = SyntaxKind.GreaterThanExpression,
+        ["op_LessThan"] = SyntaxKind.LessThanExpression,
+        ["op_GreaterThanOrEqual"] = SyntaxKind.GreaterThanOrEqualExpression,
+        ["op_LessThanOrEqual"] = SyntaxKind.LessThanOrEqualExpression,
+        ["op_LogicalAnd"] = SyntaxKind.LogicalAndExpression,
+        ["op_LogicalOr"] = SyntaxKind.LogicalOrExpression,
+        ["op_Assign"] = SyntaxKind.SimpleAssignmentExpression,
+        ["op_Increment"] = SyntaxKind.PreIncrementExpression, // Or PostIncrementExpression
+        ["op_Decrement"] = SyntaxKind.PreDecrementExpression, // Or PostDecrementExpression
+        ["op_UnaryPlus"] = SyntaxKind.UnaryPlusExpression,
+        ["op_UnaryNegation"] = SyntaxKind.UnaryMinusExpression,
+        ["op_OnesComplement"] = SyntaxKind.BitwiseNotExpression,
+        ["op_LogicalNot"] = SyntaxKind.LogicalNotExpression
+    };
+
+    public static BaseMethodDeclarationSyntax GenerateMethodByParameters(IMethodSymbol method,
+        ParameterRelay[] parameters,
         Dictionary<ISymbol?, INamedTypeSymbol> dictionary, MethodType type, string trackerName)
     {
         var resultType = TypeHelper.FindValidResultType(dictionary, method.ReturnType, out _, out _, true);
@@ -26,23 +86,18 @@ public static class MethodParametersHelper
         if (type is MethodType.Operator)
         {
             if (parameters.Length > 1)
-            {
                 invocation = BinaryExpression(
                     OperatorNameToExpressionSyntaxKind[method.Name],
-                    IdentifierName("_" +parameters[0].Name),
-                    IdentifierName("_" +parameters[1].Name));
-            }
+                    IdentifierName("_" + parameters[0].Name),
+                    IdentifierName("_" + parameters[1].Name));
             else
-            {
                 invocation = PrefixUnaryExpression(
                     SyntaxKind.UnaryMinusExpression,
-                    IdentifierName("_" +parameters[0].Name));
-            }
+                    IdentifierName("_" + parameters[0].Name));
         }
         else
         {
             if (type is MethodType.Static)
-            {
                 invocation = InvocationExpression(MemberAccessExpression(
                         SyntaxKind.SimpleMemberAccessExpression,
                         IdentifierName(method.ContainingType.GetName().FullName),
@@ -51,24 +106,20 @@ public static class MethodParametersHelper
                     [
                         ..parameters.Select(p => p.GenerateArgument())
                     ]));
-            }
             else
-            {
                 invocation = InvocationExpression(MemberAccessExpression(
                         SyntaxKind.SimpleMemberAccessExpression,
-                        IdentifierName("_" +parameters[0].Name),
+                        IdentifierName("_" + parameters[0].Name),
                         IdentifierName(method.Name)))
                     .WithArgumentList(ArgumentList(
                     [
                         ..parameters.Skip(1).Select(p => p.GenerateArgument())
                     ]));
-            }
         }
 
         StatementSyntax[] statements;
 
         if (method.ReturnType.SpecialType is SpecialType.System_Void)
-        {
             statements =
             [
                 ExpressionStatement(invocation),
@@ -78,9 +129,7 @@ public static class MethodParametersHelper
                         resultDataType,
                         IdentifierName("Ok")))))
             ];
-        }
         else
-        {
             statements =
             [
                 ExpressionStatement(AssignmentExpression(
@@ -93,7 +142,6 @@ public static class MethodParametersHelper
                             Argument(invocation)
                         ]))))
             ];
-        }
 
         var generateThis = type is MethodType.Instance;
         var isTracker = type is not MethodType.Instance and not MethodType.Static;
@@ -128,8 +176,8 @@ public static class MethodParametersHelper
                                 [
                                     Argument(CollectionExpression(
                                     [
-                                        ..reasonNames.Select(name => SpreadElement(IdentifierName(name))),
-                                    ])),
+                                        ..reasonNames.Select(name => SpreadElement(IdentifierName(name)))
+                                    ]))
                                 ]))))
                     ])),
                 IfStatement(IsPatternExpression(IdentifierName("__result"),
@@ -185,7 +233,7 @@ public static class MethodParametersHelper
         IReadOnlyCollection<ParameterRelay> parameters, out List<string> reasonNames, bool isTracker)
     {
         List<LocalDeclarationStatementSyntax> result = new(parameters.Count);
-        reasonNames = new(parameters.Count);
+        reasonNames = new List<string>(parameters.Count);
         foreach (var item in parameters
                      .Where(i => i.Kind is not RefKind.Out)
                      .Where(i => !i.Type.IsRefLikeType))
@@ -202,7 +250,8 @@ public static class MethodParametersHelper
     #region Parameters
 
     private static IEnumerable<ParameterSyntax> GenerateParametersWithCaller(
-        IReadOnlyCollection<ParameterRelay> parameterNames, bool generateThis, bool isTracker, string trackerName, ITypeSymbol? containingType)
+        IReadOnlyCollection<ParameterRelay> parameterNames, bool generateThis, bool isTracker, string trackerName,
+        ITypeSymbol? containingType)
     {
         foreach (var item in parameterNames)
         {
@@ -222,22 +271,14 @@ public static class MethodParametersHelper
                      .Where(i => i.Kind is not RefKind.Out)
                      .Where(i => !i.Type.IsRefLikeType)
                      .Select(i => i.Name)))
-        {
             yield return parameter;
-        }
     }
 
     public static IEnumerable<ParameterSyntax> GenerateCallersSyntax(IEnumerable<string> parameterNames)
     {
-        foreach (var parameterName in parameterNames)
-        {
-            yield return GenerateCallerSyntax(parameterName);
-        }
+        foreach (var parameterName in parameterNames) yield return GenerateCallerSyntax(parameterName);
 
-        foreach (var caller in GenerateFileCallers())
-        {
-            yield return caller;
-        }
+        foreach (var caller in GenerateFileCallers()) yield return caller;
     }
 
     private static IEnumerable<ParameterSyntax> GenerateFileCallers()
@@ -285,64 +326,4 @@ public static class MethodParametersHelper
     }
 
     #endregion
-
-    private static readonly Dictionary<string, SyntaxKind> OperatorNameToSyntaxKind = new()
-    {
-        ["op_Addition"] = SyntaxKind.PlusToken,
-        ["op_Subtraction"] = SyntaxKind.MinusToken,
-        ["op_Multiply"] = SyntaxKind.AsteriskToken,
-        ["op_Division"] = SyntaxKind.SlashToken,
-        ["op_Modulus"] = SyntaxKind.PercentToken,
-        ["op_ExclusiveOr"] = SyntaxKind.CaretToken,
-        ["op_BitwiseAnd"] = SyntaxKind.AmpersandToken,
-        ["op_BitwiseOr"] = SyntaxKind.BarToken,
-        ["op_LogicalAnd"] = SyntaxKind.AmpersandAmpersandToken,
-        ["op_LogicalOr"] = SyntaxKind.BarBarToken,
-        ["op_Assign"] = SyntaxKind.EqualsToken,
-        ["op_LeftShift"] = SyntaxKind.LessThanLessThanToken,
-        ["op_RightShift"] = SyntaxKind.GreaterThanGreaterThanToken,
-        ["op_Equality"] = SyntaxKind.EqualsEqualsToken,
-        ["op_Inequality"] = SyntaxKind.ExclamationEqualsToken,
-        ["op_GreaterThan"] = SyntaxKind.GreaterThanToken,
-        ["op_LessThan"] = SyntaxKind.LessThanToken,
-        ["op_GreaterThanOrEqual"] = SyntaxKind.GreaterThanEqualsToken,
-        ["op_LessThanOrEqual"] = SyntaxKind.LessThanEqualsToken,
-        ["op_Increment"] = SyntaxKind.PlusPlusToken,
-        ["op_Decrement"] = SyntaxKind.MinusMinusToken,
-        ["op_UnaryNegation"] = SyntaxKind.MinusToken,
-        ["op_UnaryPlus"] = SyntaxKind.PlusToken,
-        ["op_OnesComplement"] = SyntaxKind.TildeToken,
-        ["op_True"] = SyntaxKind.TrueKeyword,
-        ["op_False"] = SyntaxKind.FalseKeyword,
-    };
-
-    public static readonly Dictionary<string, SyntaxKind> OperatorNameToExpressionSyntaxKind = new()
-    {
-        ["op_Addition"] = SyntaxKind.AddExpression,
-        ["op_Subtraction"] = SyntaxKind.SubtractExpression,
-        ["op_Multiply"] = SyntaxKind.MultiplyExpression,
-        ["op_Division"] = SyntaxKind.DivideExpression,
-        ["op_Modulus"] = SyntaxKind.ModuloExpression,
-        ["op_BitwiseAnd"] = SyntaxKind.BitwiseAndExpression,
-        ["op_BitwiseOr"] = SyntaxKind.BitwiseOrExpression,
-        ["op_ExclusiveOr"] = SyntaxKind.ExclusiveOrExpression,
-        ["op_LeftShift"] = SyntaxKind.LeftShiftExpression,
-        ["op_RightShift"] = SyntaxKind.RightShiftExpression,
-        ["op_Equality"] = SyntaxKind.EqualsExpression,
-        ["op_Inequality"] = SyntaxKind.NotEqualsExpression,
-        ["op_GreaterThan"] = SyntaxKind.GreaterThanExpression,
-        ["op_LessThan"] = SyntaxKind.LessThanExpression,
-        ["op_GreaterThanOrEqual"] = SyntaxKind.GreaterThanOrEqualExpression,
-        ["op_LessThanOrEqual"] = SyntaxKind.LessThanOrEqualExpression,
-        ["op_LogicalAnd"] = SyntaxKind.LogicalAndExpression,
-        ["op_LogicalOr"] = SyntaxKind.LogicalOrExpression,
-        ["op_Assign"] = SyntaxKind.SimpleAssignmentExpression,
-        ["op_Increment"] = SyntaxKind.PreIncrementExpression, // Or PostIncrementExpression
-        ["op_Decrement"] = SyntaxKind.PreDecrementExpression, // Or PostDecrementExpression
-        ["op_UnaryPlus"] = SyntaxKind.UnaryPlusExpression,
-        ["op_UnaryNegation"] = SyntaxKind.UnaryMinusExpression,
-        ["op_OnesComplement"] = SyntaxKind.BitwiseNotExpression,
-        ["op_LogicalNot"] = SyntaxKind.LogicalNotExpression,
-    };
-
 }

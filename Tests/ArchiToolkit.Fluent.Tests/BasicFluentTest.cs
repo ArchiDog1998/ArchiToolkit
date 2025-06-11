@@ -3,48 +3,66 @@
 public class BasicFluentTest
 {
     [Test]
-    public Task PropertyTest() => CheckAll<BasicType<Random, int>>(
-        async obj => await Assert.That(obj.DataA).IsNull(),
-        async obj => await Assert.That(obj.DataA).IsNotNull(),
-        fluent => fluent.WithDataA(new Random()));
+    public Task PropertyTest()
+    {
+        return CheckAll<BasicType<Random, int>>(
+            async obj => await Assert.That(obj.DataA).IsNull(),
+            async obj => await Assert.That(obj.DataA).IsNotNull(),
+            fluent => fluent.WithDataA(new Random()));
+    }
 
     [Test]
-    public Task MethodTest() => CheckAll<BasicType<Random, int>>(
-        async obj => await Assert.That(obj.Name).IsEmpty(),
-        async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
-        fluent => fluent.DoAMethod(1));
+    public Task MethodTest()
+    {
+        return CheckAll<BasicType<Random, int>>(
+            async obj => await Assert.That(obj.Name).IsEmpty(),
+            async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
+            fluent => fluent.DoAMethod(1));
+    }
 
     [Test]
-    public Task ContinueTest() => CheckAll<BasicType<Random, int>>(
-        async obj =>
-        {
-            await Assert.That(obj.DataA).IsNull();
-            await Assert.That(obj.Name).IsEmpty();
-        },
-        async obj =>
-        {
-            await Assert.That(obj.DataA).IsNull();
-            await Assert.That(obj.Name).IsEqualTo(nameof(Int32));
-        },
-        fluent => fluent.DoAMethod(1).ContinueWhen(_ => false).WithDataA(new Random()));
+    public Task ContinueTest()
+    {
+        return CheckAll<BasicType<Random, int>>(
+            async obj =>
+            {
+                await Assert.That(obj.DataA).IsNull();
+                await Assert.That(obj.Name).IsEmpty();
+            },
+            async obj =>
+            {
+                await Assert.That(obj.DataA).IsNull();
+                await Assert.That(obj.Name).IsEqualTo(nameof(Int32));
+            },
+            fluent => fluent.DoAMethod(1).ContinueWhen(_ => false).WithDataA(new Random()));
+    }
 
     [Test]
-    public Task ExtensionAMethodTest() => CheckAll<BasicType<Random, int>>(
-        async obj => await Assert.That(obj.Name).IsEmpty(),
-        async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
-        fluent => fluent.DoAMethod_BasicType(1));
+    public Task ExtensionAMethodTest()
+    {
+        return CheckAll<BasicType<Random, int>>(
+            async obj => await Assert.That(obj.Name).IsEmpty(),
+            async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
+            fluent => fluent.DoAMethod_BasicType(1));
+    }
 
     [Test]
-    public Task ExtensionAMethod1Test() => CheckAll<BasicType<Random, int>>(
-        async obj => await Assert.That(obj.Name).IsEmpty(),
-        async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
-        fluent => fluent.DoAMethod_BasicType1(1));
+    public Task ExtensionAMethod1Test()
+    {
+        return CheckAll<BasicType<Random, int>>(
+            async obj => await Assert.That(obj.Name).IsEmpty(),
+            async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
+            fluent => fluent.DoAMethod_BasicType1(1));
+    }
 
     [Test]
-    public Task ExtensionBMethodTest() => CheckAll<BasicType<Random, int>>(
-        async obj => await Assert.That(obj.Name).IsEmpty(),
-        async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
-        fluent => fluent.DoBMethod(1));
+    public Task ExtensionBMethodTest()
+    {
+        return CheckAll<BasicType<Random, int>>(
+            async obj => await Assert.That(obj.Name).IsEmpty(),
+            async obj => await Assert.That(obj.Name).IsEqualTo(nameof(Int32)),
+            fluent => fluent.DoBMethod(1));
+    }
 
     private static async Task CheckAll<T>(Func<T, Task> checkBefore, Func<T, Task> checkAfter,
         Action<Fluent<T>> doWithFluent) where T : class, new()

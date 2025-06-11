@@ -1,11 +1,10 @@
 ﻿using ArchiToolkit.Fluent;
-using ArchiToolkit.PureConst;
 using FluentValidation;
 
 namespace ArchiToolkit.Console;
 
 /// <summary>
-/// Test summary.
+///     Test summary.
 /// </summary>
 [FluentApi(typeof(int))]
 public static class TestClass
@@ -14,13 +13,13 @@ public static class TestClass
     {
         i += 1;
 
-        new Validator().Validate(new(), a => { });
+        new Validator().Validate(new Item(), a => { });
     }
 }
 
 public class Item
 {
-    public int Value { get; set; } = 0;
+    public int Value { get; set; }
 
     public static Item TestMethod(bool a)
     {
@@ -43,4 +42,3 @@ public class DoubleValidator : AbstractValidator<double>
         RuleFor(i => i).GreaterThan(0).WithSeverity(Severity.Info);
     }
 }
-

@@ -5,10 +5,31 @@ namespace ArchiToolkit.ValidResults;
 
 public class ValidResult(ValidResult.Data data) : IValidResult
 {
+    public Result Result => data.Result;
+
+    [Pure]
+    public static implicit operator ValidResult(Data data)
+    {
+        return new ValidResult(data);
+    }
+
+    public static bool operator true(ValidResult message)
+    {
+        return message.Result.IsSuccess;
+    }
+
+    public static bool operator false(ValidResult message)
+    {
+        return message.Result.IsFailed;
+    }
+
     public record Data(Result Result)
     {
         [Pure]
-        public static Data Ok(Data value) => value;
+        public static Data Ok(Data value)
+        {
+            return value;
+        }
 
         [Pure]
         public static Data Ok(params IReadOnlyCollection<ISuccess> successes)
@@ -20,60 +41,21 @@ public class ValidResult(ValidResult.Data data) : IValidResult
         [Pure]
         public static Data? Fail(IReadOnlyCollection<IReason> reasons)
         {
-            return reasons.OfType<IError>().Any() ? new Data(new Result().WithReasons(reasons.RemoveDuplicated())) : null;
+            return reasons.OfType<IError>().Any()
+                ? new Data(new Result().WithReasons(reasons.RemoveDuplicated()))
+                : null;
         }
 
         [Pure]
-        public static implicit operator Data(Result result) => new(result);
+        public static implicit operator Data(Result result)
+        {
+            return new Data(result);
+        }
     }
-
-    public Result Result => data.Result;
-
-    [Pure]
-    public static implicit operator ValidResult(Data data) => new(data);
-
-    public static bool operator true(ValidResult message) => message.Result.IsSuccess;
-    public static bool operator false(ValidResult message) => message.Result.IsFailed;
 }
 
 public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<TValue>
 {
-    public record Data(Result Result, TValue ValueOrDefault)
-    {
-        [Pure]
-        public static Data Ok(Data value) => value;
-
-        [Pure]
-        public static Data Ok(TValue value, params IReadOnlyCollection<ISuccess> successes)
-        {
-            if (value is null) throw new ArgumentNullException(nameof(value));
-            var validationResult = ValidResultsConfig.ValidateObject(value);
-            var result = Result.Ok().WithSuccesses(successes.RemoveDuplicated());
-
-            return validationResult.IsValid
-                ? new Data(result, value)
-                : new Data(result.WithError(new ObjectValidationError(validationResult)), default!);
-        }
-
-        [Pure]
-        public static Data? Fail(IReadOnlyCollection<IReason> reasons)
-        {
-            return reasons.OfType<IError>().Any() ? new Data(new Result().WithReasons(reasons.RemoveDuplicated()), default!) : null;
-        }
-
-        [Pure]
-        public static implicit operator Data(TValue value) => Ok(value);
-
-        [Pure]
-        public static implicit operator Data(Result result) => new(result, default!);
-    }
-
-    [Pure]
-    public static implicit operator ValidResult<TValue>(Data data) => new(data);
-
-    [Pure]
-    public static implicit operator ValidResult<TValue>(TValue value) => Data.Ok(value);
-
     public Result Result => data.Result;
     public TValue ValueOrDefault => data.ValueOrDefault;
 
@@ -81,13 +63,24 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
     {
         get
         {
-            if (Result.IsFailed)
-            {
-                throw new InvalidOperationException("This is failed, you can't get the value.");
-            }
+            if (Result.IsFailed) throw new InvalidOperationException("This is failed, you can't get the value.");
 
             return ValueOrDefault;
         }
+    }
+
+    object? IValidObjectResult.ValueOrDefault => ValueOrDefault;
+
+    [Pure]
+    public static implicit operator ValidResult<TValue>(Data data)
+    {
+        return new ValidResult<TValue>(data);
+    }
+
+    [Pure]
+    public static implicit operator ValidResult<TValue>(TValue value)
+    {
+        return Data.Ok(value);
     }
 
     public override string ToString()
@@ -96,8 +89,15 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         return Result + " : " + ValueOrDefault;
     }
 
-    public static bool operator true(ValidResult<TValue> message) => message.Result.IsSuccess;
-    public static bool operator false(ValidResult<TValue> message) => message.Result.IsFailed;
+    public static bool operator true(ValidResult<TValue> message)
+    {
+        return message.Result.IsSuccess;
+    }
+
+    public static bool operator false(ValidResult<TValue> message)
+    {
+        return message.Result.IsFailed;
+    }
 
     protected ValidResult<T>.Data GetProperty<T>(Func<T> getter)
     {
@@ -125,5 +125,44 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         setter(value.Value);
     }
 
-    object? IValidObjectResult.ValueOrDefault => ValueOrDefault;
+    public record Data(Result Result, TValue ValueOrDefault)
+    {
+        [Pure]
+        public static Data Ok(Data value)
+        {
+            return value;
+        }
+
+        [Pure]
+        public static Data Ok(TValue value, params IReadOnlyCollection<ISuccess> successes)
+        {
+            if (value is null) throw new ArgumentNullException(nameof(value));
+            var validationResult = ValidResultsConfig.ValidateObject(value);
+            var result = Result.Ok().WithSuccesses(successes.RemoveDuplicated());
+
+            return validationResult.IsValid
+                ? new Data(result, value)
+                : new Data(result.WithError(new ObjectValidationError(validationResult)), default!);
+        }
+
+        [Pure]
+        public static Data? Fail(IReadOnlyCollection<IReason> reasons)
+        {
+            return reasons.OfType<IError>().Any()
+                ? new Data(new Result().WithReasons(reasons.RemoveDuplicated()), default!)
+                : null;
+        }
+
+        [Pure]
+        public static implicit operator Data(TValue value)
+        {
+            return Ok(value);
+        }
+
+        [Pure]
+        public static implicit operator Data(Result result)
+        {
+            return new Data(result, default!);
+        }
+    }
 }

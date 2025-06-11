@@ -7,7 +7,7 @@ using Grasshopper.Kernel;
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// For the case that you want to set the <see cref="IGH_DocumentObject.ComponentGuid"/> manually.
+///     For the case that you want to set the <see cref="IGH_DocumentObject.ComponentGuid" /> manually.
 /// </summary>
 /// <code>
 /// // For the method, you can do things like this:
@@ -23,9 +23,9 @@ namespace ArchiToolkit.Grasshopper;
 /// public class MyType;
 /// </code>
 /// <remarks>
-/// <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute"/> first.</para>
+///     <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute" /> first.</para>
 /// </remarks>
-/// <param name="id">The <see cref="IGH_DocumentObject.ComponentGuid"/>.</param>
+/// <param name="id">The <see cref="IGH_DocumentObject.ComponentGuid" />.</param>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Struct)]
 [Conditional(Constant.KeepAttributes)]
 public class ObjGuidAttribute([StringSyntax(StringSyntaxAttribute.GuidFormat)] string id) : Attribute;

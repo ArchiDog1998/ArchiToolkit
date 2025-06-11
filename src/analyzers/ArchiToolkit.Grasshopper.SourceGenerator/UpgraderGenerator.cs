@@ -1,6 +1,4 @@
-﻿using System.Data;
-using ArchiToolkit.RoslynHelper.Extensions;
-using ArchiToolkit.RoslynHelper.Names;
+﻿using ArchiToolkit.RoslynHelper.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,59 +9,23 @@ namespace ArchiToolkit.Grasshopper.SourceGenerator;
 
 public class UpgraderGenerator(string nameSpace, string className, IEnumerable<UpgraderGenerator.UpgraderItem> items)
 {
-    public class UpgraderItem(string toType, Guid guid, DateTime time)
-    {
-        public ClassDeclarationSyntax Generate(string className)
-        {
-            var id = guid.ToString("D");
-
-            return ClassDeclaration("Upgrader_" + className + "_" + id.Substring(0, 8))
-                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.SealedKeyword)))
-                .WithParameterList(ParameterList())
-                .WithBaseList(BaseList(
-                [
-                    PrimaryConstructorBaseType(GenericName(Identifier("global::ArchiToolkit.Grasshopper.ComponentUpgrader"))
-                            .WithTypeArgumentList(TypeArgumentList([IdentifierName(toType)])))
-                        .WithArgumentList(ArgumentList(
-                        [
-                            Argument(ImplicitObjectCreationExpression().WithArgumentList(ArgumentList(
-                            [
-                                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(id)))
-                            ]))),
-                            Argument(ImplicitObjectCreationExpression().WithArgumentList(ArgumentList(
-                            [
-                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Year))),
-                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Month))),
-                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Day))),
-                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Hour))),
-                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Minute))),
-                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Second)))
-                            ])))
-                        ]))
-                ]))
-                .WithAttributeLists([
-                    GeneratedCodeAttribute(typeof(UpgraderGenerator)).AddAttributes(NonUserCodeAttribute())
-                ]);
-        }
-    }
-
     public static UpgraderGenerator? Create(MethodGenerator generator)
     {
         var upgraderItems = new List<UpgraderItem>();
-        if (GetUpgradeToAttribute(generator.Symbol.GetAttributes(), generator.Id) is {} item) upgraderItems.Add(item);
+        if (GetUpgradeToAttribute(generator.Symbol.GetAttributes(), generator.Id) is { } item) upgraderItems.Add(item);
         upgraderItems.AddRange(GetUpgradeFromAttribute(generator.Symbol.GetAttributes(), generator.RealClassName));
-        if(upgraderItems.Count is 0) return null;
-        return new (generator.NameSpace, generator.RealClassName, upgraderItems);
+        if (upgraderItems.Count is 0) return null;
+        return new UpgraderGenerator(generator.NameSpace, generator.RealClassName, upgraderItems);
     }
 
     private static DateTime GetDateTime(AttributeData attr, int startIndex)
     {
-        var year =attr.ConstructorArguments[startIndex++].Value as int? ?? 2025;
-        var month =attr.ConstructorArguments[startIndex++].Value as int? ?? 1;
-        var day =attr.ConstructorArguments[startIndex++].Value as int? ?? 1;
-        var hour =attr.ConstructorArguments[startIndex++].Value as int? ?? 0;
-        var minute =attr.ConstructorArguments[startIndex++].Value as int? ?? 0;
-        var second =attr.ConstructorArguments[startIndex].Value as int? ?? 0;
+        var year = attr.ConstructorArguments[startIndex++].Value as int? ?? 2025;
+        var month = attr.ConstructorArguments[startIndex++].Value as int? ?? 1;
+        var day = attr.ConstructorArguments[startIndex++].Value as int? ?? 1;
+        var hour = attr.ConstructorArguments[startIndex++].Value as int? ?? 0;
+        var minute = attr.ConstructorArguments[startIndex++].Value as int? ?? 0;
+        var second = attr.ConstructorArguments[startIndex].Value as int? ?? 0;
         return new DateTime(year, month, day, hour, minute, second);
     }
 
@@ -103,10 +65,44 @@ public class UpgraderGenerator(string nameSpace, string className, IEnumerable<U
                 is not "global::ArchiToolkit.Grasshopper.UpgradeFromAttribute") continue;
             if (attr.ConstructorArguments[0].Value?.ToString() is { } guidString
                 && Guid.TryParse(guidString, out var guid))
-            {
                 yield return new UpgraderItem(type, guid, GetDateTime(attr, 1));
-            }
+        }
+    }
+
+    public class UpgraderItem(string toType, Guid guid, DateTime time)
+    {
+        public ClassDeclarationSyntax Generate(string className)
+        {
+            var id = guid.ToString("D");
+
+            return ClassDeclaration("Upgrader_" + className + "_" + id.Substring(0, 8))
+                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.SealedKeyword)))
+                .WithParameterList(ParameterList())
+                .WithBaseList(BaseList(
+                [
+                    PrimaryConstructorBaseType(
+                            GenericName(Identifier("global::ArchiToolkit.Grasshopper.ComponentUpgrader"))
+                                .WithTypeArgumentList(TypeArgumentList([IdentifierName(toType)])))
+                        .WithArgumentList(ArgumentList(
+                        [
+                            Argument(ImplicitObjectCreationExpression().WithArgumentList(ArgumentList(
+                            [
+                                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(id)))
+                            ]))),
+                            Argument(ImplicitObjectCreationExpression().WithArgumentList(ArgumentList(
+                            [
+                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Year))),
+                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Month))),
+                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Day))),
+                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Hour))),
+                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Minute))),
+                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(time.Second)))
+                            ])))
+                        ]))
+                ]))
+                .WithAttributeLists([
+                    GeneratedCodeAttribute(typeof(UpgraderGenerator)).AddAttributes(NonUserCodeAttribute())
+                ]);
         }
     }
 }
-

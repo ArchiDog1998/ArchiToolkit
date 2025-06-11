@@ -23,7 +23,7 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
 
         DescriptorType.CheckingSymbol,
         DescriptorType.CantFindSymbol,
-        DescriptorType.AdditionalVariable,
+        DescriptorType.AdditionalVariable
     ];
 
     public override void Initialize(AnalysisContext context)
@@ -47,15 +47,11 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
     private static void NoAccessorAnalyze(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not AccessorDeclarationSyntax accessorSyntax) return;
-        var constAttributes = accessorSyntax.AttributeLists.SelectMany(l => l.Attributes).Where(
-                attr =>
-                    context.SemanticModel.GetTypeInfo(attr).Type?.GetName().FullName is
-                        "global::ArchiToolkit.PureConst.ConstAttribute")
+        var constAttributes = accessorSyntax.AttributeLists.SelectMany(l => l.Attributes).Where(attr =>
+                context.SemanticModel.GetTypeInfo(attr).Type?.GetName().FullName is
+                    "global::ArchiToolkit.PureConst.ConstAttribute")
             .ToArray();
-        foreach (var attr in constAttributes)
-        {
-            context.Report(DescriptorType.CantUseOnAccessor, attr.GetLocation());
-        }
+        foreach (var attr in constAttributes) context.Report(DescriptorType.CantUseOnAccessor, attr.GetLocation());
     }
 
     private static void AnalyzeGetAccessorSyntax(SyntaxNodeAnalysisContext context)
@@ -91,9 +87,7 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
         }
 
         if (methodSymbol.ExplicitInterfaceImplementations.Any(interfaceMethod => predicate(interfaceMethod)))
-        {
             return true;
-        }
 
         return (from interfaceType in methodSymbol.ContainingType.AllInterfaces
             from member in interfaceType.GetMembers().OfType<IMethodSymbol>()
@@ -152,16 +146,14 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
         foreach (var itemNode in subNodes.OfType<AssignmentExpressionSyntax>().Select(s => s.Left)
                      .Concat(subNodes.OfType<PostfixUnaryExpressionSyntax>().Select(s => s.Operand))
                      .Concat(subNodes.OfType<PrefixUnaryExpressionSyntax>().Select(s => s.Operand)))
+        foreach (var name in GetFirstAccessorName(context, itemNode))
         {
-            foreach (var name in GetFirstAccessorName(context, itemNode))
-            {
-                context.Report(DescriptorType.CheckingSymbol, name.GetLocation(), name);
-                var s = context.SemanticModel.GetSymbolInfo(name).Symbol;
-                if (s is null) continue;
-                var isLocalDefined =
-                    s.ContainingAssembly.Equals(context.Compilation.Assembly, SymbolEqualityComparer.Default);
-                CheckSymbol(context, s, itemNode.GetLocation(), name, isConstMethod, isLocalDefined, constSymbols);
-            }
+            context.Report(DescriptorType.CheckingSymbol, name.GetLocation(), name);
+            var s = context.SemanticModel.GetSymbolInfo(name).Symbol;
+            if (s is null) continue;
+            var isLocalDefined =
+                s.ContainingAssembly.Equals(context.Compilation.Assembly, SymbolEqualityComparer.Default);
+            CheckSymbol(context, s, itemNode.GetLocation(), name, isConstMethod, isLocalDefined, constSymbols);
         }
 
         foreach (var itemNode in subNodes.OfType<InvocationExpressionSyntax>().Select(s => s.Expression))
@@ -210,10 +202,7 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
                                                        SymbolEqualityComparer.Default));
                                            }));
                 if (!isConst) continue;
-                if (localSymbol.Type.IsReferenceType)
-                {
-                    referenceSymbols.Add(localSymbol);
-                }
+                if (localSymbol.Type.IsReferenceType) referenceSymbols.Add(localSymbol);
 
                 yield return localSymbol;
                 context.Report(DescriptorType.AdditionalVariable, variable.Identifier.GetLocation(), localSymbol.Name);
@@ -237,7 +226,6 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
         ExpressionSyntax expression)
     {
         while (true)
-        {
             switch (expression)
             {
                 case MemberAccessExpressionSyntax member:
@@ -266,19 +254,16 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
                 //     [
                 //         ..tuple.Arguments.SelectMany(a => GetMemberAccess(context, a.Expression))
                 //     ];
-
                 default:
                     //context.Report(DescriptorType.CantFindSymbol, expression.GetLocation());
                     return [];
             }
-        }
     }
 
     private static IReadOnlyList<SimpleNameSyntax> GetFirstAccessorName(SyntaxNodeAnalysisContext context,
         ExpressionSyntax expression)
     {
         while (true)
-        {
             switch (expression)
             {
                 case ConditionalAccessExpressionSyntax conditional:
@@ -306,13 +291,9 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
                 case ThisExpressionSyntax:
                 case BaseExpressionSyntax:
                     if (expression.Parent is MemberAccessExpressionSyntax m)
-                    {
                         expression = m.Name;
-                    }
                     else
-                    {
                         return [];
-                    }
 
                     break;
 
@@ -335,6 +316,5 @@ public sealed class PureConstAnalyzer : BaseAnalyzer
                     context.Report(DescriptorType.CantFindSymbol, expression.GetLocation());
                     return [];
             }
-        }
     }
 }

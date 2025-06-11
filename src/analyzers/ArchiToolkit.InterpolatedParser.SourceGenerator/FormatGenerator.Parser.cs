@@ -5,14 +5,14 @@ namespace ArchiToolkit.InterpolatedParser.SourceGenerator;
 
 partial class FormatGenerator
 {
-    private const string  
+    private const string
         Parse = "Parse",
         CharSpan = "global::System.ReadOnlySpan<char>",
         NumberStyles = "global::System.Globalization.NumberStyles",
         FormatProvider = "global::System.IFormatProvider",
         TryParse = "TryParse",
         String = "string";
-    
+
     private static ClassDeclarationSyntax? GetParserType(ITypeSymbol type, TypeName name,
         out ObjectCreationExpressionSyntax creation)
     {
@@ -20,14 +20,14 @@ partial class FormatGenerator
 
         var typeName = name.FullName;
         var basicClass = ClassDeclaration(className)
-            .WithModifiers(TokenList([Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.SealedKeyword)]))
+            .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.SealedKeyword)))
             .WithParameterList(ParameterList());
         creation = ObjectCreationExpression(IdentifierName(className))
             .WithArgumentList(ArgumentList());
 
         //TODO: number parsing.
         if (HasStaticMethod(type, Parse, CharSpan, FormatProvider)
-            && HasStaticMethod(type, Parse, CharSpan,NumberStyles,
+            && HasStaticMethod(type, Parse, CharSpan, NumberStyles,
                 FormatProvider)
             && HasStaticMethod(type, TryParse, CharSpan, FormatProvider,
                 typeName)

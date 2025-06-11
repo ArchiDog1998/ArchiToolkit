@@ -1,13 +1,14 @@
 # ArchiToolkit.Grasshopper
 
-This is designed for simplify your way of developing plugins in Grasshopper. 
+This is designed for simplify your way of developing plugins in Grasshopper.
 It is more clean and efficient compared to [SimpleGrasshopper](https://github.com/ArchiDog1998/SimpleGrasshopper).
 So almost all features are similar to SimpleGrasshopper.
 
 This tool is using [Roslyn](https://github.com/dotnet/roslyn) to help you coding when you are coding.
 
 ## Quick Start
-Install the ArchiToolkit.Grasshopper and then make sure that your LangVersion is `latest`. At the moment, my Visual 
+
+Install the ArchiToolkit.Grasshopper and then make sure that your LangVersion is `latest`. At the moment, my Visual
 Studio is at the version `17.13.4`.
 
 ```html
@@ -20,9 +21,12 @@ Studio is at the version `17.13.4`.
 ```
 
 ## How to use
+
 ### Component
-All the components are methods. to simplify creating these things, a `static` method is a component! 
+
+All the components are methods. to simplify creating these things, a `static` method is a component!
 To let it know which method should be the component, please tag it with `DocObjAttribute`.
+
 ```c#
 public class Test
 {
@@ -37,19 +41,19 @@ Now, you'll see a component in GH!
 
 The parameters can be in, out, or ref
 
-Please notice that, the Source generator will automatically generate the `ArchiToolkit.Resources.resx` file and the 
+Please notice that, the Source generator will automatically generate the `ArchiToolkit.Resources.resx` file and the
 icons.png located in `Icons` Folder. Here are the structure.
 
 - Icons
-  - MyGrasshopperAssembly1.Component_Add.png
-  - XXX.png
-  - ...
+    - MyGrasshopperAssembly1.Component_Add.png
+    - XXX.png
+    - ...
 - l10n
-  - ArchiToolkit.Resources.resx
+    - ArchiToolkit.Resources.resx
 
 > [!NOTE]
 >
-> In `ArchiToolkit.Resources.resx`, you can't modify it! but you can add your own languages to it, so it is how we do 
+> In `ArchiToolkit.Resources.resx`, you can't modify it! but you can add your own languages to it, so it is how we do
 > with l10n.
 
 > [!WARNING]
@@ -58,10 +62,14 @@ icons.png located in `Icons` Folder. Here are the structure.
 > And the png is the icons in the grasshopper.
 
 #### General Infos
+
 This is the general infos that almost all items can be used with.
+
 ##### Category and Subcategory
+
 You can add the attribute `CategoryAttirbute` and `SubcategoryAttribute` to control them.
 Only the `closest` attribute to the `DocObj` will affect.
+
 ```c#
 [Category("MyCategory")]
 public class Test
@@ -71,8 +79,11 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+
 ##### Default Name/NickName/Description
+
 For adding the name or nickname or description on the Document object, you can add the attribute `ObjNamesAttribute`.
+
 ```c#
 public class Test
 {
@@ -84,8 +95,11 @@ public class Test
         x, int y) => x + y;
 }
 ```
+
 ##### Exposure
+
 For changing the Exposure, please add the `ExposureAttribute` on it.
+
 ```c#
 public class Test
 {
@@ -94,13 +108,20 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+
 ##### Category Information
-If you want to set the category's Short Name or Symbol name, pelase use the attribute `CategoryInfoAttribute` on the assembly.
+
+If you want to set the category's Short Name or Symbol name, pelase use the attribute `CategoryInfoAttribute` on the
+assembly.
+
 ```c#
 [assembly: CategoryInfo(null, "Short Name", 'S')]
 ```
+
 ##### Obsolete
+
 Of course, ObsoleteAttribute can be used on.
+
 ```c#
 public class Test
 {
@@ -109,8 +130,11 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+
 ##### Attributes
+
 You can add your custom attributes on your object by using `ObjAttrAttribute<>`.
+
 ```c#
 file class MyAttribute(IGH_Component component) 
     : GH_ComponentAttributes(component);
@@ -122,8 +146,11 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+
 ##### Guid
+
 You can set the custom ComponentGuid by using the attribute `ObjGuidAttribute`.
+
 ```c#
 public class Test
 {
@@ -132,10 +159,15 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+
 #### Component Infos
+
 For some cases, you may want to add more information for this component.
+
 ##### Base Component
+
 If you want to add your own base component, do it with `BaseComponentAttribute<>`.
+
 ```c#
 file abstract class MyComponent(string name, string nickname, string description, string category, string subCategory) 
     : GH_Component(name, nickname, description, category, subCategory)
@@ -149,9 +181,12 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+
 ##### Task Capable Component
-If you want to create a Task Capable Component, please make your method return a Task or ValueTask or your custom 
+
+If you want to create a Task Capable Component, please make your method return a Task or ValueTask or your custom
 awaitable things.
+
 ```c#
 public class Test
 {
@@ -159,21 +194,27 @@ public class Test
     public static Task<int> AddAsync(int x, int y) => Task.FromResult(x + y);
 }
 ```
+
 > [!NOTE]
 >
-> It needs to create the [record](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record).
-> So you may need the package [PolySharp](https://www.nuget.org/packages/PolySharp) or you need to add these codes 
+> It needs to create
+> the [record](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record).
+> So you may need the package [PolySharp](https://www.nuget.org/packages/PolySharp) or you need to add these codes
 > below to your project
+
 ```c#
 namespace System.Runtime.CompilerServices
 {
     internal static class IsExternalInit;
 }
 ```
+
 ##### Upgrade Component
-If you want to make an `IGH_UpgradeObject` to update your component, add the attribute `UpgradeToAttribute` or 
-`UpgradeFromAttribute` to 
+
+If you want to make an `IGH_UpgradeObject` to update your component, add the attribute `UpgradeToAttribute` or
+`UpgradeFromAttribute` to
 make it.
+
 ```c#
 public class Test
 {
@@ -185,6 +226,7 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+
 ```c#
 public class Test
 {
@@ -193,10 +235,15 @@ public class Test
     public static int Add(int x, int y) => x + y;
 }
 ```
+
 #### Parameter Infos
+
 This is for the parameters info, so you can add your own things.
+
 ##### Get Component or Data Access
+
 You can get the IGH_DataAccess or IGH_Component just by adding it into your parameters
+
 ```c#
 public class Test
 {
@@ -204,9 +251,12 @@ public class Test
     public static int Add(IGH_DataAccess access, IGH_Component component, int x, int y) => x + y;
 }
 ```
+
 ##### Parameter Type
+
 You can specify the parameter type by using the attribute `ParamTypeAttribute`.
 You can specify the type or the guid. But it is better to do it with type by the generic one.
+
 ```c#
 public class Test
 {
@@ -216,6 +266,7 @@ public class Test
 ```
 
 ##### Persistent Data
+
 For the persistent data, you need to add the attribute `PersistentDataAttribute` on the parameter.
 
 ```c#
@@ -234,7 +285,9 @@ public class Test
         => x + y;
 }
 ```
+
 Or you can just make a default value.
+
 ```c#
 public class Test
 {
@@ -242,8 +295,11 @@ public class Test
     public static int Add(int x, int y = 10) => x + y;
 }
 ```
+
 ##### Optional
+
 Optional the data by the attribute `OptionalAttribute`.
+
 ```c#
 public class Test
 {
@@ -253,16 +309,21 @@ public class Test
 ```
 
 ##### Hidden
+
 If you wanna your geometry is hidden, just add `HiddenAttribute` on it.
+
 ```c#
 public class Test
 {
     public static int Add([Hidden]Arc arc, int y) => (int)arc.Radius + y;
 }
 ```
+
 ##### Data Access
+
 for the Data access, List<> means list access, GH_Structure<> means tree access.
 Io is a special type which can get the Index, HasGot and the Value.
+
 ```c#
 public class Test
 {
@@ -270,8 +331,11 @@ public class Test
     public static int Add(Io<List<int>> x, int y) => x.Index + y;
 }
 ```
+
 ##### Tags
+
 For the case that you want to add the parameter with tags, you can add the attribute `ParamTagAttribute`.
+
 ```c#
 public class Test
 {
@@ -279,9 +343,12 @@ public class Test
     public static int Add([ParamTag(ParamTagType.Principal | ParamTagType.Flatten)]int x, int y)=> x + y;
 }
 ```
+
 ##### Field
+
 For the case you want the parameter is a field in the component, you can use the attribute `ObjFieldAttribute`.
 You can also change the config about should it `saveToFile`.
+
 ```c#
 public class Test
 {
@@ -289,15 +356,21 @@ public class Test
     public static int Add([ObjField(true)]int x, int y)=> x + y;
 }
 ```
+
 ### Parameter
+
 You can also add `DocObjAttribute` on the type to create a new parameter.
+
 ```c#
 [DocObj]
 public class MyType;
 ```
+
 #### Base Goo
+
 You can specify the Goo type by using `BaseGooAttribute`.
-Just notice that don't forget to using `partial` key word to implement your type. 
+Just notice that don't forget to using `partial` key word to implement your type.
+
 ```c#
 [BaseGoo<GH_GeometricGoo<MyType>>]
 [DocObj]
@@ -331,24 +404,33 @@ partial class Param_MyType
     }
 }
 ```
+
 #### Type Name & Description
+
 To Add your own type name and type description, you can add the attribute `TypeDescAttribute`.
+
 ```c#
 [TypeDesc("Type Name", "Type Description")]
 [DocObj]
 public class MyType;
 ```
+
 #### Global Type
-For the case you want to generate the parameters from other libraries, you can use the attribute `DocObj` on the 
+
+For the case you want to generate the parameters from other libraries, you can use the attribute `DocObj` on the
 assembly to do this.
+
 ```c#
 [assembly: DocObj<RemoteType>]
 
 public class RemoteType;
 ```
+
 #### IGH_PreviewData & IGH_BakeAwareData
-If you want your param can be previewed or can be baked, just let your class or struct implement the interface 
+
+If you want your param can be previewed or can be baked, just let your class or struct implement the interface
 `IGH_PreviewData` or `IGH_BakeAwareData`.
+
 ```c#
 [DocObj]
 public class MyType : IGH_PreviewData, IGH_BakeAwareData
@@ -369,9 +451,13 @@ public class MyType : IGH_PreviewData, IGH_BakeAwareData
     }
 }
 ```
+
 ### Others
+
 #### Localization
+
 For the case you want to use the ArchiToolkit.Resources. You can do this to let it generate the string for you.
+
 ```c#
 "Localization String".Loc("Optional Key");
 ```

@@ -1,7 +1,3 @@
-using Verify = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerVerifier<
-    ArchiToolkit.PureConst.Analyzer.PureConstAnalyzer,
-    Microsoft.CodeAnalysis.Testing.DefaultVerifier>;
-
 namespace ArchiToolkit.Pure.Tests;
 
 public class PureConstAnalyzerTests

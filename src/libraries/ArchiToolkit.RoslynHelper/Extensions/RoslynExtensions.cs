@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 
 namespace ArchiToolkit.RoslynHelper.Extensions;
 
@@ -24,7 +23,7 @@ public static class RoslynExtensions
     }
 
     /// <summary>
-    /// Get the base types
+    ///     Get the base types
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>

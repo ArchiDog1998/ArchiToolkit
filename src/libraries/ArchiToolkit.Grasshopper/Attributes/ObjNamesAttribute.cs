@@ -6,7 +6,7 @@ using Grasshopper.Kernel;
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// Set the default data for the <see cref="GH_InstanceDescription"/>
+///     Set the default data for the <see cref="GH_InstanceDescription" />
 /// </summary>
 /// <code>
 /// // For the method, you can do things like this:
@@ -23,11 +23,11 @@ namespace ArchiToolkit.Grasshopper;
 /// public class MyType;
 /// </code>
 /// <remarks>
-/// <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute"/> first.</para>
+///     <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute" /> first.</para>
 /// </remarks>
-/// <param name="name">the <see cref="GH_InstanceDescription.Name"/> of the <see cref="IGH_Param"/>.</param>
-/// <param name="nickName">the <see cref="GH_InstanceDescription.NickName"/> of the <see cref="IGH_Param"/>.</param>
-/// <param name="description">the <see cref="GH_InstanceDescription.Description"/> of the <see cref="IGH_Param"/>.</param>
+/// <param name="name">the <see cref="GH_InstanceDescription.Name" /> of the <see cref="IGH_Param" />.</param>
+/// <param name="nickName">the <see cref="GH_InstanceDescription.NickName" /> of the <see cref="IGH_Param" />.</param>
+/// <param name="description">the <see cref="GH_InstanceDescription.Description" /> of the <see cref="IGH_Param" />.</param>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.ReturnValue
                 | AttributeTargets.Class | AttributeTargets.Struct)]
 [Conditional(Constant.KeepAttributes)]

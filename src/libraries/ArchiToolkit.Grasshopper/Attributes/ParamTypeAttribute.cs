@@ -8,7 +8,7 @@ using Grasshopper.Kernel;
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// You can set the type of <see cref="IGH_Param"/> by its <see cref="IGH_DocumentObject.ComponentGuid"/>.
+///     You can set the type of <see cref="IGH_Param" /> by its <see cref="IGH_DocumentObject.ComponentGuid" />.
 /// </summary>
 /// <code>
 /// public class Test
@@ -18,16 +18,19 @@ namespace ArchiToolkit.Grasshopper;
 /// }
 /// </code>
 /// <remarks>
-/// <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute"/> first.</para>
-/// <para><b>⚠ NOTICE:</b> It is RECOMMENDED to use <see cref="ParamTypeAttribute{T}"/>.</para>
+///     <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute" /> first.</para>
+///     <para><b>⚠ NOTICE:</b> It is RECOMMENDED to use <see cref="ParamTypeAttribute{T}" />.</para>
 /// </remarks>
-/// <param name="id">the <see cref="IGH_DocumentObject.ComponentGuid"/> of the <see cref="IGH_Param"/> that you want to set.</param>
+/// <param name="id">
+///     the <see cref="IGH_DocumentObject.ComponentGuid" /> of the <see cref="IGH_Param" /> that you want to
+///     set.
+/// </param>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 [Conditional(Constant.KeepAttributes)]
 public class ParamTypeAttribute([StringSyntax(StringSyntaxAttribute.GuidFormat)] string id) : Attribute;
 
 /// <summary>
-///  You can set the type of <see cref="IGH_Param"/> by the generic way.
+///     You can set the type of <see cref="IGH_Param" /> by the generic way.
 /// </summary>
 /// <code>
 /// public class Test
@@ -37,9 +40,9 @@ public class ParamTypeAttribute([StringSyntax(StringSyntaxAttribute.GuidFormat)]
 /// }
 /// </code>
 /// <remarks>
-/// <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute"/> first.</para>
+///     <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute" /> first.</para>
 /// </remarks>
-/// <typeparam name="T">The type of the <see cref="IGH_Param"/> you want.</typeparam>
+/// <typeparam name="T">The type of the <see cref="IGH_Param" /> you want.</typeparam>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 [Conditional(Constant.KeepAttributes)]
 public class ParamTypeAttribute<T> : Attribute where T : IGH_Param;

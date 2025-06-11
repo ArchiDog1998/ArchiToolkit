@@ -84,7 +84,8 @@ public class AssertionScope : IDisposable
         _assertions.Add(assertion);
     }
 
-    internal IDictionary<IAssertionStrategy, object> PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag, CallerInfo callerInfo)
+    internal IDictionary<IAssertionStrategy, object> PushAssertionItem(AssertionItem assertionItem,
+        AssertionType assertionType, object? tag, CallerInfo callerInfo)
     {
         return _strategy.HandleFailure(this, assertionType, assertionItem, tag, callerInfo);
     }

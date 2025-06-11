@@ -80,7 +80,7 @@ partial class FormatGenerator
         return ClassDeclaration("InterpolatedParseStringHandler")
             .WithModifiers(
                 TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.PartialKeyword)))
-        .WithMembers([method1, method2, method3]);
+            .WithMembers([method1, method2, method3]);
     }
 
     private static MethodDeclarationSyntax ModifyMethod(MethodDeclarationSyntax method, ParseItem item,
@@ -145,14 +145,15 @@ partial class FormatGenerator
         if (string.IsNullOrEmpty(name)) return argument;
         return argument
             .WithAttributeLists([
-            AttributeList(
-            [
-                Attribute(IdentifierName("global::System.Diagnostics.CodeAnalysis.StringSyntax")).WithArgumentList(
-                    AttributeArgumentList(
-                    [
-                        AttributeArgument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(name)))
-                    ]))
-            ])]);
+                AttributeList(
+                [
+                    Attribute(IdentifierName("global::System.Diagnostics.CodeAnalysis.StringSyntax")).WithArgumentList(
+                        AttributeArgumentList(
+                        [
+                            AttributeArgument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(name)))
+                        ]))
+                ])
+            ]);
     }
 
     private static string GetStringSyntax(ParseItem item)
@@ -166,6 +167,8 @@ partial class FormatGenerator
     private static string GetStringSyntax(ITypeSymbol type)
     {
         return TypeToStringSyntax.TryGetValue(type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat
-            .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted)), out var name) ? name : string.Empty;
+            .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted)), out var name)
+            ? name
+            : string.Empty;
     }
 }

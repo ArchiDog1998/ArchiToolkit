@@ -35,9 +35,7 @@ public readonly struct MethodSignature(IMethodSymbol methodSymbol) : IEquatable<
             var otherType = other.ParameterTypes[i];
             if (thisType.TypeKind == TypeKind.TypeParameter
                 && otherType.TypeKind == TypeKind.TypeParameter)
-            {
                 continue;
-            }
 
             if (RefKinds[i] != other.RefKinds[i]) return false;
             if (!thisType.Equals(otherType, SymbolEqualityComparer.Default)) return false;

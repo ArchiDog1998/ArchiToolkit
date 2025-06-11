@@ -3,6 +3,7 @@
 Just for making ArchiToolkit.Assertions to logging.
 
 ## Usage
+
 ```c#
 using var services = new ServiceCollection()
     .AddLogging(builder =>

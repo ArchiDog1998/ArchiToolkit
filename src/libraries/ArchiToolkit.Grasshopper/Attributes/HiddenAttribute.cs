@@ -4,7 +4,7 @@ using Grasshopper.Kernel;
 namespace ArchiToolkit.Grasshopper;
 
 /// <summary>
-/// Set the <see cref="IGH_PreviewObject.Hidden"/> for the <see cref="IGH_Param"/>
+///     Set the <see cref="IGH_PreviewObject.Hidden" /> for the <see cref="IGH_Param" />
 /// </summary>
 /// <code>
 /// public class Test
@@ -13,7 +13,7 @@ namespace ArchiToolkit.Grasshopper;
 /// }
 /// </code>
 /// <remarks>
-/// <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute"/> first.</para>
+///     <para><b>⚠ WARNING:</b> Please use <see cref="DocObjAttribute" /> first.</para>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 [Conditional(Constant.KeepAttributes)]

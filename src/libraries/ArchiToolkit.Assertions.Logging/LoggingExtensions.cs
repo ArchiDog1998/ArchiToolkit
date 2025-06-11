@@ -2,7 +2,6 @@
 using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Assertions;
 using ArchiToolkit.Assertions.Execution;
-using ArchiToolkit.Assertions.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace ArchiToolkit.Assertions.Logging;
@@ -85,7 +84,7 @@ public static class LoggingExtensions
     /// <param name="args"></param>
     /// <returns></returns>
     public static IDisposable BeginAssertionScope(this ILogger logger, IAssertionStrategy strategy,
-        string? messageFormat  = null,
+        string? messageFormat = null,
         params object?[] args)
     {
         var logScope = logger.BeginScope(messageFormat, args);

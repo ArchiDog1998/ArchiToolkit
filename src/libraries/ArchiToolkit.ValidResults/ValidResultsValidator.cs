@@ -4,11 +4,11 @@ namespace ArchiToolkit.ValidResults;
 
 internal class ValidResultsValidator(Type type)
 {
-    public Type TargetType => type;
-
     private readonly Dictionary<Guid, (ValidResultsConfig.ShouldUseDelegate? shouldUse, Func<object, ValidationResult>
             validator)>
         _validators = [];
+
+    public Type TargetType => type;
 
     public ValidationResult ValidateObject(object value)
     {

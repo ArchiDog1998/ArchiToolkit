@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq.Expressions;
-using System.Reflection;
+﻿using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Constraints;
@@ -23,7 +21,8 @@ public sealed class ObjectAssertion<TValue> : IAssertion
     private readonly AssertionType _type;
     private bool _reversed;
 
-    internal ObjectAssertion(TValue subject, string valueName, AssertionType type, CallerInfo callerInfo, bool isValid = true)
+    internal ObjectAssertion(TValue subject, string valueName, AssertionType type, CallerInfo callerInfo,
+        bool isValid = true)
         : this(subject, valueName, type, DateTimeOffset.Now, AssertionScope.Current, callerInfo, isValid)
     {
     }
@@ -424,7 +423,8 @@ public sealed class ObjectAssertion<TValue> : IAssertion
         }
     }
 
-    private IDictionary<IAssertionStrategy, object> AddAssertionItem(AssertionItemType type, AssertMessage message, object? tag)
+    private IDictionary<IAssertionStrategy, object> AddAssertionItem(AssertionItemType type, AssertMessage message,
+        object? tag)
     {
         var item = new AssertionItem(type, message, DateTimeOffset.Now, tag);
         _items.Add(item);

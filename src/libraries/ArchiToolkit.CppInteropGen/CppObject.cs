@@ -4,12 +4,10 @@ using System.Text.RegularExpressions;
 
 namespace ArchiToolkit.CppInteropGen;
 
-
 public abstract class CppObject(bool disposed = false) : IDisposable
 {
-    protected abstract string DllName { get; }
-
     private bool _disposed = disposed;
+    protected abstract string DllName { get; }
 
     void IDisposable.Dispose()
     {
@@ -31,21 +29,20 @@ public abstract class CppObject(bool disposed = false) : IDisposable
         static unsafe string GetStringFromIntPtr(IntPtr errorPtr, NativeFunctionLoader loader)
         {
             var message = Marshal.PtrToStringAnsi(errorPtr) ?? "Unknown error";
-            ((delegate* unmanaged[Cdecl]<IntPtr, void> )loader.GetFunctionPointer("free_error"))(errorPtr);
+            ((delegate* unmanaged[Cdecl]<IntPtr, void>)loader.GetFunctionPointer("free_error"))(errorPtr);
             return message;
         }
     }
 
     protected virtual void Dispose()
     {
-
     }
 
     protected abstract void Delete();
 
     public sealed class CppException(string message) : Exception(message)
     {
-        private static readonly Regex Matcher = new (@"\[(.*?)\]");
+        private static readonly Regex Matcher = new(@"\[(.*?)\]");
 
         public string ExceptionType
         {

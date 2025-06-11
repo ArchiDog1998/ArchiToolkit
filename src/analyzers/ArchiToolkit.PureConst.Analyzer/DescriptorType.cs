@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 
 namespace ArchiToolkit.PureConst.Analyzer;
 
@@ -65,5 +64,5 @@ public enum DescriptorType : byte
         DiagnosticSeverity.Info,
 #endif
         "Debug")]
-    AdditionalVariable,
+    AdditionalVariable
 }

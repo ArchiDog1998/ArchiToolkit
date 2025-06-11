@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
@@ -175,6 +174,7 @@ internal static class ActiveObjectHelper
             if (!nonNull.IsValid) continue;
             box.Union(nonNull.ClippingBox);
         }
+
         return box;
     }
 }

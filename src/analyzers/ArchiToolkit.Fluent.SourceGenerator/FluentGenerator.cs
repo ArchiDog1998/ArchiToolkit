@@ -92,18 +92,11 @@ public class FluentGenerator : IIncrementalGenerator
         var staticClasses = namespaceSymbol.GetTypeMembers()
             .Where(t => t.IsStatic && t.TypeKind == TypeKind.Class);
 
-        foreach (var staticClass in staticClasses)
-        {
-            yield return staticClass;
-        }
+        foreach (var staticClass in staticClasses) yield return staticClass;
 
         foreach (var nestedNamespace in namespaceSymbol.GetNamespaceMembers())
-        {
-            foreach (var nestedStaticClass in GetAllStaticClasses(nestedNamespace))
-            {
-                yield return nestedStaticClass;
-            }
-        }
+        foreach (var nestedStaticClass in GetAllStaticClasses(nestedNamespace))
+            yield return nestedStaticClass;
     }
 
     private static bool Predicate(SyntaxNode node, CancellationToken token)
@@ -291,19 +284,13 @@ public class FluentGenerator : IIncrementalGenerator
         {
             var className = method.ContainingType.Name;
             if (className.EndsWith("Extensions"))
-            {
                 className = className.Substring(0, className.Length - "Extensions".Length);
-            }
 
             postFix = "_" + className;
             if (dic.TryGetValue(className, out var count))
-            {
                 postFix += (dic[className] = ++count).ToString();
-            }
             else
-            {
                 dic[className] = 0;
-            }
         }
 
         return MethodDeclaration(GenericName(Identifier("DoResult"))

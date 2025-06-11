@@ -1,44 +1,40 @@
-﻿using System.Reflection.Metadata;
-using System.Text;
+﻿using System.Text;
 using ArchiToolkit.RoslynHelper.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace ArchiToolkit.RoslynHelper.Names;
 
 /// <summary>
-///
 /// </summary>
 public class MethodName : TypeParametersName<IMethodSymbol>
 {
-
-    private protected override IEnumerable<ITypeParameterSymbol> GetTypeParameters(IMethodSymbol symbol)
-    {
-        return symbol.TypeParameters;
-    }
-
-    public MethodSignature Signature { get; }
-
-    /// <summary>
-    ///
-    /// </summary>
-    public ParameterName[] Parameters { get; }
-
-    /// <summary>
-    /// Return types.
-    /// </summary>
-    public TypeName ReturnType { get; }
-
-    /// <summary>
-    /// ContainingType
-    /// </summary>
-    public TypeName ContainingType { get; }
-
     internal MethodName(IMethodSymbol methodSymbol) : base(methodSymbol)
     {
         Parameters = methodSymbol.Parameters.GetNames().ToArray();
         ReturnType = methodSymbol.ReturnType.GetName();
         ContainingType = methodSymbol.ContainingType.GetName();
-        Signature =  new MethodSignature(methodSymbol);
+        Signature = new MethodSignature(methodSymbol);
+    }
+
+    public MethodSignature Signature { get; }
+
+    /// <summary>
+    /// </summary>
+    public ParameterName[] Parameters { get; }
+
+    /// <summary>
+    ///     Return types.
+    /// </summary>
+    public TypeName ReturnType { get; }
+
+    /// <summary>
+    ///     ContainingType
+    /// </summary>
+    public TypeName ContainingType { get; }
+
+    private protected override IEnumerable<ITypeParameterSymbol> GetTypeParameters(IMethodSymbol symbol)
+    {
+        return symbol.TypeParameters;
     }
 
     private protected override string GetSummaryName()

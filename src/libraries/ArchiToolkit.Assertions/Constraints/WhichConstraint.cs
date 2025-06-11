@@ -6,9 +6,9 @@ namespace ArchiToolkit.Assertions.Constraints;
 /// </summary>
 public class WhichConstraint<TValue> : IConstraint
 {
+    private readonly CallerInfo _callerInfo;
     private readonly string _name;
     private readonly Lazy<TValue> _value;
-    private readonly CallerInfo _callerInfo;
 
     internal WhichConstraint(Lazy<TValue> value, string name, CallerInfo callerInfo)
     {

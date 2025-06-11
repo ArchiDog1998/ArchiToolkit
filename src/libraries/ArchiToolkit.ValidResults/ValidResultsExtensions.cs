@@ -88,20 +88,16 @@ public static class ValidResultsExtensions
         var result = new List<T>(collection.Count);
         var validationErrors = new Dictionary<ObjectValidationError, ObjectValidationError>(collection.Count);
         foreach (var item in collection)
-        {
             if (item is ObjectValidationError { Owner: { } owner } error)
             {
                 if (!validationErrors.TryGetValue(owner, out var oldError)
                     || GetLineNumber(error) < GetLineNumber(oldError))
-                {
                     validationErrors[owner] = error;
-                }
             }
             else
             {
                 result.Add(item);
             }
-        }
 
         return [..result, ..validationErrors.Values.OfType<T>()];
 

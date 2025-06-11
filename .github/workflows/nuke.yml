@@ -16,7 +16,7 @@
 
 name: nuke
 
-on: [push]
+on: [ push ]
 
 jobs:
   windows-latest:

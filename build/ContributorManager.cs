@@ -53,10 +53,7 @@ public class ContributorManager
         builder.AppendLine("## Thank You to Our Contributors! 🎉");
         builder.AppendLine(
             "We'd like to extend our heartfelt thanks to the following contributors for their valuable contributions to this release:");
-        foreach (var contributor in Data)
-        {
-            builder.AppendLine($"- @{contributor.Key} - {contributor.Value}");
-        }
+        foreach (var contributor in Data) builder.AppendLine($"- @{contributor.Key} - {contributor.Value}");
 
         builder.AppendLine(
             "\nYour hard work and dedication helped improve this project, and we truly appreciate all the time and effort you've invested.");
