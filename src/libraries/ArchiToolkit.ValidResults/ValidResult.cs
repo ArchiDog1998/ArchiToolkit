@@ -13,14 +13,14 @@ public class ValidResult(ValidResult.Data data) : IValidResult
         [Pure]
         public static Data Ok(params IReadOnlyCollection<ISuccess> successes)
         {
-            var result = Result.Ok().WithSuccesses(successes);
+            var result = Result.Ok().WithSuccesses(successes.RemoveDuplicated());
             return new Data(result);
         }
 
         [Pure]
         public static Data? Fail(IReadOnlyCollection<IReason> reasons)
         {
-            return reasons.OfType<IError>().Any() ? new Data(new Result().WithReasons(reasons)) : null;
+            return reasons.OfType<IError>().Any() ? new Data(new Result().WithReasons(reasons.RemoveDuplicated())) : null;
         }
 
         [Pure]
@@ -48,7 +48,7 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         {
             if (value is null) throw new ArgumentNullException(nameof(value));
             var validationResult = ValidResultsConfig.ValidateObject(value);
-            var result = Result.Ok().WithSuccesses(successes);
+            var result = Result.Ok().WithSuccesses(successes.RemoveDuplicated());
 
             return validationResult.IsValid
                 ? new Data(result, value)
@@ -58,7 +58,7 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         [Pure]
         public static Data? Fail(IReadOnlyCollection<IReason> reasons)
         {
-            return reasons.OfType<IError>().Any() ? new Data(new Result().WithReasons(reasons), default!) : null;
+            return reasons.OfType<IError>().Any() ? new Data(new Result().WithReasons(reasons.RemoveDuplicated()), default!) : null;
         }
 
         [Pure]

@@ -51,13 +51,16 @@ public static class ValidResultsExtensions
     }
 
     [Pure]
-    private static IEnumerable<IReason> GetReasons<TValue>(TValue value, string callerInfo, string methodName, string methodArgumentName)where TValue : IValidResult
+    private static IEnumerable<IReason> GetReasons<TValue>(TValue value, string callerInfo, string methodName,
+        string methodArgumentName) where TValue : IValidResult
     {
         var reasons = value.Result.Reasons
             .Select(i => i is ObjectValidationError validation ? validation.WithInstanceName(callerInfo) : i);
 
-        if (value.Result.IsFailed || value is not IValidObjectResult { ValueOrDefault: {} targetObject }) return reasons;
-        var argumentValidationResult = ValidResultsConfig.ValidateArgument(targetObject, methodName, methodArgumentName);
+        if (value.Result.IsFailed || value is not IValidObjectResult { ValueOrDefault: { } targetObject })
+            return reasons;
+        var argumentValidationResult =
+            ValidResultsConfig.ValidateArgument(targetObject, methodName, methodArgumentName);
         if (argumentValidationResult.IsValid) return reasons;
         return reasons.Append(new ObjectValidationError(argumentValidationResult, callerInfo));
     }
@@ -78,5 +81,33 @@ public static class ValidResultsExtensions
         var fileInfo = ValidResultsConfig.FileInfoFormater?.Invoke((filePath, fileLineNumber))
                        ?? $"{Path.GetFileName(filePath)}:{fileLineNumber}";
         return $"{valueName} in {fileInfo}";
+    }
+
+    internal static IReadOnlyCollection<T> RemoveDuplicated<T>(this IReadOnlyCollection<T> collection) where T : IReason
+    {
+        var result = new List<T>(collection.Count);
+        var validationErrors = new Dictionary<ObjectValidationError, ObjectValidationError>(collection.Count);
+        foreach (var item in collection)
+        {
+            if (item is ObjectValidationError { Owner: { } owner } error)
+            {
+                if (!validationErrors.TryGetValue(owner, out var oldError)
+                    || GetLineNumber(error) < GetLineNumber(oldError))
+                {
+                    validationErrors[owner] = error;
+                }
+            }
+            else
+            {
+                result.Add(item);
+            }
+        }
+
+        return [..result, ..validationErrors.Values.OfType<T>()];
+
+        static int GetLineNumber(ObjectValidationError error)
+        {
+            return int.TryParse(error.CallerInfo.Split(':').LastOrDefault(), out var count) ? count : int.MaxValue;
+        }
     }
 }
