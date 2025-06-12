@@ -23,6 +23,8 @@ public class ValidResult(ValidResult.Data data) : IValidResult
         return message.Result.IsFailed;
     }
 
+    public override string ToString() => Result.GetString();
+
     public record Data(Result Result)
     {
         [Pure]
@@ -85,8 +87,9 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
 
     public override string ToString()
     {
-        if (Result.IsFailed) return Result.ToString();
-        return Result + " : " + ValueOrDefault;
+        var result = Result.GetString();
+        if (Result.IsSuccess) result += " " + ValueOrDefault;
+        return result;
     }
 
     public static bool operator true(ValidResult<TValue> message)

@@ -83,6 +83,7 @@ public static class ValidResultsExtensions
         return $"{valueName} in {fileInfo}";
     }
 
+    [Pure]
     internal static IReadOnlyCollection<T> RemoveDuplicated<T>(this IReadOnlyCollection<T> collection) where T : IReason
     {
         var result = new List<T>(collection.Count);
@@ -105,5 +106,22 @@ public static class ValidResultsExtensions
         {
             return int.TryParse(error.CallerInfo.Split(':').LastOrDefault(), out var count) ? count : int.MaxValue;
         }
+    }
+
+    [Pure]
+    internal static string GetString(this Result result)
+    {
+        if (result.IsFailed)
+            return (ValidResultsConfig.ToStringWithEmoji ? "❌" : "[Failure]") + " " +
+                   string.Join(", ", result.Reasons.Select(i => $"{{{i.GetString()}}}"));
+        return ValidResultsConfig.ToStringWithEmoji ? "✅" : "[Success]";
+    }
+
+    [Pure]
+    private static string GetString(this IReason reason)
+    {
+        return ValidResultsConfig.SimplifyObjectValidationReasonToString
+            ? $"<{reason.GetType().Name}> {reason.Message}"
+            : reason.ToString();
     }
 }

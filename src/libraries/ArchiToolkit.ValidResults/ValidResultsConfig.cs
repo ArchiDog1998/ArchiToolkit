@@ -9,7 +9,8 @@ public static class ValidResultsConfig
     public delegate bool ShouldUseDelegate(string methodName, string methodArgumentName);
 
     private static readonly Dictionary<Type, ValidResultsValidator> Validators = new();
-    public static bool SimplifyObjectValidationErrorToString { get; set; } = true;
+    public static bool SimplifyObjectValidationReasonToString { get; set; } = true;
+    public static bool ToStringWithEmoji { get; set; } = true;
 
     public static Func<Exception, IError>? ExceptionHandler { get; set; } = ex => new ExceptionalError(ex.Message, ex);
     public static Func<(string FilePath, int FileLineNumber), string>? FileInfoFormater { get; set; } = null;

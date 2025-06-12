@@ -27,13 +27,4 @@ public class ObjectValidationError : Error
         if (CallerInfo is not ThisName) return this;
         return new ObjectValidationError(ValidationResult, callerInfo, Owner ?? this);
     }
-
-    public override string ToString()
-    {
-        if (!ValidResultsConfig.SimplifyObjectValidationErrorToString) return base.ToString();
-        return new ReasonStringBuilder()
-            .WithReasonType(GetType())
-            .WithInfo(nameof(Message), Message)
-            .Build();
-    }
 }
