@@ -12,7 +12,7 @@ ValidResultsConfig.AddValidator(new DoubleValidator(), (methodName, argumentName
     return result;
 });
 var datetimeResult = DateTime.Now.ToValidResult();
-var result = datetimeResult.AddDays(10);
+var result = datetimeResult.AddDays(-10);
 
 Console.WriteLine(result);
 var validator = new Validator();

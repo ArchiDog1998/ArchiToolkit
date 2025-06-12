@@ -14,26 +14,31 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        var compilation = context.CompilationProvider;
+
         var classes = context.SyntaxProvider.CreateSyntaxProvider(
             static (s, _) => s is BaseTypeDeclarationSyntax,
             static (c, token) =>
                 ModelExtensions.GetDeclaredSymbol(c.SemanticModel, (BaseTypeDeclarationSyntax)c.Node, token));
 
-        context.RegisterSourceOutput(classes.Collect(), Generate);
+        context.RegisterSourceOutput(classes.Collect().Combine(compilation), Generate);
     }
 
-    private static void Generate(SourceProductionContext context, ImmutableArray<ISymbol?> sources)
+    private static void Generate(SourceProductionContext context,
+        (ImmutableArray<ISymbol?> Sources, Compilation Compilation) arguments)
     {
-        var dictionary = GetClassesSymbols(sources);
+        var extensionMethods = arguments.Compilation.GetAllExtensionMethods();
+        var dictionary = GetClassesSymbols(arguments.Sources);
         foreach (var pair in dictionary)
         {
             if (pair.Key is not INamedTypeSymbol data) continue;
-            GenerateItem(context, dictionary, pair.Value, data);
+            if (!extensionMethods.TryGetValue(data, out var methods)) methods = [];
+            GenerateItem(context, dictionary, pair.Value, data,methods);
         }
     }
 
     private static void GenerateItem(SourceProductionContext context, Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
-        INamedTypeSymbol target, INamedTypeSymbol data)
+        INamedTypeSymbol target, INamedTypeSymbol data, IMethodSymbol[] extensionMethods)
     {
         var members = data
             .GetMembers()
@@ -104,7 +109,7 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                                     Argument(IdentifierName("value"))
                                 ]))))
                             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                        ..GenerateStaticMembers(members, dictionary, trackerName, baseDataSymbol)
+                        ..GenerateStaticMembers(members, dictionary, trackerName, baseDataSymbol, extensionMethods)
                     ]),
                 ClassDeclaration(trackerName)
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
@@ -197,7 +202,8 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateStaticMembers(IReadOnlyCollection<ISymbol> members,
-        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName, ITypeSymbol? baseTypeSymbol)
+        Dictionary<ISymbol?, INamedTypeSymbol> dictionary, string trackerName, ITypeSymbol? baseTypeSymbol,
+        IMethodSymbol[] extensionMethods)
     {
         var staticMethods = baseTypeSymbol?
             .GetMembers()
@@ -213,6 +219,14 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                      .Where(p => !staticMethods.Contains(new MethodSignature(p))))
             if (method.MethodKind is MethodKind.Ordinary)
                 yield return OrdinaryMethod(method, dictionary, trackerName);
+
+        foreach (var method in extensionMethods
+                     .Where(p => !p.ReturnType.IsRefLikeType)
+                     .Where(p => !staticMethods.Contains(new MethodSignature(p))))
+        {
+            if (method.MethodKind is MethodKind.Ordinary)
+                yield return StaticOrdinaryMethod(method, dictionary, MethodParametersHelper.MethodType.Static, trackerName);
+        }
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateMembers(IReadOnlyCollection<ISymbol> members,

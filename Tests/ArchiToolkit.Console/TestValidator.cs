@@ -25,3 +25,11 @@ public class TestClass2
         return new TestClass2();
     }
 }
+
+public static class TestClass2Extensions
+{
+    public static void Ext(this TestClass2 @self, bool a = false)
+    {
+
+    }
+}

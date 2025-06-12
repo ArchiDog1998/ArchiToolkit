@@ -61,12 +61,7 @@ public class FluentGenerator : IIncrementalGenerator
     private static void Generate(SourceProductionContext context,
         (ImmutableArray<ITypeSymbol> types, Compilation compilation) arg)
     {
-        var staticClasses = GetAllStaticClasses(arg.compilation.GlobalNamespace)
-            .SelectMany(c => c.GetMembers())
-            .OfType<IMethodSymbol>()
-            .Where(m => m is { IsStatic: true, IsExtensionMethod: true, Parameters.Length: > 0 })
-            .GroupBy(m => m.Parameters[0].Type.OriginalDefinition, SymbolEqualityComparer.Default)
-            .ToDictionary(m => m.Key, m => m.ToArray(), SymbolEqualityComparer.Default);
+        var staticClasses = arg.compilation.GetAllExtensionMethods();
 
         foreach (var type in GetTypes(arg.types).ToImmutableHashSet(SymbolEqualityComparer.Default)
                      .OfType<ITypeSymbol>())
@@ -85,18 +80,6 @@ public class FluentGenerator : IIncrementalGenerator
                 yield return typeSymbol;
             }
         }
-    }
-
-    private static IEnumerable<INamedTypeSymbol> GetAllStaticClasses(INamespaceSymbol namespaceSymbol)
-    {
-        var staticClasses = namespaceSymbol.GetTypeMembers()
-            .Where(t => t.IsStatic && t.TypeKind == TypeKind.Class);
-
-        foreach (var staticClass in staticClasses) yield return staticClass;
-
-        foreach (var nestedNamespace in namespaceSymbol.GetNamespaceMembers())
-        foreach (var nestedStaticClass in GetAllStaticClasses(nestedNamespace))
-            yield return nestedStaticClass;
     }
 
     private static bool Predicate(SyntaxNode node, CancellationToken token)
