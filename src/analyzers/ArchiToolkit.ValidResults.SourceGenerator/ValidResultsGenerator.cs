@@ -40,9 +40,6 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
             .Where(p => p.DeclaredAccessibility is Accessibility.Public)
             .ToArray();
 
-        if (members.OfType<IPropertySymbol>().Any(m => m.Name is "Value")) return;
-        if (members.OfType<IFieldSymbol>().Any(m => m.Name is "Value")) return;
-
         var baseType =
             TypeHelper.FindValidResultType(dictionary, data, out var addDisposed, out var baseDataSymbol, false);
         var trackerName = target.Name + "Tracker";
@@ -309,8 +306,10 @@ public sealed class ValidResultsGenerator : IIncrementalGenerator
                     ]))))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
 
+        var memberName = propertyName is "Value" or "Result" ? propertyName + "_" : propertyName;
+
         return PropertyDeclaration(TypeHelper.FindValidResultType(dictionary, propertyType, out _, out _, true),
-                Identifier(propertyName))
+                Identifier(memberName))
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(ValidResultsGenerator)).AddAttributes(NonUserCodeAttribute())
