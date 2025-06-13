@@ -31,7 +31,7 @@ public static class TypeHelper
         return type.AllInterfaces.Any(i => i.GetName().FullName is "global::System.IDisposable");
     }
 
-    public static TypeSyntax FindValidResultType(Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
+    public static TypeSyntax FindValidResultType(Dictionary<ISymbol?, SimpleType> dictionary,
         ITypeSymbol target, out bool shouldDispose, out ITypeSymbol? dataTypeSymbol, bool containSelf)
     {
         dataTypeSymbol = null;
@@ -53,9 +53,9 @@ public static class TypeHelper
         if (FindValidResultType(dictionary, target, containSelf) is { } pair)
         {
             var (dataSymbol, resultTypeSymbol) = pair;
-            shouldDispose = isDataDispose && !IsDisposable(resultTypeSymbol);
+            shouldDispose = isDataDispose && !IsDisposable(dataSymbol);
             dataTypeSymbol = dataSymbol;
-            return IdentifierName(resultTypeSymbol.GetName().FullName);
+            return IdentifierName(resultTypeSymbol.FullName);
         }
 
         shouldDispose = isDataDispose;
@@ -67,8 +67,8 @@ public static class TypeHelper
             ]));
     }
 
-    private static (ITypeSymbol DataSymbol, INamedTypeSymbol TargetSymbol)? FindValidResultType(
-        Dictionary<ISymbol?, INamedTypeSymbol> dictionary,
+    private static (ITypeSymbol DataSymbol, SimpleType TargetSymbol)? FindValidResultType(
+        Dictionary<ISymbol?, SimpleType> dictionary,
         ITypeSymbol data, bool containSelf)
     {
         var loopTarget = containSelf ? data : data.BaseType;
