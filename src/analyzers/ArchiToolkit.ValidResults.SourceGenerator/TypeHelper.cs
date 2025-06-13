@@ -56,11 +56,6 @@ public static class TypeHelper
             shouldDispose = isDataDispose && !IsDisposable(dataSymbol);
             dataTypeSymbol = dataSymbol;
             var type = IdentifierName(resultTypeSymbol.FullName);
-            if (dataSymbol is INamedTypeSymbol { IsGenericType: true } symbol && symbol.TypeParameters.Any())
-            {
-                return type.WithTypeParameterNames(symbol.TypeParameters.Select(p => p.GetName()));
-            }
-
             return type;
         }
 
@@ -80,7 +75,29 @@ public static class TypeHelper
         var loopTarget = containSelf ? data : data.BaseType;
         while (loopTarget is not null)
         {
-            if (dictionary.TryGetValue(loopTarget, out var symbol)) return (loopTarget, symbol);
+
+            if (dictionary.TryGetValue(loopTarget, out var symbol))
+            {
+                if (loopTarget is INamedTypeSymbol { IsGenericType: true } targetSymbol
+                    && targetSymbol.TypeParameters.Any())
+                {
+                    return (loopTarget, symbol.WithGenericTypes(targetSymbol.TypeParameters
+                        .Select(i => i.GetName().FullName)));
+                }
+                return (loopTarget, symbol);
+            }
+            loopTarget = loopTarget.BaseType;
+        }
+
+        loopTarget = containSelf ? data : data.BaseType;
+        while (loopTarget is not null)
+        {
+            if (loopTarget is INamedTypeSymbol { IsGenericType: true } targetSymbol &&
+                dictionary.TryGetValue(loopTarget.OriginalDefinition, out var symbol))
+            {
+                return (loopTarget, symbol.WithGenericTypes(targetSymbol.TypeArguments
+                    .Select(i => i.GetName().FullName)));
+            }
 
             loopTarget = loopTarget.BaseType;
         }

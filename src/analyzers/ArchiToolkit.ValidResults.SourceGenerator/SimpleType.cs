@@ -19,4 +19,14 @@ public class SimpleType(string fullName, string name, string nameSpace, bool isS
     {
 
     }
+
+    public SimpleType WithGenericTypes(params IEnumerable<string> typeNames)
+    {
+        return WithFullNamePostfix("<" + string.Join(", ", typeNames) + ">");
+    }
+
+    public SimpleType WithFullNamePostfix(string postFix)
+    {
+        return new SimpleType(FullName + postFix, Name, NameSpace, IsSymbol);
+    }
 }
