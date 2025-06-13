@@ -55,7 +55,13 @@ public static class TypeHelper
             var (dataSymbol, resultTypeSymbol) = pair;
             shouldDispose = isDataDispose && !IsDisposable(dataSymbol);
             dataTypeSymbol = dataSymbol;
-            return IdentifierName(resultTypeSymbol.FullName);
+            var type = IdentifierName(resultTypeSymbol.FullName);
+            if (dataSymbol is INamedTypeSymbol { IsGenericType: true } symbol && symbol.TypeParameters.Any())
+            {
+                return type.WithTypeParameterNames(symbol.TypeParameters.Select(p => p.GetName()));
+            }
+
+            return type;
         }
 
         shouldDispose = isDataDispose;

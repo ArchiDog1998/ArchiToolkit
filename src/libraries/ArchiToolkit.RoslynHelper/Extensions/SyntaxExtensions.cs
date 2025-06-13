@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using ArchiToolkit.RoslynHelper.Names;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -158,6 +160,75 @@ public static class SyntaxExtensions
     {
         return EnumMemberDeclaration(name)
             .WithEqualsValue(EqualsValueClause(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(value))));
+    }
+
+    #endregion
+
+    #region ITypeParameterName
+
+    private static IEnumerable<ITypeParamName> RemoveDuplicated(this IEnumerable<ITypeParamName> names)
+    {
+        var nameSet = new HashSet<string>();
+        return names.Where(p => nameSet.Add(p.SyntaxName));
+    }
+
+    public static ClassDeclarationSyntax WithTypeParameterNames(this ClassDeclarationSyntax classDeclaration,
+        params IEnumerable<ITypeParamName> typeParamNames)
+    {
+        var set = typeParamNames.RemoveDuplicated().ToArray();
+        if (set.Length is 0) return classDeclaration;
+
+        return classDeclaration
+            .WithTypeParameterList(TypeParameterList(
+            [
+                .. set.Select(t => t.Syntax)
+            ]))
+            .WithConstraintClauses(
+            [
+                .. set.Select(t => t.ConstraintClause).OfType<TypeParameterConstraintClauseSyntax>(),
+            ]);
+    }
+
+    public static MethodDeclarationSyntax WithTypeParameterNames(this MethodDeclarationSyntax methodDeclaration,
+        params IEnumerable<ITypeParamName> typeParamNames)
+    {
+        var set = typeParamNames.RemoveDuplicated().ToArray();
+        if (set.Length is 0) return methodDeclaration;
+
+        return methodDeclaration
+            .WithTypeParameterList(TypeParameterList(
+            [
+                .. set.Select(t => t.Syntax)
+            ]))
+            .WithConstraintClauses(
+            [
+                .. set.Select(t => t.ConstraintClause).OfType<TypeParameterConstraintClauseSyntax>(),
+            ]);
+    }
+
+    public static SimpleNameSyntax WithTypeParameterNames(this SimpleNameSyntax typeSyntax,
+        params IEnumerable<ITypeParamName> typeParamNames)
+    {
+        string typeName;
+        switch (typeSyntax)
+        {
+            case IdentifierNameSyntax id:
+                typeName = id.Identifier.Text;
+                break;
+
+            case GenericNameSyntax generic:
+                typeName = generic.Identifier.Text;
+                break;
+
+            default:
+                return typeSyntax;
+        }
+        var set = typeParamNames.RemoveDuplicated().ToArray();
+        if (set.Length is 0) return typeSyntax;
+
+        return GenericName(typeName).WithTypeArgumentList(TypeArgumentList([
+            ..set .Select(t => IdentifierName(t.SyntaxName))
+        ]));
     }
 
     #endregion

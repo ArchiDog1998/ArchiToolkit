@@ -1,4 +1,5 @@
 ﻿using ArchiToolkit.RoslynHelper.Extensions;
+using ArchiToolkit.RoslynHelper.Names;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -77,45 +78,30 @@ public static class MethodParametersHelper
 
     public static BaseMethodDeclarationSyntax GenerateMethodByParameters(IMethodSymbol method,
         ParameterRelay[] parameters,
-        Dictionary<ISymbol?, SimpleType> dictionary, MethodType type, string trackerName)
+        Dictionary<ISymbol?, SimpleType> dictionary, MethodType type, string trackerName,
+        IReadOnlyCollection<ITypeParamName> paramNames)
     {
         var resultType = TypeHelper.FindValidResultType(dictionary, method.ReturnType, out _, out _, true);
         var resultDataType = TypeHelper.GetResultDataType(method.ReturnType);
 
-        ExpressionSyntax invocation;
-        if (type is MethodType.Operator)
+        ExpressionSyntax invocation = type switch
         {
-            if (parameters.Length > 1)
-                invocation = BinaryExpression(
-                    OperatorNameToExpressionSyntaxKind[method.Name],
-                    IdentifierName("_" + parameters[0].Name),
-                    IdentifierName("_" + parameters[1].Name));
-            else
-                invocation = PrefixUnaryExpression(
-                    SyntaxKind.UnaryMinusExpression,
-                    IdentifierName("_" + parameters[0].Name));
-        }
-        else
-        {
-            if (type is MethodType.Static)
-                invocation = InvocationExpression(MemberAccessExpression(
-                        SyntaxKind.SimpleMemberAccessExpression,
-                        IdentifierName(method.ContainingType.GetName().FullName),
-                        IdentifierName(method.Name)))
-                    .WithArgumentList(ArgumentList(
-                    [
-                        ..parameters.Select(p => p.GenerateArgument())
-                    ]));
-            else
-                invocation = InvocationExpression(MemberAccessExpression(
-                        SyntaxKind.SimpleMemberAccessExpression,
-                        IdentifierName("_" + parameters[0].Name),
-                        IdentifierName(method.Name)))
-                    .WithArgumentList(ArgumentList(
-                    [
-                        ..parameters.Skip(1).Select(p => p.GenerateArgument())
-                    ]));
-        }
+            MethodType.Operator when parameters.Length > 1 => BinaryExpression(
+                OperatorNameToExpressionSyntaxKind[method.Name], IdentifierName("_" + parameters[0].Name),
+                IdentifierName("_" + parameters[1].Name)),
+            MethodType.Operator => PrefixUnaryExpression(SyntaxKind.UnaryMinusExpression,
+                IdentifierName("_" + parameters[0].Name)),
+            MethodType.Static => InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName(method.ContainingType.GetName().FullName), IdentifierName(method.Name).WithTypeParameterNames([
+                        ..method.TypeParameters.Select(p => p.GetName())
+                    ])))
+                .WithArgumentList(ArgumentList([..parameters.Select(p => p.GenerateArgument())])),
+            _ => InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("_" + parameters[0].Name), IdentifierName(method.Name).WithTypeParameterNames([
+                        ..method.TypeParameters.Select(p => p.GetName())
+                    ])))
+                .WithArgumentList(ArgumentList([..parameters.Skip(1).Select(p => p.GenerateArgument())]))
+        };
 
         StatementSyntax[] statements;
 
@@ -146,9 +132,14 @@ public static class MethodParametersHelper
         var generateThis = type is MethodType.Instance;
         var isTracker = type is not MethodType.Instance and not MethodType.Static;
 
+
         BaseMethodDeclarationSyntax methodDeclaration = type is MethodType.Operator
             ? OperatorDeclaration(resultType, Token(OperatorNameToSyntaxKind[method.Name]))
-            : MethodDeclaration(resultType, Identifier(method.Name));
+            : MethodDeclaration(resultType, Identifier(method.Name))
+                .WithTypeParameterNames([
+                    ..paramNames,
+                    ..method.TypeParameters.Select(p => p.GetName())
+                ]);
 
         return methodDeclaration
             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))

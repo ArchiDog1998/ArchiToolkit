@@ -8,7 +8,7 @@ namespace ArchiToolkit.RoslynHelper.Names;
 
 /// <summary>
 /// </summary>
-public class TypeParamName : BaseName<ITypeParameterSymbol>
+public class TypeParamName : BaseName<ITypeParameterSymbol>, ITypeParamName
 {
     internal TypeParamName(ITypeParameterSymbol symbol) : base(symbol)
     {
@@ -21,7 +21,9 @@ public class TypeParamName : BaseName<ITypeParameterSymbol>
 
     /// <summary>
     /// </summary>
-    public TypeParameterSyntax Syntax => TypeParameter(Identifier(Prefix + Symbol.Name));
+    public TypeParameterSyntax Syntax => TypeParameter(Identifier(SyntaxName));
+
+    public string SyntaxName => Prefix + Symbol.Name;
 
     /// <summary>
     /// </summary>

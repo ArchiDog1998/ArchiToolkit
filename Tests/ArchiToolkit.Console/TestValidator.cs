@@ -1,5 +1,7 @@
 ﻿using ArchiToolkit.ValidResults;
-
+[assembly:GenerateValidResult(typeof(List<>),  "TestName")]
+[assembly:GenerateValidResult(typeof(List<int>),  "TestName2")]
+[assembly:GenerateValidResult(typeof(Dictionary<,>), "ListResult")]
 namespace ArchiToolkit.Console;
 
 [GenerateValidResult<ISpanFormattable>]
@@ -28,8 +30,7 @@ public class TestClass2
 
 public static class TestClass2Extensions
 {
-    public static void Ext(this TestClass2 @self, bool a = false)
+    public static void Ext(this TestClass2 self, bool a = false)
     {
-
     }
 }

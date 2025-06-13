@@ -23,7 +23,10 @@ public class ValidResult(ValidResult.Data data) : IValidResult
         return message.Result.IsFailed;
     }
 
-    public override string ToString() => Result.GetString();
+    public override string ToString()
+    {
+        return Result.GetString();
+    }
 
     public record Data(Result Result)
     {
@@ -137,9 +140,9 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         }
 
         [Pure]
-        public static Data Ok(TValue value, params IReadOnlyCollection<ISuccess> successes)
+        public static Data Ok(TValue? value, params IReadOnlyCollection<ISuccess> successes)
         {
-            if (value is null) throw new ArgumentNullException(nameof(value));
+            if (value is null) return Result.Fail("The value is null");
             var validationResult = ValidResultsConfig.ValidateObject(value);
             var result = Result.Ok().WithSuccesses(successes.RemoveDuplicated());
 

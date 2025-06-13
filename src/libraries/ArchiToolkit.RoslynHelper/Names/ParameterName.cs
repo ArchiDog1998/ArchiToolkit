@@ -1,5 +1,7 @@
 ﻿using ArchiToolkit.RoslynHelper.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace ArchiToolkit.RoslynHelper.Names;
 
@@ -26,4 +28,6 @@ public class ParameterName : BaseName<IParameterSymbol>
     ///     The type.
     /// </summary>
     public TypeName Type { get; }
+
+    public ParameterSyntax ParameterSyntax => Parameter(Identifier(Name)).WithType(IdentifierName(Type.FullName));
 }
