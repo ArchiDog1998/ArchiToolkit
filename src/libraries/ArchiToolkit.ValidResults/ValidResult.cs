@@ -112,16 +112,7 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
 
     protected ValidResult<T>.Data GetProperty<T>(Func<ValidResult<T>.Data> getter)
     {
-        if (ValidResultsConfig.ExceptionHandler is not { } handle)
-            return getter();
-        try
-        {
-            return getter();
-        }
-        catch (Exception ex)
-        {
-            return new ValidResult<T>.Data(Result.Fail(handle(ex)), default!);
-        }
+        return Bind<T>(_ => getter());
     }
 
     protected void SetProperty<T>(ValidResult<T> value, Action<T> setter)
@@ -129,6 +120,27 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         if (Result.IsFailed) return;
         if (value.Result.IsFailed) return;
         setter(value.Value);
+    }
+
+    public ValidResult<TOut>.Data Map<TOut>(Func<TValue, TOut> mapper)
+    {
+        return Bind<TOut>(v => mapper(v));
+    }
+
+    public ValidResult<TOut>.Data Bind<TOut>(Func<TValue, ValidResult<TOut>.Data> next)
+    {
+        if (Result.IsFailed) return Result;
+
+        if (ValidResultsConfig.ExceptionHandler is not { } handle)
+            return next(ValueOrDefault);
+        try
+        {
+            return next(ValueOrDefault);
+        }
+        catch (Exception ex)
+        {
+            return new ValidResult<TOut>.Data(Result.Fail(handle(ex)), default!);
+        }
     }
 
     public record Data(Result Result, TValue ValueOrDefault)
