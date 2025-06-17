@@ -26,6 +26,11 @@ public class TestClass2
     {
         return new TestClass2();
     }
+
+    public List<double> TryOne()
+    {
+        return [];
+    }
 }
 
 public static class TestClass2Extensions
