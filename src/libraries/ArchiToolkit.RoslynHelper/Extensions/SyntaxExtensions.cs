@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using ArchiToolkit.RoslynHelper.Names;
+﻿using ArchiToolkit.RoslynHelper.Names;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

@@ -4,6 +4,8 @@ namespace ArchiToolkit.RoslynHelper;
 
 public readonly struct MethodSignature(IMethodSymbol methodSymbol) : IEquatable<MethodSignature>
 {
+    public static bool EqualityWithContainingTypes { get; set; } = true;
+
     public string MethodName { get; } = methodSymbol.Name;
 
     public ITypeSymbol ContainingType { get; } = methodSymbol.IsExtensionMethod
@@ -27,7 +29,8 @@ public readonly struct MethodSignature(IMethodSymbol methodSymbol) : IEquatable<
     {
         if (!MethodName.Equals(other.MethodName)) return false;
         if (!TypeArgumentsCount.Equals(other.TypeArgumentsCount)) return false;
-        if (!ContainingType.Equals(other.ContainingType, SymbolEqualityComparer.Default)) return false;
+        if (EqualityWithContainingTypes &&
+            !ContainingType.Equals(other.ContainingType, SymbolEqualityComparer.Default)) return false;
         if (!ParameterTypes.Length.Equals(other.ParameterTypes.Length)) return false;
         for (var i = 0; i < ParameterTypes.Length; i++)
         {
