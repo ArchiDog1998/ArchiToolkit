@@ -12,7 +12,6 @@ public class TypeName : TypeParametersName<ITypeSymbol>
 {
     private readonly Lazy<string> _lazySafeName;
 
-
     internal TypeName(ITypeSymbol typeSymbol) : base(typeSymbol)
     {
         _lazySafeName = new Lazy<string>(() => Regex.Replace(FullNameNoGlobal,

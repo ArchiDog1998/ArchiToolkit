@@ -39,7 +39,9 @@ public class MethodName : TypeParametersName<IMethodSymbol>
 
     private protected override string GetSummaryName()
     {
-        var builder = new StringBuilder(base.GetSummaryName());
+        var builder = new StringBuilder(ContainingType.SummaryName)
+            .Append('.')
+            .Append(base.GetSummaryName());
         builder.Append('(').Append(string.Join(",", Parameters.Select(p =>
         {
             var type = ToSummary(p.Type.FullName);

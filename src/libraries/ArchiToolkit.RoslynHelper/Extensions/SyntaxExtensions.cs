@@ -25,6 +25,19 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
+    /// The xml comment with method.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="methodSymbol"></param>
+    /// <typeparam name="TNode"></typeparam>
+    /// <returns></returns>
+    public static TNode WithXmlComment<TNode>(this TNode node, IMethodSymbol methodSymbol)
+        where TNode : SyntaxNode
+    {
+        return node.WithXmlComment(
+            $"/// <inheritdoc cref=\"{methodSymbol.OriginalDefinition.GetName().SummaryName}\"/>");
+    }
+    /// <summary>
     ///     Generate a node by the string.
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
