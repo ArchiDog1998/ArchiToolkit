@@ -146,8 +146,7 @@ public static class MethodParametersHelper
             .WithAttributeLists([
                 GeneratedCodeAttribute(typeof(MethodParametersHelper)).AddAttributes(NonUserCodeAttribute())
             ])
-            .WithXmlComment(
-                $"/// <inheritdoc cref=\"{method.ContainingType.GetName().SummaryName}.{method.GetName().SummaryName}\"/>")
+            .WithXmlComment(method)
             .WithParameterList(ParameterList([
                 ..GenerateParametersWithCaller(parameters, generateThis, isTracker, trackerName, method.ContainingType)
             ]))
