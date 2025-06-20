@@ -1,5 +1,6 @@
 ﻿using ArchiToolkit.RoslynHelper.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -29,5 +30,59 @@ public class ParameterName : BaseName<IParameterSymbol>
     /// </summary>
     public TypeName Type { get; }
 
-    public ParameterSyntax ParameterSyntax => Parameter(Identifier(Name)).WithType(IdentifierName(Type.FullName));
+    public ParameterSyntax ParameterSyntax
+    {
+        get
+        {
+            var param = Parameter(Identifier(Name)).WithType(IdentifierName(Type.FullName));
+            switch (Symbol.RefKind)
+            {
+                case RefKind.Ref:
+                    param = param.WithModifiers(TokenList(Token(SyntaxKind.RefKeyword)));
+                    break;
+                case RefKind.Out:
+                    param = param.WithModifiers(TokenList(Token(SyntaxKind.OutKeyword)));
+                    break;
+                case RefKind.In:
+                    param = param.WithModifiers(TokenList(Token(SyntaxKind.InKeyword)));
+                    break;
+                case RefKind.None:
+                case RefKind.RefReadOnlyParameter:
+                default:
+                    break;
+            }
+
+            if (Symbol.HasExplicitDefaultValue) //DefaultValue
+            {
+                var defaultExpression = CreateDefaultValueExpression(Symbol.Type, Symbol.ExplicitDefaultValue);
+                if (defaultExpression != null)
+                {
+                    param = param.WithDefault(EqualsValueClause(defaultExpression));
+                }
+            }
+
+            return param;
+        }
+    }
+
+    private static ExpressionSyntax? CreateDefaultValueExpression(ITypeSymbol type, object? value)
+    {
+        if (value == null)
+        {
+            return LiteralExpression(SyntaxKind.NullLiteralExpression);
+        }
+
+        return type.SpecialType switch
+        {
+            SpecialType.System_Boolean => LiteralExpression((bool)value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression),
+            SpecialType.System_String => LiteralExpression(SyntaxKind.StringLiteralExpression, Literal((string)value)),
+            SpecialType.System_Char => LiteralExpression(SyntaxKind.CharacterLiteralExpression, Literal((char)value)),
+            SpecialType.System_Int32 => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((int)value)),
+            SpecialType.System_Double => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((double)value)),
+            SpecialType.System_Single => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((float)value)),
+            SpecialType.System_Decimal => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((decimal)value)),
+            SpecialType.System_Int64 => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((long)value)),
+            _ => null
+        };
+    }
 }
