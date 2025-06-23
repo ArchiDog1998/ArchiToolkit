@@ -19,10 +19,12 @@ public partial class TestClass2Result
 {
 }
 
+public struct TestStruct;
+
 public class TestClass2
 {
     public int Value { get; } = 0;
-    public static TestClass2 Create(bool a = false)
+    public static TestClass2 Create(TestStruct a = default)
     {
         return new TestClass2();
     }
