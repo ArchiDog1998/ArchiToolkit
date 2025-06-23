@@ -31,6 +31,11 @@ public class TestClass2
     {
         return [];
     }
+
+    public static TestClass2 operator ~(TestClass2 a)
+    {
+        return a;
+    }
 }
 
 public static class TestClass2Extensions

@@ -89,7 +89,7 @@ public static class MethodParametersHelper
             MethodType.Operator when parameters.Length > 1 => BinaryExpression(
                 OperatorNameToExpressionSyntaxKind[method.Name], IdentifierName("_" + parameters[0].Name),
                 IdentifierName("_" + parameters[1].Name)),
-            MethodType.Operator => PrefixUnaryExpression(SyntaxKind.UnaryMinusExpression,
+            MethodType.Operator => PrefixUnaryExpression(OperatorNameToExpressionSyntaxKind[method.Name],
                 IdentifierName("_" + parameters[0].Name)),
             MethodType.Static => InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                     IdentifierName(method.ContainingType.GetName().FullName), IdentifierName(method.Name).WithTypeParameterNames([
