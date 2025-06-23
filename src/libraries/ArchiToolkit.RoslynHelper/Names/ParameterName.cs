@@ -69,18 +69,23 @@ public class ParameterName : BaseName<IParameterSymbol>
     {
         if (value == null)
         {
-            return LiteralExpression(SyntaxKind.NullLiteralExpression);
+            return type.IsReferenceType
+                ? LiteralExpression(SyntaxKind.NullLiteralExpression)
+                : LiteralExpression(SyntaxKind.DefaultLiteralExpression);
         }
 
         return type.SpecialType switch
         {
-            SpecialType.System_Boolean => LiteralExpression((bool)value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression),
+            SpecialType.System_Boolean => LiteralExpression((bool)value
+                ? SyntaxKind.TrueLiteralExpression
+                : SyntaxKind.FalseLiteralExpression),
             SpecialType.System_String => LiteralExpression(SyntaxKind.StringLiteralExpression, Literal((string)value)),
             SpecialType.System_Char => LiteralExpression(SyntaxKind.CharacterLiteralExpression, Literal((char)value)),
             SpecialType.System_Int32 => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((int)value)),
             SpecialType.System_Double => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((double)value)),
             SpecialType.System_Single => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((float)value)),
-            SpecialType.System_Decimal => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((decimal)value)),
+            SpecialType.System_Decimal => LiteralExpression(SyntaxKind.NumericLiteralExpression,
+                Literal((decimal)value)),
             SpecialType.System_Int64 => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((long)value)),
             _ => null
         };
