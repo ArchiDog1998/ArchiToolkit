@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using ArchiToolkit.RoslynHelper.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using static ArchiToolkit.RoslynHelper.Extensions.SyntaxExtensions;
 
@@ -11,6 +12,8 @@ public class CppSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        var options = context.AnalyzerConfigOptionsProvider;
+
         var cppFiles = context.AdditionalTextsProvider
             .Where(file => file.Path.EndsWith(".cpp")
                            || file.Path.EndsWith(".h")
@@ -25,13 +28,14 @@ public class CppSourceGenerator : IIncrementalGenerator
 
         var compilation = context.CompilationProvider;
 
-        context.RegisterSourceOutput(cppFiles.Collect().Combine(compilation), Generate);
+        context.RegisterSourceOutput(cppFiles.Collect().Combine(compilation.Combine(options)), Generate);
     }
 
-    private static void Generate(SourceProductionContext content,
-        (ImmutableArray<(string Path, SourceText? text)> Left, Compilation Right) items)
+    private static void Generate(SourceProductionContext content, (ImmutableArray<(string Path, SourceText? text)> Left, (Compilation compilation, AnalyzerConfigOptionsProvider option) Right) items)
     {
-        var compilation = items.Right;
+        var isInternal = items.Right.option.GlobalOptions.TryGetValue("build_property.CppInteropGen_Accessibility", out var value)
+            && value.ToLower() is "internal";
+        var compilation = items.Right.compilation;
         var assemblyName = compilation.AssemblyName;
 
         foreach (var (path, text) in items.Left)
@@ -40,8 +44,9 @@ public class CppSourceGenerator : IIncrementalGenerator
             var fileName = Path.GetFileNameWithoutExtension(path);
             var className = fileName.Substring(0, fileName.Length - 2);
 
-            var node = NamespaceDeclaration(assemblyName + ".Wrapper")
-                .WithMembers([new CppClassGenerator(text, className).Generate()]);
+            var nameSpace = assemblyName?.EndsWith(".Wrapper") ?? false ? assemblyName : assemblyName + ".Wrapper";
+            var node = NamespaceDeclaration(nameSpace)
+                .WithMembers([new CppClassGenerator(text, className, isInternal).Generate()]);
 
             content.AddSource($"{className}.g.cs", node.NodeToString());
         }

@@ -13,11 +13,13 @@ public class CppClassGenerator
 {
     private readonly string _className;
     private readonly string _dllName = string.Empty;
+    private readonly bool _isInternal;
     private readonly IReadOnlyList<string> _fields;
     private readonly IReadOnlyList<CMethodGenerator> _methods;
 
-    public CppClassGenerator(SourceText text, string className)
+    public CppClassGenerator(SourceText text, string className, bool isInternal)
     {
+        _isInternal = isInternal;
         _className = className;
         List<string> fields = new(4);
         List<CMethodGenerator> methods = [];
@@ -134,8 +136,8 @@ public class CppClassGenerator
 
         return ClassDeclaration(_className)
             .WithModifiers(
-                TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.SealedKeyword),
-                    Token(SyntaxKind.UnsafeKeyword), Token(SyntaxKind.PartialKeyword)))
+                TokenList(Token(_isInternal? SyntaxKind.InternalKeyword : SyntaxKind.PublicKeyword),
+                    Token(SyntaxKind.SealedKeyword), Token(SyntaxKind.UnsafeKeyword), Token(SyntaxKind.PartialKeyword)))
             .WithAttributeLists([GeneratedCodeAttribute(typeof(CppClassGenerator))])
             .WithBaseList(BaseList(
             [
