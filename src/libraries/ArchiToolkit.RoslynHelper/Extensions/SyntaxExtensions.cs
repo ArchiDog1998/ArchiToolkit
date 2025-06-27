@@ -18,10 +18,25 @@ public static class SyntaxExtensions
     /// <param name="node"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public static TNode WithXmlComment<TNode>(this TNode node, string comment)
+    public static TNode WithXmlComment<TNode>(this TNode node, string comment = "/// <summary/>")
         where TNode : SyntaxNode
     {
         return node.WithLeadingTrivia(TriviaList([Comment(comment)]));
+    }
+
+    /// <summary>
+    ///  Add the comment with inheritdoc.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="name"></param>
+    /// <typeparam name="TNode"></typeparam>
+    /// <returns></returns>
+    public static TNode WithXmlCommentInheritDoc<TNode>(this TNode node, IName? name = null)
+        where TNode : SyntaxNode
+    {
+        return node.WithXmlComment(name is null
+            ? "/// <inheritdoc/>"
+            : $"/// <inheritdoc cref=\"{name.SummaryName}\"/>");
     }
 
     /// <summary>
@@ -37,6 +52,7 @@ public static class SyntaxExtensions
         return node.WithXmlComment(
             $"/// <inheritdoc cref=\"{methodSymbol.OriginalDefinition.GetName().SummaryName}\"/>");
     }
+
     /// <summary>
     ///     Generate a node by the string.
     /// </summary>
@@ -184,6 +200,12 @@ public static class SyntaxExtensions
         return names.Where(p => nameSet.Add(p.SyntaxName));
     }
 
+    /// <summary>
+    /// Add the parameter names for the class declaration
+    /// </summary>
+    /// <param name="classDeclaration"></param>
+    /// <param name="typeParamNames"></param>
+    /// <returns></returns>
     public static ClassDeclarationSyntax WithTypeParameterNames(this ClassDeclarationSyntax classDeclaration,
         params IEnumerable<ITypeParamName> typeParamNames)
     {
@@ -201,6 +223,12 @@ public static class SyntaxExtensions
             ]);
     }
 
+    /// <summary>
+    /// Add the parameter names for the method declaration
+    /// </summary>
+    /// <param name="methodDeclaration"></param>
+    /// <param name="typeParamNames"></param>
+    /// <returns></returns>
     public static MethodDeclarationSyntax WithTypeParameterNames(this MethodDeclarationSyntax methodDeclaration,
         params IEnumerable<ITypeParamName> typeParamNames)
     {
@@ -218,6 +246,12 @@ public static class SyntaxExtensions
             ]);
     }
 
+    /// <summary>
+    /// Add the parameter names for the name syntax
+    /// </summary>
+    /// <param name="typeSyntax"></param>
+    /// <param name="typeParamNames"></param>
+    /// <returns></returns>
     public static SimpleNameSyntax WithTypeParameterNames(this SimpleNameSyntax typeSyntax,
         params IEnumerable<ITypeParamName> typeParamNames)
     {
@@ -235,11 +269,12 @@ public static class SyntaxExtensions
             default:
                 return typeSyntax;
         }
+
         var set = typeParamNames.RemoveDuplicated().ToArray();
         if (set.Length is 0) return typeSyntax;
 
         return GenericName(typeName).WithTypeArgumentList(TypeArgumentList([
-            ..set .Select(t => IdentifierName(t.SyntaxName))
+            ..set.Select(t => IdentifierName(t.SyntaxName))
         ]));
     }
 

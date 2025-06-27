@@ -30,6 +30,9 @@ public class ParameterName : BaseName<IParameterSymbol>
     /// </summary>
     public TypeName Type { get; }
 
+    /// <summary>
+    /// The parameter syntax.
+    /// </summary>
     public ParameterSyntax ParameterSyntax
     {
         get

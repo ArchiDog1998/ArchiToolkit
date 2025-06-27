@@ -16,6 +16,9 @@ public class MethodName : TypeParametersName<IMethodSymbol>
         Signature = new MethodSignature(methodSymbol);
     }
 
+    /// <summary>
+    /// The singature of the method
+    /// </summary>
     public MethodSignature Signature { get; }
 
     /// <summary>
