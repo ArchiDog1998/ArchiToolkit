@@ -64,6 +64,9 @@ public class ParameterName : BaseName<IParameterSymbol>
         }
     }
 
+    /// <summary>
+    /// The default value expression
+    /// </summary>
     public ExpressionSyntax? DefaultValueExpression => GetDefaultValueExpression(Symbol);
 
 
