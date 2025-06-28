@@ -12,7 +12,27 @@ public class CppSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var options = context.AnalyzerConfigOptionsProvider;
+        var configText = context.AdditionalTextsProvider
+            .Where(f => Path.GetFileName(f.Path).Equals("CppInteropGen.ini", StringComparison.OrdinalIgnoreCase))
+            .Collect()
+            .Select((a, token) =>
+            {
+                var config = new Config();
+                var lines = a.FirstOrDefault()?.GetText(token)?.Lines;
+                if (lines is null) return config;
+
+                foreach (var line in lines)
+                {
+                    var pair = line.ToString().Split('=');
+                    if (pair.Length is not 2) continue;
+
+                    if (pair[0].Trim() is "Accessibility" && pair[1].Trim() is "internal")
+                    {
+                        config.IsInternal = true;
+                    }
+                }
+                return config;
+            });
 
         var cppFiles = context.AdditionalTextsProvider
             .Where(file => file.Path.EndsWith(".cpp")
@@ -28,13 +48,11 @@ public class CppSourceGenerator : IIncrementalGenerator
 
         var compilation = context.CompilationProvider;
 
-        context.RegisterSourceOutput(cppFiles.Collect().Combine(compilation.Combine(options)), Generate);
+        context.RegisterSourceOutput(cppFiles.Collect().Combine(compilation.Combine(configText)), Generate);
     }
 
-    private static void Generate(SourceProductionContext content, (ImmutableArray<(string Path, SourceText? text)> Left, (Compilation compilation, AnalyzerConfigOptionsProvider option) Right) items)
+    private static void Generate(SourceProductionContext content, (ImmutableArray<(string Path, SourceText? text)> Left, (Compilation compilation, Config option) Right) items)
     {
-        var isInternal = items.Right.option.GlobalOptions.TryGetValue("build_property.CppInteropGen_Accessibility", out var value)
-            && value.ToLower() is "internal";
         var compilation = items.Right.compilation;
         var assemblyName = compilation.AssemblyName;
 
@@ -46,7 +64,7 @@ public class CppSourceGenerator : IIncrementalGenerator
 
             var nameSpace = assemblyName?.EndsWith(".Wrapper") ?? false ? assemblyName : assemblyName + ".Wrapper";
             var node = NamespaceDeclaration(nameSpace)
-                .WithMembers([new CppClassGenerator(text, className, isInternal).Generate()]);
+                .WithMembers([new CppClassGenerator(text, className, items.Right.option).Generate()]);
 
             content.AddSource($"{className}.g.cs", node.NodeToString());
         }
