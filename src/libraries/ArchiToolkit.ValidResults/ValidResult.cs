@@ -69,7 +69,6 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         get
         {
             if (Result.IsFailed) throw new InvalidOperationException("This is failed, you can't get the value.");
-
             return ValueOrDefault;
         }
     }
@@ -154,7 +153,7 @@ public class ValidResult<TValue>(ValidResult<TValue>.Data data) : IValidResult<T
         [Pure]
         public static Data Ok(TValue? value, params IReadOnlyCollection<ISuccess> successes)
         {
-            if (value is null) return Result.Fail("The value is null");
+            if (value is null) return Result.Fail(new NullReferenceError(nameof(value)));
             var validationResult = ValidResultsConfig.ValidateObject(value);
             var result = Result.Ok().WithSuccesses(successes.RemoveDuplicated());
 
