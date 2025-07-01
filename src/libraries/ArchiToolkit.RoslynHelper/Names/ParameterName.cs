@@ -31,7 +31,7 @@ public class ParameterName : BaseName<IParameterSymbol>
     public TypeName Type { get; }
 
     /// <summary>
-    /// The parameter syntax.
+    ///     The parameter syntax.
     /// </summary>
     public ParameterSyntax ParameterSyntax
     {
@@ -55,17 +55,15 @@ public class ParameterName : BaseName<IParameterSymbol>
                     break;
             }
 
-            if (DefaultValueExpression is {} defaultExpression)
-            {
+            if (DefaultValueExpression is { } defaultExpression)
                 param = param.WithDefault(EqualsValueClause(defaultExpression));
-            }
 
             return param;
         }
     }
 
     /// <summary>
-    /// The default value expression
+    ///     The default value expression
     /// </summary>
     public ExpressionSyntax? DefaultValueExpression => GetDefaultValueExpression(Symbol);
 

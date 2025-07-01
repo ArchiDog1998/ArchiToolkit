@@ -25,7 +25,7 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
-    ///  Add the comment with inheritdoc.
+    ///     Add the comment with inheritdoc.
     /// </summary>
     /// <param name="node"></param>
     /// <param name="name"></param>
@@ -40,7 +40,7 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
-    /// The xml comment with method.
+    ///     The xml comment with method.
     /// </summary>
     /// <param name="node"></param>
     /// <param name="methodSymbol"></param>
@@ -201,7 +201,7 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
-    /// Add the parameter names for the class declaration
+    ///     Add the parameter names for the class declaration
     /// </summary>
     /// <param name="classDeclaration"></param>
     /// <param name="typeParamNames"></param>
@@ -219,12 +219,12 @@ public static class SyntaxExtensions
             ]))
             .WithConstraintClauses(
             [
-                .. set.Select(t => t.ConstraintClause).OfType<TypeParameterConstraintClauseSyntax>(),
+                .. set.Select(t => t.ConstraintClause).OfType<TypeParameterConstraintClauseSyntax>()
             ]);
     }
 
     /// <summary>
-    /// Add the parameter names for the method declaration
+    ///     Add the parameter names for the method declaration
     /// </summary>
     /// <param name="methodDeclaration"></param>
     /// <param name="typeParamNames"></param>
@@ -242,12 +242,12 @@ public static class SyntaxExtensions
             ]))
             .WithConstraintClauses(
             [
-                .. set.Select(t => t.ConstraintClause).OfType<TypeParameterConstraintClauseSyntax>(),
+                .. set.Select(t => t.ConstraintClause).OfType<TypeParameterConstraintClauseSyntax>()
             ]);
     }
 
     /// <summary>
-    /// Add the parameter names for the name syntax
+    ///     Add the parameter names for the name syntax
     /// </summary>
     /// <param name="typeSyntax"></param>
     /// <param name="typeParamNames"></param>

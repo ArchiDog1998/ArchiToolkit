@@ -24,7 +24,7 @@ public class TypeParamName : BaseName<ITypeParameterSymbol>, ITypeParamName
     public TypeParameterSyntax Syntax => TypeParameter(Identifier(SyntaxName));
 
     /// <summary>
-    /// The Syntax name
+    ///     The Syntax name
     /// </summary>
     public string SyntaxName => Prefix + Symbol.Name;
 

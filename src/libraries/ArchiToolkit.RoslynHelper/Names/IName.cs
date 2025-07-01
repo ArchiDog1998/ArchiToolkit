@@ -3,7 +3,6 @@
 namespace ArchiToolkit.RoslynHelper.Names;
 
 /// <summary>
-///
 /// </summary>
 public interface IName
 {
@@ -13,7 +12,7 @@ public interface IName
     string FullName { get; }
 
     /// <summary>
-    /// Full Name with Null
+    ///     Full Name with Null
     /// </summary>
     string FullNameNull { get; }
 

@@ -3,22 +3,22 @@
 namespace ArchiToolkit.RoslynHelper.Names;
 
 /// <summary>
-/// The type param name.
+///     The type param name.
 /// </summary>
 public interface ITypeParamName
 {
     /// <summary>
-    /// Syntax
+    ///     Syntax
     /// </summary>
     TypeParameterSyntax Syntax { get; }
 
     /// <summary>
-    /// Syntax name
+    ///     Syntax name
     /// </summary>
     string SyntaxName { get; }
 
     /// <summary>
-    /// THe Constraint clause.
+    ///     THe Constraint clause.
     /// </summary>
     TypeParameterConstraintClauseSyntax? ConstraintClause { get; }
 }

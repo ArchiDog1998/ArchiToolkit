@@ -64,13 +64,13 @@ public static class SymbolExtensions
     }
 
     /// <summary>
-    /// Get the extension methods for
+    ///     Get the extension methods for
     /// </summary>
     /// <param name="compilation"></param>
     /// <returns></returns>
     public static IReadOnlyDictionary<ISymbol?, IMethodSymbol[]> GetAllExtensionMethods(this Compilation compilation)
     {
-       return compilation.GlobalNamespace.GetAllStaticClasses()
+        return compilation.GlobalNamespace.GetAllStaticClasses()
             .SelectMany(c => c.GetMembers())
             .OfType<IMethodSymbol>()
             .Where(m => m is { IsStatic: true, IsExtensionMethod: true, Parameters.Length: > 0 })
@@ -79,15 +79,17 @@ public static class SymbolExtensions
     }
 
     /// <summary>
-    /// Get all static classes in a namespace.
+    ///     Get all static classes in a namespace.
     /// </summary>
     /// <param name="namespaceSymbol"></param>
     /// <returns></returns>
-    public static IEnumerable<INamedTypeSymbol> GetAllStaticClasses(this INamespaceSymbol namespaceSymbol) =>
-        namespaceSymbol.GetAllTypes().Where(t => t.IsStatic && t.TypeKind == TypeKind.Class);
+    public static IEnumerable<INamedTypeSymbol> GetAllStaticClasses(this INamespaceSymbol namespaceSymbol)
+    {
+        return namespaceSymbol.GetAllTypes().Where(t => t.IsStatic && t.TypeKind == TypeKind.Class);
+    }
 
     /// <summary>
-    /// Get all types in a namespace.
+    ///     Get all types in a namespace.
     /// </summary>
     /// <param name="namespaceSymbol"></param>
     /// <returns></returns>
@@ -103,7 +105,7 @@ public static class SymbolExtensions
     }
 
     /// <summary>
-    /// Replace the type with nested original definition.
+    ///     Replace the type with nested original definition.
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
@@ -114,6 +116,6 @@ public static class SymbolExtensions
         var newArgs = named.TypeArguments
             .Select(ReplaceWithNestedOriginalDefinition)
             .ToArray();
-        return  named.OriginalDefinition.Construct(newArgs);
+        return named.OriginalDefinition.Construct(newArgs);
     }
 }

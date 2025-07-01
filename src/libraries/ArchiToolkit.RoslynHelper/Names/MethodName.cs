@@ -17,7 +17,7 @@ public class MethodName : TypeParametersName<IMethodSymbol>
     }
 
     /// <summary>
-    /// The singature of the method
+    ///     The singature of the method
     /// </summary>
     public MethodSignature Signature { get; }
 

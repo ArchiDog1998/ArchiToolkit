@@ -3,30 +3,30 @@
 namespace ArchiToolkit.RoslynHelper;
 
 /// <summary>
-/// The signature of a method
+///     The signature of a method
 /// </summary>
 /// <param name="methodSymbol"></param>
 public readonly struct MethodSignature(IMethodSymbol methodSymbol) : IEquatable<MethodSignature>
 {
     /// <summary>
-    /// Should check the equality with containing type.
+    ///     Should check the equality with containing type.
     /// </summary>
     public static bool EqualityWithContainingType { get; set; } = true;
 
     /// <summary>
-    /// the name of the method.
+    ///     the name of the method.
     /// </summary>
     public string MethodName { get; } = methodSymbol.Name;
 
     /// <summary>
-    /// The containing type.
+    ///     The containing type.
     /// </summary>
     public ITypeSymbol ContainingType { get; } = methodSymbol.IsExtensionMethod
         ? methodSymbol.Parameters[0].Type.OriginalDefinition
         : methodSymbol.ContainingType.OriginalDefinition;
 
     /// <summary>
-    /// Tye parameter types.
+    ///     Tye parameter types.
     /// </summary>
     public ITypeSymbol[] ParameterTypes { get; } = methodSymbol.Parameters
         .Skip(methodSymbol.IsExtensionMethod ? 1 : 0)
@@ -34,7 +34,7 @@ public readonly struct MethodSignature(IMethodSymbol methodSymbol) : IEquatable<
         .ToArray();
 
     /// <summary>
-    /// The Ref Kinds.
+    ///     The Ref Kinds.
     /// </summary>
     public RefKind[] RefKinds { get; } = methodSymbol.Parameters
         .Skip(methodSymbol.IsExtensionMethod ? 1 : 0)
@@ -42,12 +42,12 @@ public readonly struct MethodSignature(IMethodSymbol methodSymbol) : IEquatable<
         .ToArray();
 
     /// <summary>
-    /// The type Argument counts.
+    ///     The type Argument counts.
     /// </summary>
     public int TypeArgumentsCount { get; } =
         methodSymbol.TypeArguments.Length + methodSymbol.ContainingType.TypeArguments.Length;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool Equals(MethodSignature other)
     {
         if (!MethodName.Equals(other.MethodName)) return false;
