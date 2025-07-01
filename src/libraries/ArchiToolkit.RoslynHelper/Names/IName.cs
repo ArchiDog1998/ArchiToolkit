@@ -13,6 +13,11 @@ public interface IName
     string FullName { get; }
 
     /// <summary>
+    /// Full Name with Null
+    /// </summary>
+    string FullNameNull { get; }
+
+    /// <summary>
     ///     Summary Name
     /// </summary>
     string SummaryName { get; }
