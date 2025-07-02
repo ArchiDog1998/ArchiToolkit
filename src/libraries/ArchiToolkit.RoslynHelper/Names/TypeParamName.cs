@@ -21,7 +21,19 @@ public class TypeParamName : BaseName<ITypeParameterSymbol>, ITypeParamName
 
     /// <summary>
     /// </summary>
-    public TypeParameterSyntax Syntax => TypeParameter(Identifier(SyntaxName));
+    public TypeParameterSyntax Syntax
+    {
+        get
+        {
+            var typeParameter = TypeParameter(Identifier(SyntaxName));
+            return Symbol.Variance switch
+            {
+                VarianceKind.In => typeParameter.WithVarianceKeyword(Token(SyntaxKind.InKeyword)),
+                VarianceKind.Out => typeParameter.WithVarianceKeyword(Token(SyntaxKind.OutKeyword)),
+                _ => typeParameter
+            };
+        }
+    }
 
     /// <summary>
     ///     The Syntax name

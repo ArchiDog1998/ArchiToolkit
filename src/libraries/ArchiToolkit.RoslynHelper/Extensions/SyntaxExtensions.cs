@@ -247,6 +247,29 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
+    ///     Add the parameter names for the interface declaration
+    /// </summary>
+    /// <param name="interfaceDeclaration"></param>
+    /// <param name="typeParamNames"></param>
+    /// <returns></returns>
+    public static InterfaceDeclarationSyntax WithTypeParameterNames(this InterfaceDeclarationSyntax interfaceDeclaration,
+        params IEnumerable<ITypeParamName> typeParamNames)
+    {
+        var set = typeParamNames.RemoveDuplicated().ToArray();
+        if (set.Length is 0) return interfaceDeclaration;
+
+        return interfaceDeclaration
+            .WithTypeParameterList(TypeParameterList(
+            [
+                .. set.Select(t => t.Syntax)
+            ]))
+            .WithConstraintClauses(
+            [
+                .. set.Select(t => t.ConstraintClause).OfType<TypeParameterConstraintClauseSyntax>()
+            ]);
+    }
+
+    /// <summary>
     ///     Add the parameter names for the name syntax
     /// </summary>
     /// <param name="typeSyntax"></param>
