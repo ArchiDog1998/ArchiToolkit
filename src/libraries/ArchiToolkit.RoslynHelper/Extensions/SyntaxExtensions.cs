@@ -126,10 +126,18 @@ public static class SyntaxExtensions
     /// <summary>
     ///     Obsolete Attribute
     /// </summary>
+    /// <param name="message">The message to show</param>
+    /// <param name="error">make it as error</param>
     /// <returns></returns>
-    public static AttributeSyntax ObsoleteAttribute()
+    public static AttributeSyntax ObsoleteAttribute(string message = "", bool error = false)
     {
-        return Attribute(IdentifierName("global::System.Obsolete"));
+        var attribute = Attribute(IdentifierName("global::System.Obsolete"));
+        if (string.IsNullOrEmpty(message)) return attribute;
+        return attribute.WithArgumentList(AttributeArgumentList(
+        [
+            AttributeArgument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(message))),
+            AttributeArgument(LiteralExpression(error ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression))
+        ]));
     }
 
     /// <summary>
@@ -252,7 +260,8 @@ public static class SyntaxExtensions
     /// <param name="interfaceDeclaration"></param>
     /// <param name="typeParamNames"></param>
     /// <returns></returns>
-    public static InterfaceDeclarationSyntax WithTypeParameterNames(this InterfaceDeclarationSyntax interfaceDeclaration,
+    public static InterfaceDeclarationSyntax WithTypeParameterNames(
+        this InterfaceDeclarationSyntax interfaceDeclaration,
         params IEnumerable<ITypeParamName> typeParamNames)
     {
         var set = typeParamNames.RemoveDuplicated().ToArray();
