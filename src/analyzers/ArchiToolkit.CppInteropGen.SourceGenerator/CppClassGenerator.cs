@@ -300,23 +300,41 @@ public class CppClassGenerator
                 _type = CheckType();
                 return;
 
-
                 string GetTypeName()
                 {
-                    if (!typeName.Contains('_'))
-                        return typeName switch
-                        {
-                            "long long" => "long",
-                            "char" => "sbyte",
-                            "wchar_t" or "char16_t" => "char",
-                            "long" /*Windows */ or "char32_t" or "singed int" => "int",
-                            "short int" => "short",
-                            "unsigned int" => "uint",
-                            "unsigned long long" => "ulong",
-                            "size_t" => "global::System.UIntPtr",
-                            _ => typeName
-                        };
-                    return typeName + ".Data";
+                    return typeName switch
+                    {
+                        // 整型
+                        "char" => "sbyte", // 通常为 signed char
+                        "signed char" => "sbyte",
+                        "unsigned char" => "byte",
+                        "short" or "short int" or "signed short" or "signed short int" => "short",
+                        "unsigned short" or "unsigned short int" => "ushort",
+                        "int" or "signed int" or "signed" or "long" => "int", // 注意 C++ 中 long == int（Windows）
+                        "unsigned" or "unsigned int" => "uint",
+                        "long long" or "signed long long" => "long",
+                        "unsigned long long" => "ulong",
+
+                        // 特殊整数类型
+                        "size_t" => "global::System.UIntPtr",
+                        "ptrdiff_t" => "global::System.IntPtr",
+
+                        // 字符
+                        "wchar_t" or "char16_t" => "char", // 注意 C++ wchar_t 通常是 UTF-16 或 UTF-32，平台相关
+                        "char32_t" => "int", // 可考虑使用 Rune 或自定义结构封装 Unicode Code Point
+
+                        // 浮点数
+                        "float" => "float",
+                        "double" => "double",
+                        "long double" => "double", // C# 没有 long double，通常映射为 double
+
+                        // 布尔
+                        "bool" => "bool",
+
+                        // void 类型
+                        "void" => "void",
+                        _ => typeName + ".Data"
+                    };
                 }
 
                 ParameterType CheckType()
