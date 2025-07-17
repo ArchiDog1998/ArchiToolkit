@@ -1,4 +1,5 @@
-﻿using ArchiToolkit.RoslynHelper.Names;
+﻿using System.Runtime.CompilerServices;
+using ArchiToolkit.RoslynHelper.Names;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -34,9 +35,22 @@ public static class SyntaxExtensions
     public static TNode WithXmlCommentInheritDoc<TNode>(this TNode node, IName? name = null)
         where TNode : SyntaxNode
     {
+        return node.WithXmlCommentInheritDoc(name?.SummaryName);
+    }
+
+    /// <summary>
+    /// Add the comment with inheritdoc.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="name"></param>
+    /// <typeparam name="TNode"></typeparam>
+    /// <returns></returns>
+    public static TNode WithXmlCommentInheritDoc<TNode>(this TNode node, string? name = null)
+        where TNode : SyntaxNode
+    {
         return node.WithXmlComment(name is null
             ? "/// <inheritdoc/>"
-            : $"/// <inheritdoc cref=\"{name.SummaryName}\"/>");
+            : $"/// <inheritdoc cref=\"{name}\"/>");
     }
 
     /// <summary>
@@ -136,7 +150,8 @@ public static class SyntaxExtensions
         return attribute.WithArgumentList(AttributeArgumentList(
         [
             AttributeArgument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(message))),
-            AttributeArgument(LiteralExpression(error ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression))
+            AttributeArgument(
+                LiteralExpression(error ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression))
         ]));
     }
 
@@ -268,6 +283,30 @@ public static class SyntaxExtensions
         if (set.Length is 0) return interfaceDeclaration;
 
         return interfaceDeclaration
+            .WithTypeParameterList(TypeParameterList(
+            [
+                .. set.Select(t => t.Syntax)
+            ]))
+            .WithConstraintClauses(
+            [
+                .. set.Select(t => t.ConstraintClause).OfType<TypeParameterConstraintClauseSyntax>()
+            ]);
+    }
+
+    /// <summary>
+    ///    Add the parameter names for the struct declaration
+    /// </summary>
+    /// <param name="structDeclaration"></param>
+    /// <param name="typeParamNames"></param>
+    /// <returns></returns>
+    public static StructDeclarationSyntax WithTypeParameterNames(
+        this StructDeclarationSyntax structDeclaration,
+        params IEnumerable<ITypeParamName> typeParamNames)
+    {
+        var set = typeParamNames.RemoveDuplicated().ToArray();
+        if (set.Length is 0) return structDeclaration;
+
+        return structDeclaration
             .WithTypeParameterList(TypeParameterList(
             [
                 .. set.Select(t => t.Syntax)
