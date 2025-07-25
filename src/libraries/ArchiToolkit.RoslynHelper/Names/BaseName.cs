@@ -5,7 +5,7 @@ namespace ArchiToolkit.RoslynHelper.Names;
 /// <inheritdoc />
 public abstract class BaseName<T> : IName<T> where T : ISymbol
 {
-    private readonly Lazy<string> _lazyFullName, _lazySummaryName, _lazyFullNameNoGlobal, _lazyFullNameNull;
+    private readonly Lazy<string> _lazyFullName, _lazySummaryName, _lazyFullNameNoGlobal, _lazyFullNameNull, _lazyMiniName;
 
     private protected BaseName(T symbol)
     {
@@ -15,6 +15,7 @@ public abstract class BaseName<T> : IName<T> where T : ISymbol
             .WithMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier)));
         _lazyFullNameNoGlobal = new Lazy<string>(() => symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat
             .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted)));
+        _lazyMiniName = new Lazy<string>(() => symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
         _lazySummaryName = new Lazy<string>(GetSummaryName);
     }
 
@@ -23,6 +24,9 @@ public abstract class BaseName<T> : IName<T> where T : ISymbol
 
     /// <inheritdoc />
     public string Name => Symbol.Name;
+
+    /// <inheritdoc />
+    public string MiniName => _lazyMiniName.Value;
 
     /// <inheritdoc />
     public string FullNameNoGlobal => _lazyFullNameNoGlobal.Value;

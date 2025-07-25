@@ -27,6 +27,11 @@ public interface IName
     string Name { get; }
 
     /// <summary>
+    ///     MiniName
+    /// </summary>
+    string MiniName { get; }
+
+    /// <summary>
     ///     Full Name without global
     /// </summary>
     string FullNameNoGlobal { get; }
