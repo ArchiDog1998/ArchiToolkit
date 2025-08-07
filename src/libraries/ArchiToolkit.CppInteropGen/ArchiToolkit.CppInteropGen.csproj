@@ -3,7 +3,6 @@
     <PropertyGroup>
         <Title>CppInteropGen</Title>
         <Description>Generate the Codes</Description>
-        <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
@@ -12,5 +11,12 @@
         <None Include="..\..\libraries\ArchiToolkit.RoslynHelper\bin\$(Configuration)\netstandard2.0\ArchiToolkit.RoslynHelper.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
         <None Include="..\ArchiToolkit.CppInteropGen.Cpp\csharp_interop.h" Pack="true" PackagePath="build/native/include/" Visible="false"/>
         <None Include="..\ArchiToolkit.CppInteropGen.Cpp\ArchiToolkitCppInteropGenConfig.cmake" Pack="true" PackagePath="build/cmake/" Visible="false"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="
+        $(TargetFramework.StartsWith('netstandard')) Or 
+        $(TargetFramework.StartsWith('net4'))
+    ">
+      <PackageReference Include="NativeLibraryLoader" />
     </ItemGroup>
 </Project>

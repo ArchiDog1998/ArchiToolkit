@@ -1,5 +1,8 @@
 ﻿using System.Collections.Concurrent;
+#if NETSTANDARD || NETFRAMEWORK
+#else
 using System.Runtime.InteropServices;
+#endif
 
 namespace ArchiToolkit.CppInteropGen;
 
@@ -42,3 +45,38 @@ public sealed class NativeFunctionLoader : IDisposable
         return _exportCache.GetOrAdd(name, n => NativeLibrary.GetExport(_libHandle.Value, n));
     }
 }
+
+#if NETSTANDARD || NETFRAMEWORK
+internal static  class NativeLibrary
+{
+    private static readonly ConcurrentDictionary<IntPtr, NativeLibraryLoader.NativeLibrary> LoadedLibraries = new();
+
+    public static IntPtr Load(string libraryPath)
+    {
+        var lib = new NativeLibraryLoader.NativeLibrary(libraryPath);
+        var handle = lib.Handle;
+        LoadedLibraries[handle] = lib;
+        return handle;
+    }
+
+    public static IntPtr GetExport(IntPtr handle, string name)
+    {
+        if (!LoadedLibraries.TryGetValue(handle, out var lib))
+            throw new InvalidOperationException("Library not found. Make sure it's loaded with NativeLibrary.Load.");
+
+        return lib.LoadFunction(name);
+    }
+
+    public static void Free(IntPtr handle)
+    {
+        if (LoadedLibraries.TryRemove(handle, out var lib))
+        {
+            lib.Dispose();
+        }
+        else
+        {
+            throw new InvalidOperationException("Library handle not found or already freed.");
+        }
+    }
+}
+#endif
