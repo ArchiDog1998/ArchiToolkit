@@ -12,7 +12,7 @@ using static SyntaxFactory;
 public class CppClassGenerator
 {
     private readonly string _className;
-    private readonly string _dllName = string.Empty;
+    private readonly string _fileName = string.Empty;
     private readonly Config _config;
     private readonly IReadOnlyList<string> _fields;
     private readonly IReadOnlyList<CMethodGenerator> _methods;
@@ -32,9 +32,9 @@ public class CppClassGenerator
             {
                 fields.Add(lineText.Trim());
             }
-            else if (IsStartWith(ref lineText, "//DLL_NAME:"))
+            else if (IsStartWith(ref lineText, "//FILE_NAME:"))
             {
-                _dllName = lineText.Trim();
+                _fileName = lineText.Trim();
             }
             else if (IsStartWith(ref lineText, "CSHARP_WRAPPER("))
             {
@@ -125,13 +125,13 @@ public class CppClassGenerator
                     ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
                         IdentifierName("Ptr"), IdentifierName("ptr")))))
         ];
-        if (!string.IsNullOrEmpty(_dllName))
+        if (!string.IsNullOrEmpty(_fileName))
             members = members.Append(
-                PropertyDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("DllName"))
+                PropertyDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)), Identifier("FileName"))
                     .WithAttributeLists([GeneratedCodeAttribute(typeof(CppClassGenerator))])
                     .WithModifiers(TokenList(Token(SyntaxKind.ProtectedKeyword), Token(SyntaxKind.OverrideKeyword)))
                     .WithExpressionBody(ArrowExpressionClause(LiteralExpression(SyntaxKind.StringLiteralExpression,
-                        Literal(_dllName))))
+                        Literal(_fileName))))
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
 
         return ClassDeclaration(_className)
