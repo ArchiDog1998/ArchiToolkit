@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using ArchiToolkit.RoslynHelper.Names;
+﻿using ArchiToolkit.RoslynHelper.Names;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -39,7 +38,7 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
-    /// Add the comment with inheritdoc.
+    ///     Add the comment with inheritdoc.
     /// </summary>
     /// <param name="node"></param>
     /// <param name="name"></param>
@@ -294,7 +293,7 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
-    ///    Add the parameter names for the struct declaration
+    ///     Add the parameter names for the struct declaration
     /// </summary>
     /// <param name="structDeclaration"></param>
     /// <param name="typeParamNames"></param>

@@ -5,7 +5,11 @@ namespace ArchiToolkit.RoslynHelper.Names;
 /// <inheritdoc />
 public abstract class BaseName<T> : IName<T> where T : ISymbol
 {
-    private readonly Lazy<string> _lazyFullName, _lazySummaryName, _lazyFullNameNoGlobal, _lazyFullNameNull, _lazyMiniName;
+    private readonly Lazy<string> _lazyFullName,
+        _lazySummaryName,
+        _lazyFullNameNoGlobal,
+        _lazyFullNameNull,
+        _lazyMiniName;
 
     private protected BaseName(T symbol)
     {
