@@ -65,7 +65,7 @@ public class AssertionScope : IDisposable
     {
         if (!_handledFailure) HandleFailure();
 
-        if (_parent is not null) CurrentScope.Value = _parent;
+        CurrentScope.Value = _parent;
         GC.SuppressFinalize(this);
     }
 
