@@ -112,4 +112,7 @@
   <data name="ContainSingleAssertion" xml:space="preserve">
         <value>数值[{SubjectName}]{AssertionType}{Not}必须有一个元素为{ExpectedValue}，但实际有{MatchedCount}个元素。</value>
     </data>
+  <data name="AllSatisfyAssertion" xml:space="preserve">
+        <value>数值[{SubjectName}]{AssertionType}{Not}均满足{Expressiont}但这些索引{Indexes}对应的元素没有做到。</value>
+    </data>
 </root>
