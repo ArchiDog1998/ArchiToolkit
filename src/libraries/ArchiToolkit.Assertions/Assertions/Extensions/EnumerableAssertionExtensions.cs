@@ -11,6 +11,47 @@ namespace ArchiToolkit.Assertions.Assertions.Extensions;
 /// </summary>
 public static class EnumerableAssertionExtensions
 {
+    #region Items
+
+    /// <summary>
+    /// All satisfy
+    /// </summary>
+    /// <param name="assertion"></param>
+    /// <param name="predicate"></param>
+    /// <param name="assertionParams"></param>
+    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TItem"></typeparam>
+    /// <returns></returns>
+    public static AndConstraint<TValue>
+        AllSatisfy<TValue, TItem>(this ObjectAssertion<TValue> assertion,
+            Expression<Func<TItem, bool>> predicate,
+            AssertionParams? assertionParams = null)
+        where TValue : IEnumerable<TItem>
+    {
+        List<int> indexes = [];
+        var index = 0;
+        var func = predicate.Compile();
+        foreach (var item in assertion.Subject)
+        {
+            try
+            {
+                if (!func(item)) indexes.Add(index);
+            }
+            finally
+            {
+                index++;
+            }
+        }
+
+        return assertion.AssertCheck(assertion.Subject.All(predicate.Compile()),
+            AssertionItemType.AllSatisfy,
+            new AssertMessage(AssertionLocalization.AllSatisfyAssertion,
+                new Argument("Indexes", indexes), new Argument("Expression", predicate.Body)),
+            assertionParams);
+    }
+
+    #endregion
+
     #region ItemEquality
 
     /// <summary>

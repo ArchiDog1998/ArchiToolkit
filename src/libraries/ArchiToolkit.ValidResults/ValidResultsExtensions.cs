@@ -118,7 +118,7 @@ public static class ValidResultsExtensions
     }
 
     [Pure]
-    private static string GetString(this IReason reason)
+    private static string? GetString(this IReason reason)
     {
         return ValidResultsConfig.SimplifyObjectValidationReasonToString
             ? $"<{reason.GetType().Name}> {reason.Message}"

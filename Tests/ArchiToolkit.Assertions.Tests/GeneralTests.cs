@@ -21,7 +21,7 @@ public class GeneralTests
     [Test]
     public Task TestMethodScopeHere()
     {
-        using (new ArchiToolkit.Assertions.Execution.AssertionScope("Checking"))
+        using (new Execution.AssertionScope("Checking"))
         {
         }
 
