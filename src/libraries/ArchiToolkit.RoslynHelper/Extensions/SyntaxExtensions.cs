@@ -137,6 +137,19 @@ public static class SyntaxExtensions
     }
 
     /// <summary>
+    ///     Overload resolution priority attribute.
+    /// </summary>
+    /// <returns></returns>
+    public static AttributeSyntax OverloadResolutionPriorityAttribute(int priority)
+    {
+        return Attribute(IdentifierName("global::System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute"))
+            .WithArgumentList(AttributeArgumentList(
+            [
+                AttributeArgument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(priority)))
+            ]));
+    }
+
+    /// <summary>
     ///     Obsolete Attribute
     /// </summary>
     /// <param name="message">The message to show</param>
