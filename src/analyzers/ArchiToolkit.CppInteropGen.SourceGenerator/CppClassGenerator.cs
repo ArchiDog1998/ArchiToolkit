@@ -163,7 +163,7 @@ public class CppClassGenerator
             _className = className;
             var startIndex = methodDeclare.IndexOf('(');
             _methodName = methodDeclare.Substring(0, startIndex);
-            _csMethodName = _methodName.Substring(className.Length).Split('_').First(x => !string.IsNullOrEmpty(x));
+            _csMethodName = string.Join("_", _methodName.Substring(className.Length).Split('_').Where(x => !string.IsNullOrEmpty(x)));
             var endIndex = methodDeclare.LastIndexOf(')');
 
             _parameters = methodDeclare.Substring(startIndex + 1, endIndex - startIndex - 1)
