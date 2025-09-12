@@ -2,7 +2,7 @@
 #define CSHARP_INTEROP_H
 
 #ifndef WRAP_CALL_CUSTOM_CATCH
-#error "WRAP_CALL_CUSTOM_CATCH must be defined before including this file"
+#define WRAP_CALL_CUSTOM_CATCH
 #endif
 
 #ifdef _WIN32
@@ -17,6 +17,7 @@ return (wrap_call([&] BODY));             \
 }
 
 #include <string>
+#include <functional>
 
 inline char* copy_to_heap(const std::string& msg)
 {
