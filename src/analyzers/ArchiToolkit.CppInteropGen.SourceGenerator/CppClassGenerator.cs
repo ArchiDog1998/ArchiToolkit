@@ -240,7 +240,7 @@ public class CppClassGenerator
                 ]))
                 .WithBody(Block((StatementSyntax[])
                 [
-                    .._parameters.Where(p => p.IsRefOrOut).SelectMany(p => p.GenerateLocalDeclaration()),
+                    .._parameters.Skip(1).Where(p => p.IsRefOrOut).SelectMany(p => p.GenerateLocalDeclaration()),
                     GetRunMethod(Block(
                         GetFunctionPointer(_parameters.Select(p => FunctionPointerParameter(p.InnerType))),
                         ReturnStatement(InvocationExpression(IdentifierName("__method"))
@@ -249,7 +249,7 @@ public class CppClassGenerator
                                 Argument(IdentifierName("Ptr")),
                                 .._parameters.Skip(1).Select(p => p.GenerateArgument())
                             ]))))),
-                    .._parameters.Where(p => p.IsRefOrOut).Select(p => p.GenerateAssignment())
+                    .._parameters.Skip(1).Where(p => p.IsRefOrOut).Select(p => p.GenerateAssignment())
                 ]));
             yield break;
 
