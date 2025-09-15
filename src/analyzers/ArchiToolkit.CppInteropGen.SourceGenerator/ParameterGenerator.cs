@@ -130,7 +130,8 @@ public sealed class ParameterGenerator : BaseParameterGenerator
                 ? ImplicitObjectCreationExpression()
                     .WithArgumentList(ArgumentList(
                     [
-                        Argument(IdentifierName("_" + Name))
+                        Argument(IdentifierName("_" + Name)),
+                        Argument(LiteralExpression(SyntaxKind.FalseLiteralExpression))
                     ]))
                 : IdentifierName("_" + Name)));
     }

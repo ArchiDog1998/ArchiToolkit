@@ -115,12 +115,16 @@ public class CppClassGenerator
                 .WithParameterList(ParameterList(
                 [
                     Parameter(Identifier("ptr"))
-                        .WithType(PointerType(IdentifierName("Data")))
+                        .WithType(PointerType(IdentifierName("Data"))),
+                    Parameter(Identifier("disposed"))
+                        .WithType(PredefinedType(Token(SyntaxKind.BoolKeyword)))
+                        .WithDefault(EqualsValueClause(
+                            LiteralExpression(SyntaxKind.TrueLiteralExpression)))
                 ]))
                 .WithInitializer(ConstructorInitializer(SyntaxKind.BaseConstructorInitializer,
                     ArgumentList(
                     [
-                        Argument(LiteralExpression(SyntaxKind.TrueLiteralExpression))
+                        Argument(IdentifierName("disposed"))
                     ])))
                 .WithBody(Block(
                     ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
@@ -206,7 +210,7 @@ public class CppClassGenerator
 
             if (_methodName.Contains("Delete", StringComparison.InvariantCultureIgnoreCase))
             {
-                yield return  MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("Delete"))
+                yield return MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("Delete"))
                     .WithModifiers(TokenList(Token(SyntaxKind.ProtectedKeyword), Token(SyntaxKind.OverrideKeyword)))
                     .WithAttributeLists([GeneratedCodeAttribute(typeof(CMethodGenerator))])
                     .WithBody(Block(
