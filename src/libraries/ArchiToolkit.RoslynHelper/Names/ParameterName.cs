@@ -55,6 +55,11 @@ public class ParameterName : BaseName<IParameterSymbol>
                     break;
             }
 
+            if (Symbol.IsParams)
+            {
+                param = param.AddModifiers(Token(SyntaxKind.ParamsKeyword));
+            }
+
             if (DefaultValueExpression is { } defaultExpression)
                 param = param.WithDefault(EqualsValueClause(defaultExpression));
 
