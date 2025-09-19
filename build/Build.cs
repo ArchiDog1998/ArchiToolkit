@@ -496,9 +496,11 @@ class Build : NukeBuild
             GitTasks.Git($"config user.name \"nuke-bot\"");
             GitTasks.Git($"config user.email \"nuke-bot@users.noreply.github.com\"");
 
+            GitTasks.Git($"fetch origin");
+            GitTasks.Git($"checkout -B development origin/development");
             GitTasks.Git($"add Directory.Build.props");
             GitTasks.Git($"commit -m \"🔖 {version} Released!\"");
-            GitTasks.Git($"push origin HEAD:development");
+            GitTasks.Git($"push origin development");
         });
 
     private static Version ChangeVersionTag(AbsolutePath propsFile, Func<Version, Version> changer)
