@@ -480,6 +480,8 @@ class Build : NukeBuild
     Target BumpVersion => d => d
         .Executes(() =>
         {
+            if (GitTasks.Git("log -1 --pretty=%B").First().Text.Trim().StartsWith("🔖")) return;
+
             var propsFile = RootDirectory / "Directory.Build.props";
 
             if (ChangeVersionTag(propsFile, v =>
@@ -490,16 +492,15 @@ class Build : NukeBuild
 
                     return new Version(today.Year, today.Month, today.Day, 0);
                 }) is not { } version) return;
-            
+
             GitTasks.Git($"config user.name \"nuke-bot\"");
             GitTasks.Git($"config user.email \"nuke-bot@users.noreply.github.com\"");
-            
+
             GitTasks.Git($"add Directory.Build.props");
             GitTasks.Git($"commit -m \"🔖 {version} Released!\"");
-            const string branch = "development";
-            GitTasks.Git($"push origin {branch}:{branch}");
+            GitTasks.Git($"push origin HEAD:development");
         });
-    
+
     private static Version ChangeVersionTag(AbsolutePath propsFile, Func<Version, Version> changer)
     {
         var doc = XDocument.Load(propsFile);
@@ -511,6 +512,6 @@ class Build : NukeBuild
         doc.Save(propsFile);
         return newVersion;
     }
-    
+
     #endregion
 }
