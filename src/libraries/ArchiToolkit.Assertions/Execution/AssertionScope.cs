@@ -65,7 +65,7 @@ public class AssertionScope : IDisposable
     {
         if (!_handledFailure) HandleFailure();
 
-        if (_parent is not null) CurrentScope.Value = _parent;
+        CurrentScope.Value = _parent;
         GC.SuppressFinalize(this);
     }
 
@@ -84,8 +84,9 @@ public class AssertionScope : IDisposable
         _assertions.Add(assertion);
     }
 
-    internal IDictionary<IAssertionStrategy, object> PushAssertionItem(AssertionItem assertionItem, AssertionType assertionType, object? tag)
+    internal IDictionary<IAssertionStrategy, object> PushAssertionItem(AssertionItem assertionItem,
+        AssertionType assertionType, object? tag, CallerInfo callerInfo)
     {
-        return _strategy.HandleFailure(this, assertionType, assertionItem, tag);
+        return _strategy.HandleFailure(this, assertionType, assertionItem, tag, callerInfo);
     }
 }

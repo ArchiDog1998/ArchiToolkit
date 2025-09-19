@@ -3,28 +3,47 @@
 namespace ArchiToolkit.RoslynHelper.Names;
 
 /// <summary>
-///
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public interface IName<out T> where T : ISymbol
+public interface IName
 {
     /// <summary>
-    /// Symbol
-    /// </summary>
-    public T Symbol { get; }
-
-    /// <summary>
-    /// Full Name
+    ///     Full Name
     /// </summary>
     string FullName { get; }
 
     /// <summary>
-    /// Summary Name
+    ///     Full Name with Null
     /// </summary>
-    string SummaryName  { get; }
+    string FullNameNull { get; }
 
     /// <summary>
-    /// Name
+    ///     Summary Name
+    /// </summary>
+    string SummaryName { get; }
+
+    /// <summary>
+    ///     Name
     /// </summary>
     string Name { get; }
+
+    /// <summary>
+    ///     MiniName
+    /// </summary>
+    string MiniName { get; }
+
+    /// <summary>
+    ///     Full Name without global
+    /// </summary>
+    string FullNameNoGlobal { get; }
+}
+
+/// <summary>
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IName<out T> : IName where T : ISymbol
+{
+    /// <summary>
+    ///     Symbol
+    /// </summary>
+    public T Symbol { get; }
 }

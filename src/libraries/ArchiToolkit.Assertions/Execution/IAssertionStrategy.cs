@@ -29,6 +29,8 @@ public interface IAssertionStrategy
     /// <param name="assertionType"></param>
     /// <param name="assertion"></param>
     /// <param name="tag"></param>
+    /// <param name="callerInfo"></param>
     /// <returns>This value will push to <see cref="IAndConstraint.FailureReturnValues" /></returns>
-    object? HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion, object? tag);
+    object? HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion, object? tag,
+        CallerInfo callerInfo);
 }

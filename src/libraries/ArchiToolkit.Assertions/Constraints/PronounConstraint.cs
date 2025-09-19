@@ -16,7 +16,6 @@ public class PronounConstraint<TValue> : IConstraint
     }
 
     /// <summary>
-    ///     Must thing.
     /// </summary>
     public ObjectAssertion<TValue> Must => _assertion.Duplicate(AssertionType.Must);
 

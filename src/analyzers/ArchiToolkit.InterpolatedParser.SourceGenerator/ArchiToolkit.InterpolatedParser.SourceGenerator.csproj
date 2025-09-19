@@ -5,7 +5,8 @@
 
     <ItemGroup>
         <EmbeddedResource Include="..\..\libraries\ArchiToolkit.InterpolatedParser.Sources\*.cs"
-                          Exclude="..\..\libraries\ArchiToolkit.InterpolatedParser.Sources\Program.cs"/>
+                          Exclude="..\..\libraries\ArchiToolkit.InterpolatedParser.Sources\Program.cs"
+                          Visible="false"/>
         <ProjectReference Include="..\..\libraries\ArchiToolkit.RoslynHelper\ArchiToolkit.RoslynHelper.csproj"/>
     </ItemGroup>
 </Project>

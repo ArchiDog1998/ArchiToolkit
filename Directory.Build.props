@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>0.9.8</Version>
+        <Version>0.9.16.23</Version>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
@@ -18,7 +18,7 @@
         <NeedAlmostAllFrameWorks>False</NeedAlmostAllFrameWorks>
         <NeedAlmostAllFrameWorks Condition="!$(IsTestProject) and $(IsLibraryProject) and !$(MSBuildProjectName.EndsWith('RoslynHelper'))">True</NeedAlmostAllFrameWorks>
         <NeedTestsPackage>False</NeedTestsPackage>
-        <NeedTestsPackage Condition="$(IsTestProject)">True</NeedTestsPackage>
+        <NeedTestsPackage Condition="$(IsTestProject) and $(MSBuildProjectName.EndsWith('Tests'))">True</NeedTestsPackage>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(NeedTestsPackage)">
@@ -27,7 +27,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="$(NeedTestsPackage)">
-        <PackageReference Include="TUnit" />
+        <PackageReference Include="TUnit"/>
     </ItemGroup>
 
     <PropertyGroup Condition="$(NeedPackage)">
@@ -56,10 +56,10 @@
     </ItemGroup>
 
     <PropertyGroup Condition="$(NeedAlmostAllFrameWorks)">
-        <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0;net472;net48;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net472;net48;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
 
-    <ItemGroup Condition="$(NeedAlmostAllFrameWorks)">
+    <ItemGroup Condition="$(NeedAlmostAllFrameWorks) and !$(MSBuildProjectName.EndsWith('Sources'))">
         <PackageReference Include="PolySharp">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 
 namespace ArchiToolkit.RoslynHelper.Extensions;
 
@@ -16,6 +15,21 @@ public static class RoslynExtensions
     public static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(this ITypeSymbol type)
     {
         var current = type;
+        while (current != null)
+        {
+            yield return current;
+            current = current.BaseType;
+        }
+    }
+
+    /// <summary>
+    ///     Get the base types
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static IEnumerable<ITypeSymbol> GetBaseTypes(this ITypeSymbol type)
+    {
+        var current = type.BaseType;
         while (current != null)
         {
             yield return current;

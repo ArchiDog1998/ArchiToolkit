@@ -12,21 +12,16 @@ public class TypeName : TypeParametersName<ITypeSymbol>
 {
     private readonly Lazy<string> _lazySafeName;
 
+    internal TypeName(ITypeSymbol typeSymbol) : base(typeSymbol)
+    {
+        _lazySafeName = new Lazy<string>(() => Regex.Replace(FullNameNoGlobal,
+            @"[.\[\]<>,\s:]", "_") + "_" + GetHashName(FullName, 8));
+    }
+
     /// <summary>
     ///     The safe name.
     /// </summary>
     public string SafeName => _lazySafeName.Value;
-
-
-    internal TypeName(ITypeSymbol typeSymbol) : base(typeSymbol)
-    {
-        _lazySafeName = new Lazy<string>(() =>
-        {
-            var name = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat
-                .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
-            return Regex.Replace(name, @"[.\[\]<>,\s:]", "_") + "_" + GetHashName(FullName, 8);
-        });
-    }
 
     private static string GetHashName(string input, int count)
     {

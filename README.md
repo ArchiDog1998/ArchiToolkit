@@ -1,6 +1,7 @@
 # ArchiToolkit
 
 You can check these packages on [Release](https://github.com/ArchiDog1998/ArchiToolkit/releases/latest).
+The Visual Studio Version is `17.13.4`.
 
 There are a lot of packages here.
 
@@ -11,6 +12,7 @@ There are a lot of packages here.
 | [Assertions](src/libraries/ArchiToolkit.Assertions)                 | Fluent Assertions with three states                   |
 | [InterpolatedParser](src/libraries/ArchiToolkit.InterpolatedParser) | Parse the data from string in a curse way             |
 | [Roslyn Helper](src/libraries/ArchiToolkit.RoslynHelper)            | To help you with roslyn coding                        |
+| [Grasshopper](src/libraries/ArchiToolkit.Grasshopper)               | Simplify your Grasshopper development                 |
 
 ## Links
 

@@ -2,7 +2,6 @@
 using ArchiToolkit.Assertions.AssertionItems;
 using ArchiToolkit.Assertions.Assertions;
 using ArchiToolkit.Assertions.Execution;
-using ArchiToolkit.Assertions.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace ArchiToolkit.Assertions.Logging;
@@ -16,7 +15,7 @@ file class LoggerStrategy(AssertionLogOptions options) : IAssertionStrategy
     }
 
     public object? HandleFailure(AssertionScope scope, AssertionType assertionType, AssertionItem assertion,
-        object? tag)
+        object? tag, CallerInfo callerInfo)
     {
         if (scope.Tag is not ILogger logger) return null;
 
@@ -29,10 +28,10 @@ file class LoggerStrategy(AssertionLogOptions options) : IAssertionStrategy
             arguments = arguments.Append(tag);
         }
 
-        if (options.ShowFrame && assertion.StackFrame is { } frame)
+        if (options.ShowCallerInfo)
         {
-            format += "\nStackFrame: {StackFrame}";
-            arguments = arguments.Append(options.StackFrameFormat?.Invoke(frame) ?? frame.GetString());
+            format += "\nCallerInfo: {CallerInfo}";
+            arguments = arguments.Append(options.CallerInfoFormat?.Invoke(callerInfo) ?? callerInfo.ToString());
         }
 
         var eventId = tag is EventId id ? id : 0;
@@ -85,7 +84,7 @@ public static class LoggingExtensions
     /// <param name="args"></param>
     /// <returns></returns>
     public static IDisposable BeginAssertionScope(this ILogger logger, IAssertionStrategy strategy,
-        string? messageFormat  = null,
+        string? messageFormat = null,
         params object?[] args)
     {
         var logScope = logger.BeginScope(messageFormat, args);

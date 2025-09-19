@@ -26,4 +26,9 @@ public class AndConstraint<TValue> : IAndConstraint
 
     /// <inheritdoc />
     public IDictionary<IAssertionStrategy, object>? FailureReturnValues { get; set; }
+
+    /// <summary>
+    /// Get the Value
+    /// </summary>
+    public TValue Value => And.Subject;
 }

@@ -54,7 +54,8 @@ public partial class FormatGenerator : IIncrementalGenerator
         static ITypeSymbol? GetCollectionElementType(ITypeSymbol typeSymbol)
         {
             var iCollectionInterface = typeSymbol.AllInterfaces
-                .FirstOrDefault(i => i.OriginalDefinition.GetName().FullName == "global::System.Collections.Generic.ICollection<T>");
+                .FirstOrDefault(i =>
+                    i.OriginalDefinition.GetName().FullName == "global::System.Collections.Generic.ICollection<T>");
             return iCollectionInterface?.TypeArguments.FirstOrDefault();
         }
     }

@@ -21,7 +21,7 @@ public static class DescriptorExtensions
     {
         return Cache.GetOrAdd(diagnosticType, static type =>
         {
-            var attr = GetAttribute<DescriptorAttribute,DescriptorType>(type);
+            var attr = GetAttribute<DescriptorAttribute, DescriptorType>(type);
             if (attr is null) throw new NullReferenceException();
             return GetDiagnostic(attr.Id, attr.Severity, attr.Category);
         });

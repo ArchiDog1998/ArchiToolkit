@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -27,7 +26,7 @@ namespace NukeBuilder;
     On = [GitHubActionsTrigger.Push],
     ImportSecrets = [nameof(NuGetApiKey), nameof(GithubToken)],
     InvokedTargets = [nameof(PushMain)])]
-partial class Build : NukeBuild
+class Build : NukeBuild
 {
     [Parameter] readonly string GithubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
     [Parameter] readonly string NuGetApiKey = Environment.GetEnvironmentVariable("NUGET_API_KEY");
@@ -58,18 +57,14 @@ partial class Build : NukeBuild
         {
             DotNetTasks.DotNetBuild(s => s
                 .SetProjectFile(Solution)
-                .SetConfiguration(Configuration.Release)
-                .EnableNoRestore());
+                .SetConfiguration(Configuration.Release));
         });
 
     Target Test => d => d
         .DependsOn(Compile)
         .Executes(() =>
         {
-            foreach (var project in Solution.AllProjects.Where(p => p.Name.EndsWith(".Tests")))
-            {
-                TestProject(project);
-            }
+            foreach (var project in Solution.AllProjects.Where(p => p.Name.EndsWith(".Tests"))) TestProject(project);
 
             return;
 
@@ -296,9 +291,7 @@ partial class Build : NukeBuild
             var repository = await client.Repository.Get(Repository.GetGitHubOwner(), Repository.GetGitHubName());
             ReleaseNote.AppendLine(repository.Description);
             if (PushedPackages.Count > 0)
-            {
                 ReleaseNote.AppendLine($"Nuget Packages:\n{string.Join("\n", PushedPackages)}");
-            }
 
             ReleaseNote.Append(PullRequestNote);
             ReleaseNote.Append(IssuesNote);
@@ -312,40 +305,42 @@ partial class Build : NukeBuild
         .DependsOn(GetGitmoji, GetCommits)
         .Executes(() =>
         {
-            var regx = GitmojiRegex();
-
             Dictionary<string, StringBuilder> commitsBuilders = new();
 
             foreach (var commit in Commits)
             {
                 var message = commit.Commit.Message;
 
-                var match = regx.Match(message);
-                if (!match.Success) continue;
-
-                var type = match.Groups[0].Value;
+                var type = GetCommitType(message, out var content);
+                if (string.IsNullOrEmpty(type)) continue;
                 ref var builder = ref CollectionsMarshal.GetValueRefOrAddDefault(commitsBuilders, type, out var exist);
                 if (!exist) builder = new StringBuilder();
-                var content = regx.Replace(message, string.Empty).Split('\n')[0].Trim();
                 if (Contributors.Add(commit))
-                {
                     builder.AppendLine($"1. {content} by @{commit.Author.Login} in {commit.Sha}");
-                }
                 else
-                {
                     builder.AppendLine($"1. {content} in {commit.Sha}");
-                }
             }
 
             if (commitsBuilders.Count == 0) return;
             CommitsNote.AppendLine("## Commits");
             foreach (var pair in commitsBuilders)
             {
-                if (!Gitmojis.TryGetValue(pair.Key, out var gitmoji)) continue;
-                CommitsNote.AppendLine($"### {pair.Key} {gitmoji}");
+                CommitsNote.AppendLine($"### {Gitmojis.FirstOrDefault(i => i.Value == pair.Key).Key} {pair.Key}");
                 CommitsNote.Append(pair.Value);
             }
         });
+
+    private static string GetCommitType(string message, out string content)
+    {
+        foreach (var pair in Gitmojis.Where(pair => message.StartsWith(pair.Key)))
+        {
+            content = message[pair.Key.Length..].Split('\n')[0].Trim();
+            return pair.Value;
+        }
+
+        return content = string.Empty;
+    }
+
 
     private readonly StringBuilder PullRequestNote = new();
 
@@ -358,7 +353,7 @@ partial class Build : NukeBuild
             };
             var pullRequests =
                 await client.PullRequest.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(),
-                    new PullRequestRequest()
+                    new PullRequestRequest
                     {
                         State = ItemStateFilter.Closed
                     });
@@ -369,16 +364,10 @@ partial class Build : NukeBuild
             PullRequestNote.AppendLine("## Pull Requests");
 
             foreach (var pr in mergedPRs)
-            {
                 if (Contributors.Add(pr))
-                {
                     PullRequestNote.AppendLine($"1. {pr.Title} by @{pr.User.Login} in #{pr.Number}");
-                }
                 else
-                {
                     PullRequestNote.AppendLine($"1. {pr.Title} #{pr.Number}");
-                }
-            }
         });
 
     private readonly StringBuilder IssuesNote = new();
@@ -393,10 +382,10 @@ partial class Build : NukeBuild
 
             var issues =
                 await client.Issue.GetAllForRepository(Repository.GetGitHubOwner(), Repository.GetGitHubName(),
-                    new RepositoryIssueRequest()
+                    new RepositoryIssueRequest
                     {
                         Since = LastTagCreatedTime,
-                        State = ItemStateFilter.Closed,
+                        State = ItemStateFilter.Closed
                     });
 
             var closedIssues = issues.Where(i => i.PullRequest is null).ToArray();
@@ -408,20 +397,13 @@ partial class Build : NukeBuild
                 var icon = issue.StateReason?.Value is ItemStateReason.Completed ? "✅" : "🚫";
 
                 if (issue.User is { } user)
-                {
                     IssuesNote.AppendLine($"1. {icon}{issue.Title} by @{user.Login} in #{issue.Number}");
-                }
                 else
-                {
                     IssuesNote.AppendLine($"1. {icon}{issue.Title} #{issue.Number}");
-                }
             }
         });
 
-    private readonly Dictionary<string, string> Gitmojis = [];
-
-    [GeneratedRegex("^:(.*):")]
-    private static partial Regex GitmojiRegex();
+    private static readonly Dictionary<string, string> Gitmojis = [];
 
     Target GetGitmoji => d => d
         .Executes(async () =>
@@ -432,11 +414,13 @@ partial class Build : NukeBuild
             if (jObject["gitmojis"] is not JArray emojis) return;
             foreach (var emoji in emojis)
             {
-                var key = emoji["code"]?.ToString();
                 var description = emoji["description"]?.ToString();
 
-                if (key is null || description is null) continue;
-                Gitmojis[key] = description;
+                if (description is null) continue;
+                if (emoji["emoji"]?.ToString() is { } emojiKey)
+                    Gitmojis[emojiKey] = description;
+                if (emoji["code"]?.ToString() is { } codeKey)
+                    Gitmojis[codeKey] = description;
             }
         });
 

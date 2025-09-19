@@ -1,14 +1,11 @@
-﻿using Microsoft.CodeAnalysis;
-
-namespace ArchiToolkit.RoslynHelper.Names;
+﻿namespace ArchiToolkit.RoslynHelper.Names;
 
 /// <summary>
-///
 /// </summary>
 public interface ITypeParametersName
 {
     /// <summary>
-    /// Has the type parameters.
+    ///     Has the type parameters.
     /// </summary>
     bool HasTypeParameters { get; }
 

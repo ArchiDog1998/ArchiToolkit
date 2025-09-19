@@ -1,13 +1,9 @@
 ﻿using System.Collections;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace ArchiToolkit.Assertions.Utils;
 
-/// <summary>
-///     Some general helpers.
-/// </summary>
-public static class GeneralHelper
+internal static class GeneralHelper
 {
     internal static Match PlaceHolderMatch(this string input, string placeholder)
     {
@@ -64,15 +60,5 @@ public static class GeneralHelper
     internal static int Count(this IEnumerable enumerable)
     {
         return Enumerable.Count(enumerable.Cast<object?>());
-    }
-
-    /// <summary>
-    ///     A better way of showing the stack frame.
-    /// </summary>
-    /// <param name="frame"></param>
-    /// <returns></returns>
-    public static string GetString(this StackFrame frame)
-    {
-        return $"{frame.GetMethod()} in {frame.GetFileName()}:line {frame.GetFileLineNumber()}";
     }
 }

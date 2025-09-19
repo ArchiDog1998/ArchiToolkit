@@ -61,12 +61,7 @@ public class FluentGenerator : IIncrementalGenerator
     private static void Generate(SourceProductionContext context,
         (ImmutableArray<ITypeSymbol> types, Compilation compilation) arg)
     {
-        var staticClasses = GetAllStaticClasses(arg.compilation.GlobalNamespace)
-            .SelectMany(c => c.GetMembers())
-            .OfType<IMethodSymbol>()
-            .Where(m => m is { IsStatic: true, IsExtensionMethod: true, Parameters.Length: > 0 })
-            .GroupBy(m => m.Parameters[0].Type.OriginalDefinition, SymbolEqualityComparer.Default)
-            .ToDictionary(m => m.Key, m => m.ToArray(), SymbolEqualityComparer.Default);
+        var staticClasses = arg.compilation.GetAllExtensionMethods();
 
         foreach (var type in GetTypes(arg.types).ToImmutableHashSet(SymbolEqualityComparer.Default)
                      .OfType<ITypeSymbol>())
@@ -83,25 +78,6 @@ public class FluentGenerator : IIncrementalGenerator
                 if (typeSymbol.IsRefLikeType) continue;
                 if (typeSymbol.ContainingAssembly.Name is "ArchiToolkit.Fluent") continue;
                 yield return typeSymbol;
-            }
-        }
-    }
-
-    private static IEnumerable<INamedTypeSymbol> GetAllStaticClasses(INamespaceSymbol namespaceSymbol)
-    {
-        var staticClasses = namespaceSymbol.GetTypeMembers()
-            .Where(t => t.IsStatic && t.TypeKind == TypeKind.Class);
-
-        foreach (var staticClass in staticClasses)
-        {
-            yield return staticClass;
-        }
-
-        foreach (var nestedNamespace in namespaceSymbol.GetNamespaceMembers())
-        {
-            foreach (var nestedStaticClass in GetAllStaticClasses(nestedNamespace))
-            {
-                yield return nestedStaticClass;
             }
         }
     }
@@ -291,19 +267,13 @@ public class FluentGenerator : IIncrementalGenerator
         {
             var className = method.ContainingType.Name;
             if (className.EndsWith("Extensions"))
-            {
                 className = className.Substring(0, className.Length - "Extensions".Length);
-            }
 
             postFix = "_" + className;
             if (dic.TryGetValue(className, out var count))
-            {
                 postFix += (dic[className] = ++count).ToString();
-            }
             else
-            {
                 dic[className] = 0;
-            }
         }
 
         return MethodDeclaration(GenericName(Identifier("DoResult"))

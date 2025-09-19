@@ -57,5 +57,15 @@ public enum AssertionItemType : byte
     /// <summary>
     ///     Empty
     /// </summary>
-    Empty
+    Empty,
+
+    /// <summary>
+    ///     Valid
+    /// </summary>
+    Valid,
+
+    /// <summary>
+    /// All satisfy
+    /// </summary>
+    AllSatisfy,
 }

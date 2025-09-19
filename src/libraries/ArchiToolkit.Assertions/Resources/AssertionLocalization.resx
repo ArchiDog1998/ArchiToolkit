@@ -115,4 +115,7 @@
     <data name="ContainSingleAssertion" xml:space="preserve">
         <value>The data [{SubjectName}] {AssertionType} {Not}have a single item which is {ExpectedValue}, but there are {MatchedCount} item(s).</value>
     </data>
+    <data name="AllSatisfyAssertion" xml:space="preserve">
+        <value>The data [{SubjectName}] {AssertionType} {Not}all satisfy {Expression}, but the ones at these {Indexes} aren't.</value>
+    </data>
 </root>

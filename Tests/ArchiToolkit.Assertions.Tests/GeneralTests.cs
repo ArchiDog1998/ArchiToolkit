@@ -1,5 +1,4 @@
-﻿using ArchiToolkit.Assertions.Assertions.Extensions;
-using ArchiToolkit.Assertions.Execution;
+﻿using ArchiToolkit.Assertions.Exceptions;
 
 namespace ArchiToolkit.Assertions.Tests;
 
@@ -17,5 +16,16 @@ public class GeneralTests
         //     a.Must();
         //     a.Must().BeAssignableTo<double>("Bad reason.");
         // }
+    }
+
+    [Test]
+    public Task TestMethodScopeHere()
+    {
+        using (new Execution.AssertionScope("Checking"))
+        {
+        }
+
+        Assert.Throws<AssertionException>(() => 1.Must().Be(2));
+        return Task.CompletedTask;
     }
 }

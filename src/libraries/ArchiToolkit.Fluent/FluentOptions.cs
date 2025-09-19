@@ -1,6 +1,6 @@
 ﻿namespace ArchiToolkit.Fluent;
 
 /// <summary>
-/// The options
+///     The options
 /// </summary>
 public record struct FluentOptions(FluentType DefaultType = FluentType.Immediate);

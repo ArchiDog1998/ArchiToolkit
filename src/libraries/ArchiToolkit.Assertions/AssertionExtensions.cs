@@ -26,14 +26,21 @@ public static class AssertionExtensions
     /// </summary>
     /// <param name="value"></param>
     /// <param name="valueName"></param>
+    /// <param name="memberName"></param>
+    /// <param name="filePath"></param>
+    /// <param name="lineNumber"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public static ObjectAssertion<T> Must<T>(this T value,
         [CallerArgumentExpression(nameof(value))]
-        string valueName = "")
+        string valueName = "",
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0)
     {
         ThrowIfInvalid(value);
-        return new ObjectAssertion<T>(value, valueName, AssertionType.Must);
+        return new ObjectAssertion<T>(value, valueName, AssertionType.Must,
+            new CallerInfo(memberName, filePath, lineNumber));
     }
 
     /// <summary>
@@ -41,14 +48,21 @@ public static class AssertionExtensions
     /// </summary>
     /// <param name="value"></param>
     /// <param name="valueName"></param>
+    /// <param name="memberName"></param>
+    /// <param name="filePath"></param>
+    /// <param name="lineNumber"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public static ObjectAssertion<T> Should<T>(this T value,
         [CallerArgumentExpression(nameof(value))]
-        string valueName = "")
+        string valueName = "",
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0)
     {
         ThrowIfInvalid(value);
-        return new ObjectAssertion<T>(value, valueName, AssertionType.Should);
+        return new ObjectAssertion<T>(value, valueName, AssertionType.Should,
+            new CallerInfo(memberName, filePath, lineNumber));
     }
 
     /// <summary>
@@ -56,13 +70,20 @@ public static class AssertionExtensions
     /// </summary>
     /// <param name="value"></param>
     /// <param name="valueName"></param>
+    /// <param name="memberName"></param>
+    /// <param name="filePath"></param>
+    /// <param name="lineNumber"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public static ObjectAssertion<T> Could<T>(this T value,
         [CallerArgumentExpression(nameof(value))]
-        string valueName = "")
+        string valueName = "",
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0)
     {
         ThrowIfInvalid(value);
-        return new ObjectAssertion<T>(value, valueName, AssertionType.Could);
+        return new ObjectAssertion<T>(value, valueName, AssertionType.Could,
+            new CallerInfo(memberName, filePath, lineNumber));
     }
 }

@@ -60,6 +60,15 @@ namespace ArchiToolkit.Assertions.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The data [{SubjectName}] {AssertionType} {Not}all satisfy {Expression}, but the ones at these {Indexes} aren&apos;t..
+        /// </summary>
+        internal static string AllSatisfyAssertion {
+            get {
+                return ResourceManager.GetString("AllSatisfyAssertion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The data [{SubjectName}] {AssertionType} {Not}be assignable to {ExpectedType}, but it is {ValueType}..
         /// </summary>
         internal static string AssignableAssertion {
