@@ -64,7 +64,7 @@
         <value>You can't modify this field here, becasue the mtethod is const</value>
     </data>
   <data name="PC0002MessageFormat" xml:space="preserve">
-        <value>You can't modify the field [{0}] here, becasue the mtethod is const</value>
+        <value>You can't modify the field {[0}] here, becasue the mtethod is const</value>
     </data>
   <data name="PC0003Description" xml:space="preserve">
         <value>You can't modify this property here, becasue the method is const</value>
