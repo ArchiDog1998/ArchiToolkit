@@ -496,7 +496,8 @@ class Build : NukeBuild
             
             GitTasks.Git($"add Directory.Build.props");
             GitTasks.Git($"commit -m \"🔖 {version} Released!\"");
-            GitTasks.Git($"push origin HEAD");
+            var branch = GitTasks.Git("rev-parse --abbrev-ref HEAD").First().Text.Trim();
+            GitTasks.Git($"push origin {branch}:{branch}");
         });
     
     private static Version ChangeVersionTag(AbsolutePath propsFile, Func<Version, Version> changer)
