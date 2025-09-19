@@ -9,14 +9,17 @@
 #
 #     - To trigger manual generation invoke:
 #
-#         nuke --generate-configuration GitHubActions_test --host GitHubActions
+#         nuke --generate-configuration GitHubActions_bump_version --host GitHubActions
 #
 # </auto-generated>
 # ------------------------------------------------------------------------------
 
-name: test
+name: bump_version
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   windows-latest:
@@ -31,5 +34,5 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
-      - name: 'Run: Test'
-        run: ./build.cmd Test
+      - name: 'Run: BumpVersion'
+        run: ./build.cmd BumpVersion
