@@ -490,13 +490,13 @@ class Build : NukeBuild
 
                     return new Version(today.Year, today.Month, today.Day, 0);
                 }) is not { } version) return;
-        
+            
             GitTasks.Git($"config user.name \"nuke-bot\"");
             GitTasks.Git($"config user.email \"nuke-bot@users.noreply.github.com\"");
             
             GitTasks.Git($"add Directory.Build.props");
             GitTasks.Git($"commit -m \"🔖 {version} Released!\"");
-            var branch = GitTasks.Git("rev-parse --abbrev-ref HEAD").First().Text.Trim();
+            const string branch = "development";
             GitTasks.Git($"push origin {branch}:{branch}");
         });
     
