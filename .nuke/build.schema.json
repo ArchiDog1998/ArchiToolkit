@@ -35,8 +35,8 @@
         "GetIssuesNote",
         "GetLastTag",
         "GetPullRequestNote",
-        "PushMain",
         "PushNugetPackages",
+        "Release",
         "Restore",
         "Test",
         "UploadGitHubReleasePackages"

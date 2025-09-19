@@ -22,10 +22,14 @@ using Project = Nuke.Common.ProjectModel.Project;
 
 namespace NukeBuilder;
 
-[GitHubActions("nuke", GitHubActionsImage.WindowsLatest,
+[GitHubActions("test", GitHubActionsImage.WindowsLatest,
     On = [GitHubActionsTrigger.Push],
     ImportSecrets = [nameof(NuGetApiKey), nameof(GithubToken)],
-    InvokedTargets = [nameof(PushMain)])]
+    InvokedTargets = [nameof(Test)])]
+[GitHubActions("release", GitHubActionsImage.WindowsLatest,
+    OnPushBranches = ["main"],
+    ImportSecrets = [nameof(NuGetApiKey), nameof(GithubToken)],
+    InvokedTargets = [nameof(Release)])]
 class Build : NukeBuild
 {
     [Parameter] readonly string GithubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
@@ -79,12 +83,9 @@ class Build : NukeBuild
             }
         });
 
-    Target PushMain => d => d
+    Target Release => d => d
         .DependsOn(PushNugetPackages, CreateGitHubRelease, UploadGitHubReleasePackages)
-        .OnlyWhenStatic(HasNotRelease)
-        .Executes(() =>
-        {
-        });
+        .OnlyWhenStatic(HasNotRelease);
 
     private bool HasNotRelease()
     {
