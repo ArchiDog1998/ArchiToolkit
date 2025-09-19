@@ -25,7 +25,7 @@ using Project = Nuke.Common.ProjectModel.Project;
 namespace NukeBuilder;
 
 [GitHubActions("bump_version", GitHubActionsImage.WindowsLatest,
-    OnPushBranches = ["main"],
+    OnPullRequestBranches = ["main"],
     InvokedTargets = [nameof(BumpVersion)])]
 [GitHubActions("test", GitHubActionsImage.WindowsLatest,
     On = [GitHubActionsTrigger.Push],
