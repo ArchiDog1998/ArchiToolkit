@@ -491,6 +491,9 @@ class Build : NukeBuild
                     return new Version(today.Year, today.Month, today.Day, 0);
                 }) is not { } version) return;
         
+            GitTasks.Git($"config user.name \"nuke-bot\"");
+            GitTasks.Git($"config user.email \"nuke-bot@users.noreply.github.com\"");
+            
             GitTasks.Git($"add Directory.Build.props");
             GitTasks.Git($"commit -m \"🔖 {version} Released!\"");
             GitTasks.Git($"push origin HEAD");
