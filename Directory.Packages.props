@@ -19,6 +19,7 @@
     <PackageVersion Include="TUnit" Version="0.14.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.2" />
     <PackageVersion Include="Seq.Extensions.Logging" Version="8.0.0" />
+    <PackageVersion Include="UnitsNet" Version="5.75.0" />
     <PackageVersion Include="WPF-UI" Version="4.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

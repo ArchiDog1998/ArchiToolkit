@@ -28,7 +28,7 @@ namespace NukeBuilder;
     OnPullRequestBranches = ["main"],
     InvokedTargets = [nameof(BumpVersion)])]
 [GitHubActions("test", GitHubActionsImage.WindowsLatest,
-    On = [GitHubActionsTrigger.Push],
+    OnPushBranchesIgnore = ["main"],
     InvokedTargets = [nameof(Test)])]
 [GitHubActions("release", GitHubActionsImage.WindowsLatest,
     OnPushBranches = ["main"],
@@ -480,6 +480,9 @@ class Build : NukeBuild
     Target BumpVersion => d => d
         .Executes(() =>
         {
+            GitTasks.Git($"fetch origin");
+            GitTasks.Git($"checkout -B development origin/development");
+            
             if (GitTasks.Git("log -1 --pretty=%B").First().Text.Trim().StartsWith("🔖")) return;
 
             var propsFile = RootDirectory / "Directory.Build.props";
@@ -495,9 +498,7 @@ class Build : NukeBuild
 
             GitTasks.Git($"config user.name \"nuke-bot\"");
             GitTasks.Git($"config user.email \"nuke-bot@users.noreply.github.com\"");
-
-            GitTasks.Git($"fetch origin");
-            GitTasks.Git($"checkout -B development origin/development");
+            
             GitTasks.Git($"add Directory.Build.props");
             GitTasks.Git($"commit -m \"🔖 {version} Released!\"");
             GitTasks.Git($"push origin development");

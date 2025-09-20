@@ -16,7 +16,10 @@
 
 name: test
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - main
 
 jobs:
   windows-latest:
