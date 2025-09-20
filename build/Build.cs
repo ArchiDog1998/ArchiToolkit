@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,6 +16,7 @@ using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitHub;
 using Octokit;
 using Serilog;
@@ -22,10 +24,16 @@ using Project = Nuke.Common.ProjectModel.Project;
 
 namespace NukeBuilder;
 
-[GitHubActions("nuke", GitHubActionsImage.WindowsLatest,
-    On = [GitHubActionsTrigger.Push],
+[GitHubActions("bump_version", GitHubActionsImage.WindowsLatest,
+    OnPullRequestBranches = ["main"],
+    InvokedTargets = [nameof(BumpVersion)])]
+[GitHubActions("test", GitHubActionsImage.WindowsLatest,
+    OnPushBranchesIgnore = ["main"],
+    InvokedTargets = [nameof(Test)])]
+[GitHubActions("release", GitHubActionsImage.WindowsLatest,
+    OnPushBranches = ["main"],
     ImportSecrets = [nameof(NuGetApiKey), nameof(GithubToken)],
-    InvokedTargets = [nameof(PushMain)])]
+    InvokedTargets = [nameof(Release)])]
 class Build : NukeBuild
 {
     [Parameter] readonly string GithubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
@@ -79,12 +87,9 @@ class Build : NukeBuild
             }
         });
 
-    Target PushMain => d => d
+    Target Release => d => d
         .DependsOn(PushNugetPackages, CreateGitHubRelease, UploadGitHubReleasePackages)
-        .OnlyWhenStatic(HasNotRelease)
-        .Executes(() =>
-        {
-        });
+        .OnlyWhenStatic(HasNotRelease);
 
     private bool HasNotRelease()
     {
@@ -467,6 +472,49 @@ class Build : NukeBuild
                 //Ignore
             }
         });
+
+    #endregion
+
+    #region Bump Version
+
+    Target BumpVersion => d => d
+        .Executes(() =>
+        {
+            GitTasks.Git($"fetch origin");
+            GitTasks.Git($"checkout -B development origin/development");
+            
+            if (GitTasks.Git("log -1 --pretty=%B").First().Text.Trim().StartsWith("🔖")) return;
+
+            var propsFile = RootDirectory / "Directory.Build.props";
+
+            if (ChangeVersionTag(propsFile, v =>
+                {
+                    var today = DateTime.Today;
+                    if (v.Major == today.Year && v.Minor == today.Month && v.Build == today.Day)
+                        return new Version(today.Year, today.Month, today.Day, Math.Max(0, v.Revision) + 1);
+
+                    return new Version(today.Year, today.Month, today.Day, 0);
+                }) is not { } version) return;
+
+            GitTasks.Git($"config user.name \"nuke-bot\"");
+            GitTasks.Git($"config user.email \"nuke-bot@users.noreply.github.com\"");
+            
+            GitTasks.Git($"add Directory.Build.props");
+            GitTasks.Git($"commit -m \"🔖 {version} Released!\"");
+            GitTasks.Git($"push origin development");
+        });
+
+    private static Version ChangeVersionTag(AbsolutePath propsFile, Func<Version, Version> changer)
+    {
+        var doc = XDocument.Load(propsFile);
+        var versionElement = doc.Descendants("Version").FirstOrDefault();
+        if (versionElement is null) return null;
+        if (!Version.TryParse(versionElement.Value, out var version)) return null;
+        var newVersion = changer(version);
+        versionElement.Value = newVersion.ToString();
+        doc.Save(propsFile);
+        return newVersion;
+    }
 
     #endregion
 }

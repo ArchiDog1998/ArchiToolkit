@@ -5,6 +5,7 @@ using ArchiToolkit.Assertions.Assertions.Extensions;
 using ArchiToolkit.Assertions.Execution;
 using ArchiToolkit.Assertions.FluentValidation;
 using ArchiToolkit.Console;using ArchiToolkit.Console.Wrapper;
+using ArchiToolkit.QuantExtensions;
 using ArchiToolkit.ValidResults;
 
 ValidResultsConfig.AddValidator(new DoubleValidator(), (methodName, argumentName) =>

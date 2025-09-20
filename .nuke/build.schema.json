@@ -24,6 +24,7 @@
     "ExecutableTarget": {
       "type": "string",
       "enum": [
+        "BumpVersion",
         "Clean",
         "Compile",
         "CopyNuGetPackages",
@@ -35,8 +36,8 @@
         "GetIssuesNote",
         "GetLastTag",
         "GetPullRequestNote",
-        "PushMain",
         "PushNugetPackages",
+        "Release",
         "Restore",
         "Test",
         "UploadGitHubReleasePackages"
