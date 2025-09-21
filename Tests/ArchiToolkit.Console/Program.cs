@@ -4,9 +4,15 @@ using ArchiToolkit.Assertions;
 using ArchiToolkit.Assertions.Assertions.Extensions;
 using ArchiToolkit.Assertions.Execution;
 using ArchiToolkit.Assertions.FluentValidation;
-using ArchiToolkit.Console;using ArchiToolkit.Console.Wrapper;
+using ArchiToolkit.Console;
+using ArchiToolkit.Console.Wrapper;
 using ArchiToolkit.QuantExtensions;
 using ArchiToolkit.ValidResults;
+
+Console.WriteLine(90.Degrees.NormalizePositive());
+Console.WriteLine(360.Degrees.NormalizePositive());
+Console.WriteLine((-Math.Tau.Radians).NormalizePositive());
+return;
 
 ValidResultsConfig.AddValidator(new DoubleValidator(), (methodName, argumentName) =>
 {
