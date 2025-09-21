@@ -45,6 +45,32 @@ public static class UnitsExtensions
 
         /// <inheritdoc cref="Math.Cos"/>
         public double Cos => Math.Cos(angle.Radians);
+
+        /// <summary>
+        /// Normalizes an angle into the range [min, min + 2π).
+        /// Useful when you want to wrap angles into a custom range starting at <paramref name="min"/>.
+        /// </summary>
+        /// <param name="min"></param>
+        /// <returns></returns>
+        public Angle NormalizeToRange(Angle min) => angle.NormalizePositive() + min;
+
+        /// <summary>
+        /// Normalizes an angle into the range [-π, π).
+        /// The result is symmetric around zero, useful for applications where both clockwise and counter-clockwise directions are needed.
+        /// </summary>
+        public Angle NormalizeSymmetric() => angle.NormalizePositive() - Angle.FromRevolutions(0.5);
+
+        /// <summary>
+        /// Normalizes an angle into the range [0, 2π).
+        /// The result is always a positive angle, useful for applications requiring unsigned angles.
+        /// </summary>
+        /// <returns></returns>
+        public Angle NormalizePositive()
+        {
+            var revolution = Angle.FromRevolutions(1);
+            var round = (angle / revolution).FloorToInt();
+            return angle - round * revolution;
+        }
     }
 
     /// <inheritdoc cref="Math.Atan"/>
